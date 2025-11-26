@@ -1,0 +1,801 @@
+/* =========================================
+   RESET & BASE
+========================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, "SF Pro Text", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 10% 20%, #4facfe 0, transparent 35%),
+    radial-gradient(circle at 80% 0, #43e97b 0, transparent 40%),
+    radial-gradient(circle at 0 80%, #fa709a 0, transparent 40%),
+    #0f172a;
+  color: #e5e7eb;
+  direction: ltr;          /* كل النص إنكليزي */
+  overflow: hidden;        /* ماكو page scroll – كل بطاقة هي اللي تستقبل السحب */
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 14px 24px;
+  text-align: left;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.96),
+    rgba(15, 23, 42, 0.8)
+  );
+  border-bottom: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.9);
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
+  color: #e5f3ff;
+}
+
+/* =========================================
+   MAIN 3-CARD LAYOUT
+========================================= */
+
+.app-layout {
+  max-width: 1200px;
+  margin: 10px auto 16px;
+  padding: 0 16px 12px;
+  display: grid;
+  grid-template-columns: 1.05fr 1.2fr 1.05fr; /* LEFT (DDX) – CENTER (Reason) – RIGHT (History) */
+  grid-template-areas: "ddx reason history";
+  gap: 16px;
+  height: calc(100vh - 64px); /* تقريبا ارتفاع الهيدر */
+}
+
+/* Cards placement */
+.card-ddx {
+  grid-area: ddx;
+}
+.card-reason {
+  grid-area: reason;
+}
+.card-history {
+  grid-area: history;
+}
+
+/* =========================================
+   CARD BASE STYLE – GLASSMORPHIC
+========================================= */
+
+.card {
+  position: relative;
+  border-radius: 22px;
+  padding: 14px 16px 14px;
+  background: radial-gradient(
+      circle at top left,
+      rgba(148, 163, 184, 0.18),
+      rgba(15, 23, 42, 0.85)
+    );
+  border: 1px solid rgba(226, 232, 240, 0.2);
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.85),
+    0 0 0 1px rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* soft glow */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.26), transparent 55%),
+    radial-gradient(circle at 100% 0, rgba(34, 197, 94, 0.16), transparent 55%),
+    radial-gradient(circle at 0 100%, rgba(244, 114, 182, 0.2), transparent 55%);
+  opacity: 0.28;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(248, 250, 252, 0.7);
+  box-shadow:
+    0 24px 55px rgba(15, 23, 42, 1),
+    0 0 0 1px rgba(148, 163, 184, 0.7);
+}
+
+/* =========================================
+   CARD HEADER
+========================================= */
+
+.card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.card-header::before {
+  content: "";
+  width: 6px;
+  height: 24px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #38bdf8, #22c55e);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+}
+
+.card-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e5f3ff;
+}
+
+/* History card header special */
+.history-header {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.history-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e5f3ff;
+}
+
+.history-subtitle {
+  font-size: 0.85rem;
+  color: #cbd5f5;
+}
+
+/* =========================================
+   CARD BODY
+========================================= */
+
+.card-body {
+  flex: 1;
+  min-height: 0;       /* مهم حتى يشتغل overflow داخل البطاقة */
+  overflow-y: auto;
+  padding-top: 4px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* ====== HISTORY (right card) ====== */
+
+.history-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.question-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.question-text {
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: #f9fafb;
+}
+
+/* options */
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* single/multi choice labels */
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.95),
+    rgba(30, 64, 175, 0.9)
+  );
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.option-row:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.98),
+    rgba(59, 130, 246, 0.95)
+  );
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.8);
+  transform: translateY(-2px);
+}
+
+.option-row input[type="radio"],
+.option-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #38bdf8;
+  cursor: pointer;
+}
+
+.option-label {
+  font-size: 0.9rem;
+  color: #e5e7eb;
+}
+
+/* numeric / text inputs */
+.options-container input[type="number"],
+.options-container input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.85);
+  color: #e5e7eb;
+  outline: none;
+  font-size: 0.9rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.options-container input[type="number"]:focus,
+.options-container input[type="text"]:focus {
+  border-color: #38bdf8;
+  background: rgba(15, 23, 42, 0.98);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.9);
+}
+
+/* ====== NAV FOOTER (history card) ====== */
+
+.card-footer.nav-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+}
+
+.nav-footer button {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: radial-gradient(
+      circle at top left,
+      rgba(56, 189, 248, 0.35),
+      rgba(15, 23, 42, 0.98)
+    );
+  color: #f9fafb;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.2s ease;
+}
+
+.nav-footer button:hover {
+  transform: translateY(-2px);
+  border-color: #e5f3ff;
+  background: radial-gradient(
+      circle at top left,
+      rgba(96, 165, 250, 0.7),
+      rgba(15, 23, 42, 0.98)
+    );
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 1);
+}
+
+.nav-footer button:active {
+  transform: scale(0.97);
+}
+
+/* =========================================
+   CLINICAL REASONING (center card)
+========================================= */
+
+.reason-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reason-question {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e5f3ff;
+  margin-bottom: 4px;
+}
+
+.reason-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* كل نقطة فيها سبب + أمراض */
+.reason-item {
+  font-size: 0.86rem;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.reason-text {
+  display: block;
+  color: #60a5fa;  /* أزرق ناعم */
+}
+
+.reason-diseases {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.82rem;
+  color: #fb923c;  /* برتقالي مميز */
+}
+
+/* =========================================
+   DDX (left card)
+========================================= */
+
+.ddx-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* رسالة فارغة */
+.dd-empty {
+  font-size: 0.86rem;
+  color: #9ca3af;
+}
+
+/* بطاقة جهاز واحد (Cardiac, Pulmonary, ...) */
+.dd-group-card {
+  border-radius: 16px;
+  padding: 8px 10px 10px;
+  margin-bottom: 6px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.9);
+  display: flex;
+  flex-direction: column;
+}
+
+/* عنوان الجهاز */
+.dd-group-header {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* جسم البطاقة: الأمراض + features مع scroll داخلي */
+.dd-group-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 190px;      /* حتى يصير scroll داخل البطاقة */
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* مرض واحد داخل جهاز */
+.dd-disease {
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+/* اسم المرض + السكور في سطر */
+.dd-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+/* اسم المرض */
+.dd-name {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+/* السكور */
+.dd-score {
+  font-size: 0.8rem;
+}
+
+/* features كنقاط */
+.dd-features {
+  list-style: disc;
+  padding-left: 14px;
+  margin-top: 2px;
+}
+
+.dd-features li {
+  font-size: 0.78rem;
+  color: #93c5fd; /* أزرق فاتح ناعم */
+}
+/* ألوان ناعمة لكل جهاز (pastel) */
+
+.dd-group-card--cardiac {
+  border-color: rgba(248, 113, 113, 0.7);
+  background: radial-gradient(circle at top left,
+    rgba(248, 113, 113, 0.28),
+    rgba(15, 23, 42, 0.96)
+  );
+}
+.dd-group-card--cardiac .dd-group-header {
+  color: #fecaca;
+}
+.dd-group-card--cardiac .dd-name {
+  color: #fecaca;
+}
+.dd-group-card--cardiac .dd-score {
+  color: #fca5a5;
+}
+
+/* Pulmonary – أزرق ناعم */
+.dd-group-card--pulmonary {
+  border-color: rgba(96, 165, 250, 0.7);
+  background: radial-gradient(circle at top left,
+    rgba(59, 130, 246, 0.25),
+    rgba(15, 23, 42, 0.96)
+  );
+}
+.dd-group-card--pulmonary .dd-group-header {
+  color: #bfdbfe;
+}
+.dd-group-card--pulmonary .dd-name {
+  color: #bfdbfe;
+}
+.dd-group-card--pulmonary .dd-score {
+  color: #93c5fd;
+}
+
+/* Pleura – سماوي */
+.dd-group-card--pleural {
+  border-color: rgba(45, 212, 191, 0.7);
+  background: radial-gradient(circle at top left,
+    rgba(45, 212, 191, 0.28),
+    rgba(15, 23, 42, 0.96)
+  );
+}
+.dd-group-card--pleural .dd-group-header {
+  color: #a5f3fc;
+}
+.dd-group-card--pleural .dd-name {
+  color: #a5f3fc;
+}
+.dd-group-card--pleural .dd-score {
+  color: #67e8f9;
+}
+
+/* Chest wall – بنفسجي ناعم */
+.dd-group-card--chestWall {
+  border-color: rgba(192, 132, 252, 0.7);
+  background: radial-gradient(circle at top left,
+    rgba(168, 85, 247, 0.25),
+    rgba(15, 23, 42, 0.96)
+  );
+}
+.dd-group-card--chestWall .dd-group-header {
+  color: #e9d5ff;
+}
+.dd-group-card--chestWall .dd-name {
+  color: #e9d5ff;
+}
+.dd-group-card--chestWall .dd-score {
+  color: #d8b4fe;
+}
+
+/* Oesophagus – برتقالي ناعم */
+.dd-group-card--oesophagus {
+  border-color: rgba(251, 146, 60, 0.8);
+  background: radial-gradient(circle at top left,
+    rgba(251, 146, 60, 0.25),
+    rgba(15, 23, 42, 0.96)
+  );
+}
+.dd-group-card--oesophagus .dd-group-header {
+  color: #fed7aa;
+}
+.dd-group-card--oesophagus .dd-name {
+  color: #fed7aa;
+}
+.dd-group-card--oesophagus .dd-score {
+  color: #fdba74;
+}
+
+/* Aorta – أخضر ناعم */
+.dd-group-card--aorta {
+  border-color: rgba(74, 222, 128, 0.7);
+  background: radial-gradient(circle at top left,
+    rgba(74, 222, 128, 0.25),
+    rgba(15, 23, 42, 0.96)
+  );
+}
+.dd-group-card--aorta .dd-group-header {
+  color: #bbf7d0;
+}
+.dd-group-card--aorta .dd-name {
+  color: #bbf7d0;
+}
+.dd-group-card--aorta .dd-score {
+  color: #86efac;
+}
+
+/* Neurologic – رمادي فضي */
+.dd-group-card--neuro {
+  border-color: rgba(148, 163, 184, 0.9);
+  background: radial-gradient(circle at top left,
+    rgba(148, 163, 184, 0.35),
+    rgba(15, 23, 42, 0.96)
+  );
+}
+.dd-group-card--neuro .dd-group-header {
+  color: #e5e7eb;
+}
+.dd-group-card--neuro .dd-name {
+  color: #e5e7eb;
+}
+.dd-group-card--neuro .dd-score {
+  color: #d1d5db;
+}
+
+/* Peripheral vascular – بني/ذهبي ناعم */
+.dd-group-card--peripheral {
+  border-color: rgba(251, 191, 36, 0.8);
+  background: radial-gradient(circle at top left,
+    rgba(234, 179, 8, 0.25),
+    rgba(15, 23, 42, 0.96)
+  );
+}
+.dd-group-card--peripheral .dd-group-header {
+  color: #facc15;
+}
+.dd-group-card--peripheral .dd-name {
+  color: #fef3c7;
+}
+.dd-group-card--peripheral .dd-score {
+  color: #fde68a;
+}
+
+/* Hematologic – أصفر فاتح */
+.dd-group-card--hema {
+  border-color: rgba(250, 204, 21, 0.85);
+  background: radial-gradient(circle at top left,
+    rgba(250, 204, 21, 0.25),
+    rgba(15, 23, 42, 0.96)
+  );
+}
+.dd-group-card--hema .dd-group-header {
+  color: #fef3c7;
+}
+.dd-group-card--hema .dd-name {
+  color: #fef3c7;
+}
+.dd-group-card--hema .dd-score {
+  color: #facc15;
+}
+
+/* =========================================
+   RESPONSIVE (iPad + mobile)
+========================================= */
+
+/* 1) موبايل صغير: عمود واحد + scroll للصفحة */
+@media (max-width: 700px) {
+  body {
+    overflow: auto;
+  }
+
+  .app-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "history"
+      "reason"
+      "ddx";
+    height: auto;
+  }
+}
+
+/* 2) iPad Portrait: عمودين (History + Reason) و DDX صف كامل تحتهم */
+@media (max-width: 1200px) and (orientation: portrait) {
+  body {
+    overflow: hidden; /* السحب داخل البطاقات فقط */
+  }
+
+  .app-layout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "history reason"
+      "ddx ddx";
+    height: calc(100vh - 64px);
+    grid-auto-rows: minmax(0, 1fr);
+  }
+}
+
+/* Desktop / iPad Landscape: ثلاثة أعمدة (الإعداد الأصلي) */
+/* (ما يحتاج نغيره لأنه موجود فوق بشكل افتراضي) */
+.dd-toggle {
+  background: none;
+  border: none;
+  color: #93c5fd;
+  cursor: pointer;
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+}
+
+.hidden {
+  display: none;
+}
+.question-meta {
+  display: none;
+}
+.history-subtitle {
+  color: #ffd8a8; /* أي لون يعجبج */
+}
+.question-text {
+  color: #f0f0ff; /* لون أفتح */
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.nav-footer {
+  padding-bottom: 20px !important;
+  padding-top: 10px;
+}
+.app-layout {
+  padding-bottom: 20px;
+}
+.hidden {
+  display: none;
+}
+.hidden {
+  display: none;
+}
+/* =========================================
+   CASE PRESENTATION MODAL
+========================================= */
+
+.case-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.case-modal.hidden {
+  display: none;
+}
+
+.case-modal-dialog {
+  width: min(900px, 95vw);
+  max-height: 80vh;
+  background: rgba(15, 23, 42, 0.98);
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.case-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.case-modal-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e5f3ff;
+}
+
+.case-modal-close {
+  background: none;
+  border: none;
+  color: #e5e7eb;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.case-modal-body {
+  padding: 12px 16px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.case-section {
+  margin-bottom: 10px;
+}
+
+.case-section-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #facc15; /* عنوان مميز */
+  margin-bottom: 4px;
+}
+
+.case-section-line {
+  font-size: 0.86rem;
+  color: #e5e7eb;
+  margin-left: 10px;
+}
+
+.case-modal-footer {
+  padding: 10px 16px 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.case-modal-footer button {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: radial-gradient(
+    circle at top left,
+    rgba(56, 189, 248, 0.35),
+    rgba(15, 23, 42, 0.98)
+  );
+  color: #f9fafb;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.case-modal-footer button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.9);
+}
