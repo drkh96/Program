@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>برنامج أخذ تاريخ حالة ألم الصدر</title>
+  <title>Chest Pain History-Taking Program</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <header class="app-header">
-    <h1>برنامج أخذ تاريخ حالة ألم الصدر</h1>
+    <h1>Chest Pain History-Taking Program</h1>
   </header>
 
   <main class="app-layout">
     <section class="card card-history">
       <header class="card-header history-header">
-        <div class="history-title">تاريخ الحالة</div>
-        <div class="history-subtitle" id="sectionLabel">البيانات الشخصية</div>
+        <div class="history-title">History Taking</div>
+        <div class="history-subtitle" id="sectionLabel">Personal Data</div>
       </header>
 
       <div class="card-body history-body">
@@ -25,25 +25,25 @@
         </div>
 
         <div class="question-text" id="questionText">
-          السؤال سيظهر هنا...
+          Question will appear here…
         </div>
 
         <div id="optionsContainer" class="options-container"></div>
       </div>
 
       <footer class="card-footer nav-footer">
-        <button id="btnPrev" type="button">السابق</button>
-        <button id="btnNext" type="button">التالي</button>
+        <button id="btnPrev" type="button">Previous</button>
+        <button id="btnNext" type="button">Next</button>
       </footer>
     </section>
 
     <section class="card card-reason">
       <header class="card-header">
-        <h2>المنطق السريري</h2>
+        <h2>Clinical Reasoning</h2>
       </header>
       <div class="card-body reason-body">
         <div class="reason-question" id="reasonQuestion">
-          اختر خياراً لعرض المنطق السريري.
+          Select an option to see clinical reasoning.
         </div>
         <ul class="reason-list" id="reasonList"></ul>
       </div>
@@ -51,11 +51,11 @@
 
     <section class="card card-ddx">
       <header class="card-header">
-        <h2>التشخيص التفريقي الحالي</h2>
+        <h2>Current Differential Diagnosis</h2>
       </header>
       <div class="card-body ddx-body" id="ddxContainer">
         <p class="dd-empty">
-          لم يتم اقتراح تشخيص بعد. أجب على المزيد من الأسئلة لبناء التشخيص التفريقي.
+          No diagnosis suggested yet. Start answering questions to build the differential diagnosis.
         </p>
       </div>
     </section>
@@ -64,17 +64,17 @@
   <div id="caseModal" class="case-modal hidden">
     <div class="case-modal-dialog">
       <header class="case-modal-header">
-        <h2>عرض الحالة (سيناريو سردي)</h2>
+        <h2>Case Presentation (Narrative Summary)</h2>
         <button id="caseModalClose" type="button" class="case-modal-close">&times;</button>
       </header>
 
-      <div class="case-modal-body">
+      <div class="case-modal-body" dir="ltr">
         <div id="caseModalContent"></div>
       </div>
 
       <footer class="case-modal-footer">
-        <button id="caseModalCopy" type="button">نسخ النص</button>
-        <button id="caseModalClose2" type="button">إغلاق</button>
+        <button id="caseModalCopy" type="button">Copy Text</button>
+        <button id="caseModalClose2" type="button">Close</button>
       </footer>
     </div>
   </div>
