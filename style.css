@@ -16,15 +16,15 @@ body {
 }
 
 body {
-  font-family: system-ui, -apple-system, "SF Pro Text", "Segoe UI", sans-serif;
+  font-family: 'Droid Arabic Kufi', 'Tahoma', sans-serif; /* خط عربي */
   background:
     radial-gradient(circle at 10% 20%, #4facfe 0, transparent 35%),
     radial-gradient(circle at 80% 0, #43e97b 0, transparent 40%),
     radial-gradient(circle at 0 80%, #fa709a 0, transparent 40%),
     #0f172a;
   color: #e5e7eb;
-  direction: ltr;          /* كل النص إنكليزي */
-  overflow: hidden;        /* ماكو page scroll – كل بطاقة هي اللي تستقبل السحب */
+  direction: rtl; /* الاتجاه من اليمين لليسار */
+  overflow: hidden;
 }
 
 /* =========================================
@@ -36,7 +36,7 @@ body {
   top: 0;
   z-index: 20;
   padding: 14px 24px;
-  text-align: left;
+  text-align: right; /* محاذاة لليمين */
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   background: linear-gradient(
@@ -63,21 +63,22 @@ body {
   margin: 10px auto 16px;
   padding: 0 16px 12px;
   display: grid;
-  grid-template-columns: 1.05fr 1.2fr 1.05fr; /* LEFT (DDX) – CENTER (Reason) – RIGHT (History) */
-  grid-template-areas: "ddx reason history";
+  /* تغيير ترتيب الأعمدة لدعم RTL */
+  grid-template-columns: 1.05fr 1.2fr 1.05fr; 
+  grid-template-areas: "history reason ddx"; 
   gap: 16px;
-  height: calc(100vh - 64px); /* تقريبا ارتفاع الهيدر */
+  height: calc(100vh - 64px); 
 }
 
-/* Cards placement */
-.card-ddx {
-  grid-area: ddx;
+/* Cards placement (معكوسة الآن) */
+.card-history {
+  grid-area: history; /* يمين */
 }
 .card-reason {
-  grid-area: reason;
+  grid-area: reason; /* وسط */
 }
-.card-history {
-  grid-area: history;
+.card-ddx {
+  grid-area: ddx; /* يسار */
 }
 
 /* =========================================
@@ -89,7 +90,7 @@ body {
   border-radius: 22px;
   padding: 14px 16px 14px;
   background: radial-gradient(
-      circle at top left,
+      circle at top right, /* تعديل الاتجاه */
       rgba(148, 163, 184, 0.18),
       rgba(15, 23, 42, 0.85)
     );
@@ -114,9 +115,9 @@ body {
   position: absolute;
   inset: -40%;
   background:
-    radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.26), transparent 55%),
-    radial-gradient(circle at 100% 0, rgba(34, 197, 94, 0.16), transparent 55%),
-    radial-gradient(circle at 0 100%, rgba(244, 114, 182, 0.2), transparent 55%);
+    radial-gradient(circle at 100% 0, rgba(59, 130, 246, 0.26), transparent 55%), /* تعديل الاتجاه */
+    radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.16), transparent 55%),     /* تعديل الاتجاه */
+    radial-gradient(circle at 100% 100%, rgba(244, 114, 182, 0.2), transparent 55%); /* تعديل الاتجاه */
   opacity: 0.28;
   pointer-events: none;
   z-index: -1;
@@ -148,18 +149,16 @@ body {
   border-radius: 999px;
   background: linear-gradient(180deg, #38bdf8, #22c55e);
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+  order: 2; /* وضع العصا في اليسار */
 }
-
 .card-header h2 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #e5f3ff;
+  order: 1; /* وضع العنوان في اليمين */
 }
 
 /* History card header special */
 .history-header {
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end; /* محاذاة لليمين */
   gap: 2px;
 }
 
@@ -171,7 +170,7 @@ body {
 
 .history-subtitle {
   font-size: 0.85rem;
-  color: #cbd5f5;
+  color: #ffd8a8;
 }
 
 /* =========================================
@@ -180,7 +179,7 @@ body {
 
 .card-body {
   flex: 1;
-  min-height: 0;       /* مهم حتى يشتغل overflow داخل البطاقة */
+  min-height: 0;
   overflow-y: auto;
   padding-top: 4px;
   font-size: 0.9rem;
@@ -196,16 +195,14 @@ body {
 }
 
 .question-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: #9ca3af;
+  display: none; /* إخفاؤها والاكتفاء بالـ subtitle */
 }
 
 .question-text {
-  font-size: 0.96rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  color: #f9fafb;
+  color: #f0f0ff;
+  text-align: right;
 }
 
 /* options */
@@ -257,6 +254,8 @@ body {
 .option-label {
   font-size: 0.9rem;
   color: #e5e7eb;
+  flex-grow: 1;
+  text-align: right;
 }
 
 /* numeric / text inputs */
@@ -270,6 +269,7 @@ body {
   color: #e5e7eb;
   outline: none;
   font-size: 0.9rem;
+  text-align: right; /* المحاذاة لليمين */
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
@@ -290,6 +290,7 @@ body {
   justify-content: space-between;
   gap: 10px;
   padding-top: 10px;
+  padding-bottom: 20px !important;
 }
 
 .nav-footer button {
@@ -299,7 +300,7 @@ body {
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.7);
   background: radial-gradient(
-      circle at top left,
+      circle at top right, /* تعديل الاتجاه */
       rgba(56, 189, 248, 0.35),
       rgba(15, 23, 42, 0.98)
     );
@@ -320,7 +321,7 @@ body {
   transform: translateY(-2px);
   border-color: #e5f3ff;
   background: radial-gradient(
-      circle at top left,
+      circle at top right, /* تعديل الاتجاه */
       rgba(96, 165, 250, 0.7),
       rgba(15, 23, 42, 0.98)
     );
@@ -346,6 +347,7 @@ body {
   font-weight: 600;
   color: #e5f3ff;
   margin-bottom: 4px;
+  text-align: right;
 }
 
 .reason-list {
@@ -362,6 +364,7 @@ body {
   border-radius: 10px;
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.4);
+  text-align: right;
 }
 
 .reason-text {
@@ -374,6 +377,7 @@ body {
   margin-top: 2px;
   font-size: 0.82rem;
   color: #fb923c;  /* برتقالي مميز */
+  direction: ltr; /* الإنجليزية تكون LTR */
 }
 
 /* =========================================
@@ -384,12 +388,14 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  direction: rtl; /* DDx باللغة العربية */
 }
 
 /* رسالة فارغة */
 .dd-empty {
   font-size: 0.86rem;
   color: #9ca3af;
+  text-align: right;
 }
 
 /* بطاقة جهاز واحد (Cardiac, Pulmonary, ...) */
@@ -409,6 +415,7 @@ body {
   font-size: 0.9rem;
   font-weight: 700;
   margin-bottom: 4px;
+  text-align: right;
 }
 
 /* جسم البطاقة: الأمراض + features مع scroll داخلي */
@@ -416,9 +423,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 190px;      /* حتى يصير scroll داخل البطاقة */
+  max-height: 190px;
   overflow-y: auto;
-  padding-right: 2px;
+  padding-left: 2px; /* تعديل الـ padding بسبب RTL */
 }
 
 /* مرض واحد داخل جهاز */
@@ -427,6 +434,7 @@ body {
   border-radius: 10px;
   background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgba(148, 163, 184, 0.5);
+  text-align: right;
 }
 
 /* اسم المرض + السكور في سطر */
@@ -449,218 +457,29 @@ body {
   font-size: 0.8rem;
 }
 
+/* wells score */
+.dd-wells-score {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #ffc400; /* لون أصفر/ذهبي للخطر */
+  margin-top: 2px;
+  padding: 2px 0;
+}
+
 /* features كنقاط */
 .dd-features {
   list-style: disc;
-  padding-left: 14px;
+  padding-right: 18px; /* تعديل الـ padding بسبب RTL */
   margin-top: 2px;
+  text-align: right;
 }
 
 .dd-features li {
   font-size: 0.78rem;
   color: #93c5fd; /* أزرق فاتح ناعم */
 }
-/* ألوان ناعمة لكل جهاز (pastel) */
 
-.dd-group-card--cardiac {
-  border-color: rgba(248, 113, 113, 0.7);
-  background: radial-gradient(circle at top left,
-    rgba(248, 113, 113, 0.28),
-    rgba(15, 23, 42, 0.96)
-  );
-}
-.dd-group-card--cardiac .dd-group-header {
-  color: #fecaca;
-}
-.dd-group-card--cardiac .dd-name {
-  color: #fecaca;
-}
-.dd-group-card--cardiac .dd-score {
-  color: #fca5a5;
-}
-
-/* Pulmonary – أزرق ناعم */
-.dd-group-card--pulmonary {
-  border-color: rgba(96, 165, 250, 0.7);
-  background: radial-gradient(circle at top left,
-    rgba(59, 130, 246, 0.25),
-    rgba(15, 23, 42, 0.96)
-  );
-}
-.dd-group-card--pulmonary .dd-group-header {
-  color: #bfdbfe;
-}
-.dd-group-card--pulmonary .dd-name {
-  color: #bfdbfe;
-}
-.dd-group-card--pulmonary .dd-score {
-  color: #93c5fd;
-}
-
-/* Pleura – سماوي */
-.dd-group-card--pleural {
-  border-color: rgba(45, 212, 191, 0.7);
-  background: radial-gradient(circle at top left,
-    rgba(45, 212, 191, 0.28),
-    rgba(15, 23, 42, 0.96)
-  );
-}
-.dd-group-card--pleural .dd-group-header {
-  color: #a5f3fc;
-}
-.dd-group-card--pleural .dd-name {
-  color: #a5f3fc;
-}
-.dd-group-card--pleural .dd-score {
-  color: #67e8f9;
-}
-
-/* Chest wall – بنفسجي ناعم */
-.dd-group-card--chestWall {
-  border-color: rgba(192, 132, 252, 0.7);
-  background: radial-gradient(circle at top left,
-    rgba(168, 85, 247, 0.25),
-    rgba(15, 23, 42, 0.96)
-  );
-}
-.dd-group-card--chestWall .dd-group-header {
-  color: #e9d5ff;
-}
-.dd-group-card--chestWall .dd-name {
-  color: #e9d5ff;
-}
-.dd-group-card--chestWall .dd-score {
-  color: #d8b4fe;
-}
-
-/* Oesophagus – برتقالي ناعم */
-.dd-group-card--oesophagus {
-  border-color: rgba(251, 146, 60, 0.8);
-  background: radial-gradient(circle at top left,
-    rgba(251, 146, 60, 0.25),
-    rgba(15, 23, 42, 0.96)
-  );
-}
-.dd-group-card--oesophagus .dd-group-header {
-  color: #fed7aa;
-}
-.dd-group-card--oesophagus .dd-name {
-  color: #fed7aa;
-}
-.dd-group-card--oesophagus .dd-score {
-  color: #fdba74;
-}
-
-/* Aorta – أخضر ناعم */
-.dd-group-card--aorta {
-  border-color: rgba(74, 222, 128, 0.7);
-  background: radial-gradient(circle at top left,
-    rgba(74, 222, 128, 0.25),
-    rgba(15, 23, 42, 0.96)
-  );
-}
-.dd-group-card--aorta .dd-group-header {
-  color: #bbf7d0;
-}
-.dd-group-card--aorta .dd-name {
-  color: #bbf7d0;
-}
-.dd-group-card--aorta .dd-score {
-  color: #86efac;
-}
-
-/* Neurologic – رمادي فضي */
-.dd-group-card--neuro {
-  border-color: rgba(148, 163, 184, 0.9);
-  background: radial-gradient(circle at top left,
-    rgba(148, 163, 184, 0.35),
-    rgba(15, 23, 42, 0.96)
-  );
-}
-.dd-group-card--neuro .dd-group-header {
-  color: #e5e7eb;
-}
-.dd-group-card--neuro .dd-name {
-  color: #e5e7eb;
-}
-.dd-group-card--neuro .dd-score {
-  color: #d1d5db;
-}
-
-/* Peripheral vascular – بني/ذهبي ناعم */
-.dd-group-card--peripheral {
-  border-color: rgba(251, 191, 36, 0.8);
-  background: radial-gradient(circle at top left,
-    rgba(234, 179, 8, 0.25),
-    rgba(15, 23, 42, 0.96)
-  );
-}
-.dd-group-card--peripheral .dd-group-header {
-  color: #facc15;
-}
-.dd-group-card--peripheral .dd-name {
-  color: #fef3c7;
-}
-.dd-group-card--peripheral .dd-score {
-  color: #fde68a;
-}
-
-/* Hematologic – أصفر فاتح */
-.dd-group-card--hema {
-  border-color: rgba(250, 204, 21, 0.85);
-  background: radial-gradient(circle at top left,
-    rgba(250, 204, 21, 0.25),
-    rgba(15, 23, 42, 0.96)
-  );
-}
-.dd-group-card--hema .dd-group-header {
-  color: #fef3c7;
-}
-.dd-group-card--hema .dd-name {
-  color: #fef3c7;
-}
-.dd-group-card--hema .dd-score {
-  color: #facc15;
-}
-
-/* =========================================
-   RESPONSIVE (iPad + mobile)
-========================================= */
-
-/* 1) موبايل صغير: عمود واحد + scroll للصفحة */
-@media (max-width: 700px) {
-  body {
-    overflow: auto;
-  }
-
-  .app-layout {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "history"
-      "reason"
-      "ddx";
-    height: auto;
-  }
-}
-
-/* 2) iPad Portrait: عمودين (History + Reason) و DDX صف كامل تحتهم */
-@media (max-width: 1200px) and (orientation: portrait) {
-  body {
-    overflow: hidden; /* السحب داخل البطاقات فقط */
-  }
-
-  .app-layout {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "history reason"
-      "ddx ddx";
-    height: calc(100vh - 64px);
-    grid-auto-rows: minmax(0, 1fr);
-  }
-}
-
-/* Desktop / iPad Landscape: ثلاثة أعمدة (الإعداد الأصلي) */
-/* (ما يحتاج نغيره لأنه موجود فوق بشكل افتراضي) */
+/* زر إظهار الميزات */
 .dd-toggle {
   background: none;
   border: none;
@@ -668,35 +487,52 @@ body {
   cursor: pointer;
   font-size: 0.75rem;
   margin-bottom: 4px;
+  text-align: right;
+  padding: 0;
 }
 
-.hidden {
-  display: none;
+/* NEW: Key Next Steps/Missing Features */
+.dd-missing-box {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px dashed rgba(255, 255, 255, 0.5); /* خط منقَّط */
+  background: rgba(30, 64, 175, 0.7); /* خلفية داكنة مميزة */
+  text-align: right;
 }
-.question-meta {
-  display: none;
+
+.dd-missing-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffcc99; /* لون مميز للعناوين الإرشادية */
+  margin-bottom: 4px;
 }
-.history-subtitle {
-  color: #ffd8a8; /* أي لون يعجبج */
+
+.dd-missing-list {
+  list-style: none;
+  padding-right: 0;
 }
-.question-text {
-  color: #f0f0ff; /* لون أفتح */
-  font-weight: 600;
-  font-size: 1.05rem;
+
+.dd-missing-list li {
+  font-size: 0.78rem;
+  color: #e5f3ff;
+  line-height: 1.4;
+  padding-right: 1em; /* مسافة للرمز */
+  text-indent: -1em;  /* إزاحة النص للوراء للرمز */
 }
-.nav-footer {
-  padding-bottom: 20px !important;
-  padding-top: 10px;
+
+.dd-missing-list li::before {
+  content: "•";
+  color: #facc15; /* نقطة صفراء تميز القائمة */
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-right: 0.1em;
+  margin-left: -1em; /* تعديل الازاحة لـ RTL */
 }
-.app-layout {
-  padding-bottom: 20px;
-}
-.hidden {
-  display: none;
-}
-.hidden {
-  display: none;
-}
+
+/* ... (ألوان الأجهزة تظل كما هي) ... */
+
 /* =========================================
    CASE PRESENTATION MODAL
 ========================================= */
@@ -733,6 +569,7 @@ body {
   align-items: center;
   padding: 10px 16px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+  direction: rtl; /* لـ RTL */
 }
 
 .case-modal-header h2 {
@@ -754,10 +591,12 @@ body {
   overflow-y: auto;
   font-size: 0.9rem;
   line-height: 1.6;
+  direction: rtl; /* لـ RTL */
 }
 
 .case-section {
   margin-bottom: 10px;
+  text-align: right;
 }
 
 .case-section-title {
@@ -770,13 +609,14 @@ body {
 .case-section-line {
   font-size: 0.86rem;
   color: #e5e7eb;
-  margin-left: 10px;
+  margin-right: 10px; /* تعديل الاتجاه */
+  margin-left: 0;
 }
 
 .case-modal-footer {
   padding: 10px 16px 12px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start; /* تعديل الاتجاه */
   gap: 8px;
   border-top: 1px solid rgba(148, 163, 184, 0.4);
 }
@@ -786,7 +626,7 @@ body {
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.7);
   background: radial-gradient(
-    circle at top left,
+    circle at top right,
     rgba(56, 189, 248, 0.35),
     rgba(15, 23, 42, 0.98)
   );

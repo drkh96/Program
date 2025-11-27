@@ -1,6 +1,6 @@
 // ========================================
 // chest-ui.js
-// Connect ChestEngine with the 3-card UI
+// Connect ChestEngine with the 3-card UI (Arabic/RTL)
 // ========================================
 
 "use strict";
@@ -52,7 +52,7 @@ function renderDDx() {
   if (!groups.length) {
     const p = document.createElement("p");
     p.className = "dd-empty";
-    p.textContent = "No diagnosis suggested yet. Answer more questions to build the differential diagnosis.";
+    p.textContent = "لم يتم اقتراح تشخيص بعد. أجب على المزيد من الأسئلة لبناء التشخيص التفريقي.";
     elDDxContainer.appendChild(p);
     return;
   }
@@ -84,38 +84,75 @@ function renderDDx() {
 
       const scoreSpan = document.createElement("span");
       scoreSpan.className = "dd-score";
-      scoreSpan.textContent = `Score: ${item.score}`;
+      scoreSpan.textContent = `النقاط: ${item.score}`;
 
       dHeader.appendChild(nameSpan);
       dHeader.appendChild(scoreSpan);
       diseaseDiv.appendChild(dHeader);
-if (item.features && item.features.length) {
+      
+      // 💡 NEW: Display Wells Score if available
+      if (item.wells) {
+          const wellsDiv = document.createElement("div");
+          wellsDiv.className = "dd-wells-score";
+          wellsDiv.textContent = `Wells Score: ${item.wells.split(' (')[0]} - خطر ${item.wells.includes('High') ? 'مرتفع' : item.wells.includes('Moderate') ? 'متوسط' : 'منخفض'}`;
+          diseaseDiv.appendChild(wellsDiv);
+          
+          if (item.wells.includes('High Risk')) {
+              scoreSpan.style.color = '#f87171'; // أحمر لتنبيه الخطر
+          }
+      }
 
-  // القائمة (مخفية بالبداية)
-  const ul = document.createElement("ul");
-  ul.className = "dd-features hidden";
+      // 💡 LOGIC FOR POSITIVE FEATURES (EXISTING)
+      if (item.features && item.features.length) {
+        // القائمة (مخفية بالبداية)
+        const ul = document.createElement("ul");
+        ul.className = "dd-features hidden";
 
-  item.features.forEach((f) => {
-    const li = document.createElement("li");
-    li.textContent = f;
-    ul.appendChild(li);
-  });
+        item.features.forEach((f) => {
+          const li = document.createElement("li");
+          li.textContent = f;
+          ul.appendChild(li);
+        });
 
-  // زر Show/Hide
-  const toggleBtn = document.createElement("button");
-  toggleBtn.className = "dd-toggle";
-  toggleBtn.textContent = "Show features";
+        // زر Show/Hide
+        const toggleBtn = document.createElement("button");
+        toggleBtn.className = "dd-toggle";
+        toggleBtn.textContent = "إظهار الميزات الإيجابية";
 
-  toggleBtn.addEventListener("click", () => {
-    ul.classList.toggle("hidden");
-    toggleBtn.textContent = ul.classList.contains("hidden")
-      ? "Show features"
-      : "Hide features";
-  });
+        toggleBtn.addEventListener("click", () => {
+          ul.classList.toggle("hidden");
+          toggleBtn.textContent = ul.classList.contains("hidden")
+            ? "إظهار الميزات الإيجابية"
+            : "إخفاء الميزات الإيجابية";
+        });
 
-  diseaseDiv.appendChild(toggleBtn);
-  diseaseDiv.appendChild(ul);
-}
+        diseaseDiv.appendChild(toggleBtn);
+        diseaseDiv.appendChild(ul);
+      }
+      
+      // 💡 NEW LOGIC: Display Missing/Key findings
+      if (item.missing && item.missing.length) {
+        const missingDiv = document.createElement("div");
+        missingDiv.className = "dd-missing-box";
+        
+        const missingHeader = document.createElement("div");
+        missingHeader.className = "dd-missing-header";
+        missingHeader.textContent = "الخطوات الرئيسية التالية:";
+        missingDiv.appendChild(missingHeader);
+
+        const missingUl = document.createElement("ul");
+        missingUl.className = "dd-missing-list";
+
+        item.missing.forEach((m) => {
+          const li = document.createElement("li");
+          li.textContent = m;
+          missingUl.appendChild(li);
+        });
+
+        missingDiv.appendChild(missingUl);
+        diseaseDiv.appendChild(missingDiv);
+      }
+
 
       body.appendChild(diseaseDiv);
     });
@@ -124,133 +161,148 @@ if (item.features && item.features.length) {
     elDDxContainer.appendChild(groupDiv);
   });
 }
-  // ===== Helpers to build Case Presentation =====
-
-  function getStepAnswerLine(step) {
-    const t = engine.getStepType(step);
-    const val = engine.state.answers[step.id];
-
-    if (val === undefined || val === null || val === "" ||
-        (Array.isArray(val) && val.length === 0)) {
-      return null;
-    }
-
-    // نص / رقم
-    if (t === "text" || t === "numeric") {
-      return `${step.question} ${val}`;
-    }
-
-    if (!step.options) return null;
-
-    // خيار واحد
-    if (t === "single") {
-      const opt = step.options[val];
-      if (!opt) return null;
-      return `${step.question} ${opt.label || val}`;
-    }
-
-    // عدة خيارات
-    if (t === "multi") {
-      const labels = (Array.isArray(val) ? val : [])
-        .map((key) => step.options[key])
-        .filter(Boolean)
-        .map((opt) => opt.label);
-      if (!labels.length) return null;
-      return `${step.question} ${labels.join(", ")}`;
-    }
-
-    return null;
-  }
-
-  function collectSectionLines(sectionId) {
-    const lines = [];
+  // ===== Helpers to build Case Presentation (NARRATIVE SUMMARY) =====
+  
+  function getSectionNarrative(sectionId) {
+    const answers = {};
     engine.steps
       .filter((s) => s.sectionId === sectionId)
       .forEach((step) => {
-        const line = getStepAnswerLine(step);
-        if (line) {
-          lines.push("• " + line);
+        const val = engine.state.answers[step.id];
+
+        if (val === undefined || val === null || val === "" ||
+            (Array.isArray(val) && val.length === 0)) {
+          return;
+        }
+
+        const t = engine.getStepType(step);
+        
+        if (t === "single" && step.options && step.options[val]) {
+           answers[step.id] = step.options[val].label;
+        } else if (t === "multi" && step.options) {
+           answers[step.id] = (Array.isArray(val) ? val : [])
+              .map((key) => step.options[key])
+              .filter(Boolean)
+              .map((opt) => opt.label)
+              .join("، ");
+        } else {
+           answers[step.id] = val;
         }
       });
-    return lines;
+      return answers;
   }
 
   function buildCasePresentation() {
     const parts = [];
+    let textSummary = "";
+    
+    const personal = getSectionNarrative("personal");
+    const cc = getSectionNarrative("cc");
+    const hpi = getSectionNarrative("hpi");
+    const ros = getSectionNarrative("ros");
+    const pmh = getSectionNarrative("pmh");
+    const psh = getSectionNarrative("psh");
+    const dh = getSectionNarrative("dh");
+    const fh = getSectionNarrative("fh");
+    const sh = getSectionNarrative("sh");
 
-    // 1) Chief complaint & duration
-    const ccLines = collectSectionLines("cc");
-    if (ccLines.length) {
-      parts.push({
-        title: "Chief complaint and duration",
-        lines: ccLines
-      });
+    // 1) PATIENT DEMOGRAPHICS (Personal data)
+    if (Object.keys(personal).length > 0) {
+      let line = "";
+      if (personal.name && personal.name !== "المريض") line += `المريض **${personal.name}**`;
+      else line += `المريض`;
+      
+      const age = personal.ageGroup || "عمر غير معلوم";
+      const sex = personal.sex ? personal.sex.toLowerCase().split(' ')[0] : "جنس غير معلوم";
+
+      line += ` هو **${sex}** يبلغ من العمر **${age}** سنة ويشتكي من ألم صدري.`;
+      
+      parts.push({ title: "البيانات الشخصية", lines: [line] });
     }
 
-    // 2) HPI
-    const hpiLines = collectSectionLines("hpi");
-    if (hpiLines.length) {
-      parts.push({
-        title: "History of present illness",
-        lines: hpiLines
-      });
+    // 2) CHIEF COMPLAINT (CC)
+    if (cc.mainSymptom || cc.ccDuration) {
+      let line = "الشكوى الرئيسية هي **" + (cc.mainSymptom || "ألم صدري") + "**";
+      if (cc.ccDuration) {
+        line += "، وهي موجودة منذ **" + cc.ccDuration + "**.";
+      } else {
+        line += ".";
+      }
+      parts.push({ title: "الشكوى الرئيسية ومدة المرض", lines: [line] });
     }
 
-    // 3) ROS
-    const rosLines = collectSectionLines("ros");
-    if (rosLines.length) {
-      parts.push({
-        title: "Review of systems",
-        lines: rosLines
-      });
+    // 3) HISTORY OF PRESENT ILLNESS (HPI)
+    if (Object.keys(hpi).length > 0) {
+        let lines = [];
+        
+        // Onset and Site
+        let hpiLine1 = "بدأ الألم **" + (hpi.onset || "تدريجياً") + "**";
+        hpiLine1 += "، ويقع بشكل رئيسي في **" + (hpi.site || "خلف القص مركزياً") + "**.";
+        lines.push(hpiLine1);
+
+        // Character and Radiation
+        let hpiLine2 = "وصف الألم هو **" + (hpi.character || "ضيق/ضغط") + "**";
+        if (hpi.radiation && !hpi.radiation.includes("لا يوجد")) {
+            hpiLine2 += "، مع إشعاع **" + hpi.radiation + "**.";
+        } else {
+            hpiLine2 += "، و**لا يوجد إشعاع محدد** له.";
+        }
+        lines.push(hpiLine2);
+
+        // Modifying Factors
+        let hpiLine3 = "يزداد الألم سوءاً عادةً **مع " + (hpi.aggravating || "الجهد") + "**";
+        hpiLine3 += "، ويخف **بـ " + (hpi.relief || "لا شيء مهم") + "**.";
+        lines.push(hpiLine3);
+        
+        // Severity and Course
+        let hpiLine4 = "كل نوبة تستمر **" + (hpi.episodeDuration || "5-20 دقيقة") + "**.";
+        if (hpi.severity) {
+            hpiLine4 += ` شدة الألم مقدرة بـ **${hpi.severity}/10**`;
+        }
+        hpiLine4 += `، ومسار الألم العام هو **${hpi.course || "ثابت"}**.`
+        lines.push(hpiLine4);
+
+        // Associated Symptoms
+        if (hpi.associated) {
+             lines.push(`الأعراض المرافقة تشمل: **${hpi.associated}**.`);
+        }
+        
+        parts.push({ title: "تاريخ المرض الحالي (HPI)", lines: lines });
+    }
+    
+    // 4) REVIEW OF SYSTEMS (ROS)
+    if (Object.keys(ros).length > 0) {
+        let lines = [];
+        if (ros.rosCVS) lines.push(`**القلبي الوعائي:** ${ros.rosCVS}`);
+        if (ros.rosResp) lines.push(`**التنفسي:** ${ros.rosResp}`);
+        if (ros.rosGIT) lines.push(`**الهضمي:** ${ros.rosGIT}`);
+        if (ros.rosCNS) lines.push(`**الجهاز العصبي:** ${ros.rosCNS}`);
+        if (ros.rosLM) lines.push(`**الحركي/الوعائي المحيطي:** ${ros.rosLM}`);
+        if (ros.rosHema) lines.push(`**الدموي:** ${ros.rosHema}`);
+        
+        if (lines.length > 0) {
+             parts.push({ title: "مراجعة الأجهزة (ROS)", lines: lines });
+        }
+    }
+    
+    // 5) PMH, PSH, DH, FH, SH (As lists)
+    if (pmh.pmhChronic) {
+      parts.push({ title: "التاريخ المرضي السابق (PMH)", lines: [`تاريخ إيجابي لـ: **${pmh.pmhChronic}**`] });
+    }
+    if (psh.pshOps) {
+      parts.push({ title: "التاريخ الجراحي السابق (PSH)", lines: [`أُجريت له: **${psh.pshOps}**`] });
+    }
+    if (dh.drugHistory) {
+      parts.push({ title: "تاريخ الأدوية (DH)", lines: [`يتناول حالياً: **${dh.drugHistory}**`] });
+    }
+    if (fh.familyHistory) {
+      parts.push({ title: "التاريخ العائلي (FH)", lines: [`تاريخ عائلي ذو صلة بـ: **${fh.familyHistory}**`] });
+    }
+    if (sh.socialHistory) {
+      parts.push({ title: "التاريخ الاجتماعي (SH)", lines: [`عوامل نمط الحياة تشمل: **${sh.socialHistory}**`] });
     }
 
-    // 4) PMH
-    const pmhLines = collectSectionLines("pmh");
-    if (pmhLines.length) {
-      parts.push({
-        title: "Past medical history",
-        lines: pmhLines
-      });
-    }
-
-    // 5) PSH
-    const pshLines = collectSectionLines("psh");
-    if (pshLines.length) {
-      parts.push({
-        title: "Past surgical history",
-        lines: pshLines
-      });
-    }
-
-    // 6) Drug history
-    const dhLines = collectSectionLines("dh");
-    if (dhLines.length) {
-      parts.push({
-        title: "Drug history",
-        lines: dhLines
-      });
-    }
-
-    // 7) Family history
-    const fhLines = collectSectionLines("fh");
-    if (fhLines.length) {
-      parts.push({
-        title: "Family history",
-        lines: fhLines
-      });
-    }
-
-    // 8) Social history
-    const shLines = collectSectionLines("sh");
-    if (shLines.length) {
-      parts.push({
-        title: "Social history",
-        lines: shLines
-      });
-    }
-
-    // 9) Probable diagnosis
+    // 6) Probable diagnosis
     const groups = engine.getDDxGrouped();
     const allDx = [];
     groups.forEach((g) => {
@@ -263,47 +315,60 @@ if (item.features && item.features.length) {
       const others = allDx.slice(1, 4).map((dx) => dx.label);
       const dxLines = [];
       dxLines.push(
-        `Most likely diagnosis: ${main.label} (score ${main.score}).`
+        `التشخيص الأكثر ترجيحاً: **${main.label}** (النقاط: ${main.score}).`
       );
       if (others.length) {
         dxLines.push(
-          `Other possible diagnoses: ${others.join(", ")}.`
+          `تشخيصات أخرى في التشخيص التفريقي: **${others.join("، ")}**.`
         );
       }
+      
+      if (main.wells) {
+          dxLines.push(`**Wells Score** للاشتباه بالانصمام الرئوي: ${main.wells.split(' (')[0]} (خطر ${main.wells.includes('High') ? 'مرتفع' : main.wells.includes('Moderate') ? 'متوسط' : 'منخفض'}).`);
+      }
+
 
       parts.push({
-        title: "Probable diagnosis",
+        title: "ملخص التشخيص التفريقي (DDx)",
         lines: dxLines
       });
     }
 
     // تحويل إلى HTML + نص خام (لـ copy)
     let html = "";
-    let text = "";
+    let rawText = "";
 
     if (!parts.length) {
-      html = "<p>No sufficient answers yet to build a case presentation.</p>";
-      text = "No sufficient answers yet to build a case presentation.";
-      return { html, text };
+      html = "<p>لا توجد إجابات كافية لبناء عرض الحالة بعد.</p>";
+      rawText = "لا توجد إجابات كافية لبناء عرض الحالة بعد.";
+      return { html, text: rawText };
     }
 
     parts.forEach((p) => {
       html += `<div class="case-section">`;
       html += `<div class="case-section-title">${p.title}</div>`;
+      
+      rawText += `${p.title}:\n`;
+
       p.lines.forEach((ln) => {
-        html += `<p class="case-section-line">${ln}</p>`;
+        // تحويل النص الغامق **...** إلى HTML
+        const formattedLine = ln
+          .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+          .replace(/^•\s*/, '');
+          
+        html += `<p class="case-section-line">${formattedLine}</p>`;
+        
+        // للنص الخام (raw text)، نحذف علامات الـ Markdown ونضيف -
+        rawText += `- ${ln.replace(/\*\*/g, '').replace(/^•\s*/, '')}\n`;
       });
       html += `</div>`;
 
-      text += `${p.title}:\n`;
-      text += p.lines
-        .map((ln) => ln.replace(/^•\s*/, "- "))
-        .join("\n");
-      text += "\n\n";
+      rawText += "\n";
     });
 
-    return { html, text };
+    return { html, text: rawText };
   }
+
 
   function openCaseModal() {
     if (!elCaseModal || !elCaseContent) return;
@@ -336,12 +401,10 @@ if (item.features && item.features.length) {
   if (elCaseCopy) {
     elCaseCopy.addEventListener("click", async () => {
       await navigator.clipboard.writeText(lastCaseText);
-      alert("Case presentation copied to clipboard!");
+      alert("تم نسخ عرض الحالة إلى الحافظة!");
     });
   }
-  // render options for current step
-// =============== NEW CLINICAL REASONING FUNCTION ===============
-// هذه الدالة مسؤولة عن(عرض ال clinical reasoning)
+  
 function renderClinicalReasoning(step) {
   const val = engine.state.answers[step.id];
   const reasons = engine.getReasoningFor(step, val);
@@ -349,11 +412,11 @@ function renderClinicalReasoning(step) {
   elReasonList.innerHTML = "";
 
   if (!reasons.length) {
-    elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
+    elReasonQuestion.textContent = "اختر خياراً لعرض المنطق السريري.";
     return;
   }
 
-  elReasonQuestion.textContent = "Clinical reasoning:";
+  elReasonQuestion.textContent = "المنطق السريري:";
 
   reasons.forEach((r) => {
     const li = document.createElement("li");
@@ -365,6 +428,7 @@ function renderClinicalReasoning(step) {
 
     const dis = document.createElement("span");
     dis.className = "reason-diseases";
+    // يتم عرض الأسماء الإنجليزية هنا للحفاظ على المصطلحات الدقيقة
     dis.textContent = r.diseases
   .map(d => engine.pretty[d] || d)
   .join(", ");
@@ -386,9 +450,9 @@ function renderReasoning(step) {
     const input = document.createElement("input");
     input.type = "number";
     input.min = "0";
-    input.max = "10";
+    input.max = "100"; 
     input.value = val !== undefined ? val : "";
-    input.placeholder = "0–10";
+    input.placeholder = step.id === "severity" ? "0–10" : "العمر بالسنوات"; 
 
     input.addEventListener("input", () => {
       engine.setAnswer(step.id, input.value);
@@ -405,10 +469,13 @@ function renderReasoning(step) {
     const input = document.createElement("input");
     input.type = "text";
     input.value = val || "";
-    input.placeholder = "Type your answer";
+    input.placeholder = "أدخل إجابتك هنا...";
 
     input.addEventListener("input", () => {
       engine.setAnswer(step.id, input.value);
+      if (step.getDxFromText) {
+         renderDDx();
+      }
       renderClinicalReasoning(step);
     });
 
@@ -447,7 +514,6 @@ function renderReasoning(step) {
         engine.setAnswer(step.id, key);
       }
       renderDDx();
-      renderReasoning(step);
       renderClinicalReasoning(step);
     });
 
@@ -457,8 +523,6 @@ function renderReasoning(step) {
 
     row.appendChild(input);
     row.appendChild(span);
-
- //============================================
 
     elOptions.appendChild(row);
   });
@@ -472,7 +536,7 @@ function renderCurrentStep() {
 
   // labels
   elSectionLabel.textContent = step.sectionLabel || "";
-  elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
+  elStepCounter.textContent = `الخطوة ${prog.current} من ${prog.total}`;
 
   const totalInSection = engine.steps.filter(
     (s) => s.sectionId === step.sectionId
@@ -483,27 +547,27 @@ function renderCurrentStep() {
       .findIndex((s) => s.id === step.id) + 1;
 
   elSectionStepCtr.textContent =
-    `${step.sectionLabel} – Question ${indexInSection}/${totalInSection}`;
+    `${step.sectionLabel} – السؤال ${indexInSection}/${totalInSection}`;
 
-  // ✅ الصحيح
   elQuestionText.textContent = step.question || "";
-  renderReasoning(step);      // <-- هذه الدالة ترسم الخيارات فعلياً
-renderClinicalReasoning(step);
+  renderReasoning(step);      
+  renderClinicalReasoning(step);
 
-    const isFirst = (engine.state.currentIndex === 0);
+  const isFirst = (engine.state.currentIndex === 0);
   const isLast  = (engine.state.currentIndex >= engine.steps.length - 1);
 
   elBtnPrev.disabled = isFirst;
   elBtnNext.disabled = false;
-  elBtnNext.textContent = isLast ? "Case presentation" : "Next";
+  elBtnNext.textContent = isLast ? "عرض الحالة" : "التالي";
 }
 
   // ---------- Button handlers ----------
 
-    elBtnNext.addEventListener("click", () => {
+       elBtnNext.addEventListener("click", () => {
+    renderDDx(); 
+    
     const isLast = (engine.state.currentIndex >= engine.steps.length - 1);
     if (isLast) {
-      // افتح الـ case presentation popup
       openCaseModal();
     } else {
       engine.nextStep();
@@ -511,6 +575,7 @@ renderClinicalReasoning(step);
       renderClinicalReasoning(engine.getCurrentStep());
     }
   });
+
   elBtnPrev.addEventListener("click", () => {
     engine.prevStep();
     renderCurrentStep();
@@ -521,5 +586,5 @@ renderClinicalReasoning(step);
 
   renderCurrentStep();
   renderDDx();
-  renderClinicalReasoning(engine.getCurrentStep());   // ✔️ ضروري
+  renderClinicalReasoning(engine.getCurrentStep()); 
 });

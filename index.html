@@ -1,49 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>History Taking Program</title>
+  <title>برنامج أخذ تاريخ حالة ألم الصدر</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- Top glass header -->
   <header class="app-header">
-    <h1>Chest Pain History-Taking Program</h1>
+    <h1>برنامج أخذ تاريخ حالة ألم الصدر</h1>
   </header>
 
-  <!-- Main 3-card layout -->
   <main class="app-layout">
-    <!-- LEFT: Differential Diagnosis -->
-    <section class="card card-ddx">
-      <header class="card-header">
-        <h2>Current Differential Diagnosis</h2>
-      </header>
-      <div class="card-body ddx-body" id="ddxContainer">
-        <p class="dd-empty">
-          No diagnosis suggested yet. Start answering questions to build the differential diagnosis.
-        </p>
-      </div>
-    </section>
-
-    <!-- CENTER: Clinical Reasoning -->
-    <section class="card card-reason">
-      <header class="card-header">
-        <h2>Clinical Reasoning</h2>
-      </header>
-      <div class="card-body reason-body">
-        <div class="reason-question" id="reasonQuestion">
-          Select an option to see the clinical reasoning here.
-        </div>
-        <ul class="reason-list" id="reasonList"></ul>
-      </div>
-    </section>
-
-    <!-- RIGHT: History Taking -->
     <section class="card card-history">
       <header class="card-header history-header">
-        <div class="history-title">History Taking</div>
-        <div class="history-subtitle" id="sectionLabel">Personal data</div>
+        <div class="history-title">تاريخ الحالة</div>
+        <div class="history-subtitle" id="sectionLabel">البيانات الشخصية</div>
       </header>
 
       <div class="card-body history-body">
@@ -53,25 +25,46 @@
         </div>
 
         <div class="question-text" id="questionText">
-          Question will appear here…
+          السؤال سيظهر هنا...
         </div>
 
         <div id="optionsContainer" class="options-container"></div>
       </div>
 
       <footer class="card-footer nav-footer">
-        <button id="btnPrev" type="button">Previous</button>
-        <button id="btnNext" type="button">Next</button>
+        <button id="btnPrev" type="button">السابق</button>
+        <button id="btnNext" type="button">التالي</button>
       </footer>
+    </section>
+
+    <section class="card card-reason">
+      <header class="card-header">
+        <h2>المنطق السريري</h2>
+      </header>
+      <div class="card-body reason-body">
+        <div class="reason-question" id="reasonQuestion">
+          اختر خياراً لعرض المنطق السريري.
+        </div>
+        <ul class="reason-list" id="reasonList"></ul>
+      </div>
+    </section>
+
+    <section class="card card-ddx">
+      <header class="card-header">
+        <h2>التشخيص التفريقي الحالي</h2>
+      </header>
+      <div class="card-body ddx-body" id="ddxContainer">
+        <p class="dd-empty">
+          لم يتم اقتراح تشخيص بعد. أجب على المزيد من الأسئلة لبناء التشخيص التفريقي.
+        </p>
+      </div>
     </section>
   </main>
 
-  <!-- Scripts (order is important) -->
-    <!-- Case Presentation Modal -->
   <div id="caseModal" class="case-modal hidden">
     <div class="case-modal-dialog">
       <header class="case-modal-header">
-        <h2>Case Presentation</h2>
+        <h2>عرض الحالة (سيناريو سردي)</h2>
         <button id="caseModalClose" type="button" class="case-modal-close">&times;</button>
       </header>
 
@@ -80,13 +73,12 @@
       </div>
 
       <footer class="case-modal-footer">
-        <button id="caseModalCopy" type="button">Copy text</button>
-        <button id="caseModalClose2" type="button">Close</button>
+        <button id="caseModalCopy" type="button">نسخ النص</button>
+        <button id="caseModalClose2" type="button">إغلاق</button>
       </footer>
     </div>
   </div>
 
-  <!-- Scripts (order is important) -->
   <script src="chest-data.js"></script>
   <script src="chest-engine.js"></script>
   <script src="chest-ui.js"></script>

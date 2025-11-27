@@ -1,6 +1,6 @@
 // ========================================
 // chest-engine.js
-// Core logic for chest pain history engine
+// Core logic for chest pain history engine (Updated with Wells Score)
 // ========================================
 
 "use strict";
@@ -22,7 +22,6 @@
   const STEPS = [];
   SECTIONS.forEach((sec) => {
     (sec.steps || []).forEach((st) => {
-      // تأكيد وجود sectionLabel
       st.sectionLabel = st.sectionLabel || sec.label || "";
       st.sectionId = st.sectionId || sec.id;
       STEPS.push(st);
@@ -30,24 +29,26 @@
   });
 
   // Diagnosis index
-  // Pretty names for diseases
-const PRETTY_NAME = {
-  IHD: "Ischemic Heart Disease",
-  StableAngina: "Stable Angina",
-  UnstableAngina: "Unstable Angina",
-  MI: "Myocardial Infarction",
-  HF: "Heart Failure",
-  Pneumothorax: "Pneumothorax",
-  PneumothoraxMajor: "Pneumothorax (Major)",
-  Pleurisy: "Pleurisy",
-  PNA: "Pneumonia",
-  PEMajor: "Pulmonary Embolism – Major",
-  PEMinor: "Pulmonary Embolism – Minor",
-  Myocarditis: "Myocarditis",
-  Pericarditis: "Pericarditis",
-  Anxiety: "Anxiety-Related Chest Pain",
-  AorticDissection: "Aortic Dissection"
-};
+  const PRETTY_NAME = {
+      IHD: "Ischemic Heart Disease",
+      StableAngina: "Stable Angina",
+      UnstableAngina: "Unstable Angina",
+      MI: "Myocardial Infarction",
+      ACS: "Acute Coronary Syndrome (ACS)",
+      HF: "Heart Failure",
+      Pneumothorax: "Pneumothorax",
+      Pleurisy: "Pleurisy",
+      Pneumonia: "Pneumonia",
+      PEMajor: "Pulmonary Embolism (Major)",
+      Myocarditis: "Myocarditis",
+      Pericarditis: "Pericarditis",
+      PanicAttack: "Panic attack / Anxiety",
+      AorticDissection: "Aortic Dissection",
+      PAD: "Peripheral Arterial Disease",
+      Oesophagitis: "Oesophagitis",
+      EsophagealSpasm: "Esophageal Spasm",
+      ChestWallPain: "Chest Wall Pain"
+  };
   const DIAG_MAP = {};
   (Data.diagnoses || []).forEach((dx) => {
     DIAG_MAP[dx.id] = dx;
@@ -59,8 +60,9 @@ const PRETTY_NAME = {
 
   const state = {
     currentIndex: 0,
-    answers: {},   // stepId -> value or [values] or scalar
-    dxScores: {}   // dxId -> { score, features[] }
+    answers: {},
+    dxScores: {},
+    wellsScore: 0
   };
 
   function resetDxScores() {
@@ -71,6 +73,7 @@ const PRETTY_NAME = {
         features: []
       };
     });
+    state.wellsScore = 0;
   }
 
   // helper to add score/feature
@@ -94,8 +97,9 @@ const PRETTY_NAME = {
     if (step.type === "text") return "text";
     return "single";
   }
+
 // --------------------------------------
-// Apply one option effect
+// Apply one option effect (WEIGHTED SCORING)
 // --------------------------------------
 
 function applyOptionEffect(step, optKey) {
@@ -103,17 +107,91 @@ function applyOptionEffect(step, optKey) {
   const opt = step.options[optKey];
   if (!opt) return;
 
-  // بدل ما نكتب: question → option
-  // نخزن فقط نص الخيار نفسه كـ feature
   const feature = opt.label || optKey;
 
   (opt.dxAdd || []).forEach((dxId) => {
-    bumpDx(dxId, 2, feature);
+    let weight = 2; // Default weight
+
+    // Red Flags (+10)
+    if (dxId === "AorticDissection" && (feature.includes("تمزيقي") || feature.includes("يشع إلى الظهر"))) {
+        weight = 10; 
+    }
+    
+    // High Weight (+5) for strong clinical indicators
+    else if (dxId === "MI" || dxId === "ACS") {
+      if (feature.includes("تعرق غزير") || feature.includes("إلى الفك") || feature.includes("أكثر من 30 دقيقة")) {
+        weight = 5; 
+      }
+    } 
+    else if (dxId === "PEMajor") {
+      if (feature.includes("سعال مصحوب بدم") || feature.includes("جراحة كبرى حديثة") || feature.includes("أكثر من 30 دقيقة")) {
+        weight = 5; 
+      }
+    } 
+    else if (dxId === "UnstableAngina") {
+        if (feature.includes("أكثر من 30 دقيقة") || feature.includes("يزداد سوءاً")) {
+            weight = 3; 
+        }
+    }
+
+    bumpDx(dxId, weight, feature);
   });
 
   (opt.dxRemove || []).forEach((dxId) => {
-    bumpDx(dxId, -1, null);
+    bumpDx(dxId, -1, null); // Standard removal penalty
   });
+}
+
+// --------------------------------------
+// Wells' Criteria for Pulmonary Embolism (PE)
+// --------------------------------------
+
+function calculateWellsScore() {
+  let score = 0;
+  const ans = state.answers;
+  
+  // 1. Signs/symptoms of DVT (3 points)
+  if (Array.isArray(ans.rosCVS) && ans.rosCVS.includes('legEdema')) {
+    score += 3;
+  }
+
+  // 2. PE is #1 diagnosis OR equally likely (3 points)
+  const onset = ans.onset;
+  const character = ans.character;
+  if (onset === 'sudden' && character === 'sharp') {
+      score += 3; 
+  }
+
+  // 4. Immobilization (>= 3 days) or surgery in the previous 4 weeks (1.5 points)
+  if (Array.isArray(ans.pshOps) && ans.pshOps.includes('majorSurgery')) {
+    score += 1.5;
+  }
+
+  // 5. Previous DVT/PE (1.5 points) - نستخدم مضادات التخثر كبديل مقترح
+  if (Array.isArray(ans.drugHistory) && ans.drugHistory.includes('anticoag')) {
+    score += 1.5;
+  }
+  
+  // 6. Hemoptysis (1 point)
+  if (Array.isArray(ans.associated) && ans.associated.includes('hemoptysis')) {
+    score += 1;
+  }
+  
+  // 7. Malignancy (1 point) - غير متوفرة في الأسئلة الحالية
+
+  state.wellsScore = score;
+  
+  // تطبيق نقاط إضافية على PE بناءً على نتيجة Wells Score
+  // Low Risk: (Score < 2) -> لا يوجد نقاط إضافية
+  // Moderate Risk: (Score 2 - 6) -> +5
+  // High Risk: (Score > 6) -> +10
+  if (score > 6) {
+    bumpDx('PE', 10, `Wells Score High Risk: ${score} points`);
+    bumpDx('PEMajor', 10, `Wells Score High Risk: ${score} points`);
+  } else if (score >= 2) {
+    bumpDx('PE', 5, `Wells Score Moderate Risk: ${score} points`);
+    bumpDx('PEMajor', 5, `Wells Score Moderate Risk: ${score} points`);
+  }
 }
   
   // --------------------------------------
@@ -121,40 +199,58 @@ function applyOptionEffect(step, optKey) {
   // --------------------------------------
 
   function recomputeDx() {
-  resetDxScores();
+    resetDxScores();
 
-  STEPS.forEach((step) => {
-    const t = getStepType(step);
-    const val = state.answers[step.id];
+    STEPS.forEach((step) => {
+      const t = getStepType(step);
+      const val = state.answers[step.id];
 
-    if (val === undefined || val === null || val === "") return;
+      if (val === undefined || val === null || val === "") return;
 
-    if (t === "multi") {
-      if (Array.isArray(val)) {
-        val.forEach((v) => applyOptionEffect(step, v));
+      if (t === "single") {
+        applyOptionEffect(step, val);
+      } else if (t === "multi") {
+        if (Array.isArray(val)) {
+          val.forEach((v) => applyOptionEffect(step, v));
+        }
+      } else if (t === "numeric") {
+        const num = parseInt(val, 10);
+        
+        if (!isNaN(num) && typeof step.getDxFromValue === "function") {
+          const rulesOrDxList = step.getDxFromValue(num) || [];
+          
+          rulesOrDxList.forEach(item => {
+            if (typeof item === 'object' && (item.add || item.remove)) {
+              // Age logic
+              const feature = step.reasoningForNumeric && step.reasoningForNumeric.length > 0 ? step.reasoningForNumeric[0].text : "Numeric value influence";
+              (item.add || []).forEach(dxId => bumpDx(dxId, 2, feature));
+              (item.remove || []).forEach(dxId => bumpDx(dxId, -1, null));
+            } 
+            else if (typeof item === 'string') { 
+              // Severity logic (Red Flag)
+              const feature = step.reasoningForNumeric && step.reasoningForNumeric.length > 0 ? step.reasoningForNumeric[0].text : "Severe pain";
+              bumpDx(item, 7, feature); 
+            }
+          });
+        }
+      } else if (t === "text" && typeof step.getDxFromText === "function") {
+        const dxRules = step.getDxFromText(val) || [];
+        dxRules.forEach(rule => {
+          const feature = rule.featureText || "Duration/text analysis"; 
+          (rule.add || []).forEach(dxId =>
+            bumpDx(dxId, 2, feature)
+          );
+          (rule.remove || []).forEach(dxId =>
+            bumpDx(dxId, -1, feature)
+          );
+        });
       }
-    } else if (t === "single") {
-      applyOptionEffect(step, val);
-    } else if (t === "numeric") {
-      const num = parseInt(val, 10);
-      if (!isNaN(num) && typeof step.getDxFromValue === "function") {
-        const dxList = step.getDxFromValue(num) || [];
-        const feature = " → very severe pain";
-        dxList.forEach((dxId) => bumpDx(dxId, 2, feature));
-      }
-    } else if (t === "text" && typeof step.getDxFromText === "function") {
-      const dxRules = step.getDxFromText(val) || [];
-      dxRules.forEach(rule => {
-        (rule.add || []).forEach(dxId =>
-          bumpDx(dxId, 2, "duration")
-        );
-        (rule.remove || []).forEach(dxId =>
-          bumpDx(dxId, -1, "duration")
-        );
-      });
-    }
-  });
-}
+    });
+    
+    // Run Wells Score Calculation
+    calculateWellsScore();
+  }
+
   // --------------------------------------
   // Public: set answer for a step
   // --------------------------------------
@@ -210,7 +306,7 @@ function applyOptionEffect(step, optKey) {
   }
 
   // --------------------------------------
-  // Build DDx list grouped by system
+  // Build DDx list grouped by system (INCLUDE MISSING FEATURES)
   // --------------------------------------
 
   function getDDxGrouped() {
@@ -227,7 +323,7 @@ function applyOptionEffect(step, optKey) {
     });
 
     Object.entries(state.dxScores).forEach(([dxId, obj]) => {
-      if (!obj || obj.score <= 0) return;
+      if (!obj || obj.score < 1) return; 
       const dxMeta = DIAG_MAP[dxId];
       if (!dxMeta) return;
       const gId = dxMeta.group || "other";
@@ -240,12 +336,24 @@ function applyOptionEffect(step, optKey) {
           items: []
         };
       }
+      
+      let wellsStatus = null;
+      if (dxId === 'PE' || dxId === 'PEMajor') {
+          const score = state.wellsScore;
+          let risk = 'Low';
+          if (score >= 2 && score <= 6) risk = 'Moderate';
+          else if (score > 6) risk = 'High';
+          
+          wellsStatus = `Wells Score: ${score} (${risk} Risk)`;
+      }
 
       groups[gId].items.push({
         id: dxId,
         label: dxMeta.label,
         score: obj.score,
-        features: obj.features || []
+        features: obj.features || [],
+        missing: dxMeta.keyMissingFeatures || [], 
+        wells: wellsStatus 
       });
     });
 
@@ -274,7 +382,6 @@ function applyOptionEffect(step, optKey) {
 
     if (!step.options) return [];
     if (type === "multi" && Array.isArray(value)) {
-      // collect all selected options reasoning
       const out = [];
       value.forEach((v) => {
         const opt = step.options[v];

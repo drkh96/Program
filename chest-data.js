@@ -1,6 +1,6 @@
 // ========================================
 // Data.js
-// Chest pain history data + DDx structure
+// Chest pain history data + DDx structure (Arabic Version)
 // ========================================
 
 "use strict";
@@ -12,50 +12,134 @@
   // ======================================
 
   const DX_GROUPS = {
-    cardiac:  { id: "cardiac",  label: "Cardiac",  order: 1 },
-    aorta:    { id: "aorta",    label: "Aorta",    order: 2 },
-    pulmonary:{ id: "pulmonary",label: "Pulmonary",order: 3 },
-    pleural:  { id: "pleural",  label: "Pleura",   order: 4 },
-    chestWall:{ id: "chestWall",label: "Chest wall",order: 5 },
-    oesophagus:{id: "oesophagus",label:"Oesophagus",order: 6},
-    neuro:    { id: "neuro",    label: "Neurologic",order: 7 },
-    peripheral:{id: "peripheral",label:"Peripheral vascular",order: 8},
-    hema:     { id: "hema",     label: "Hematologic",order: 9 }
+    cardiac:  { id: "cardiac",  label: "القلب",  order: 1 },
+    aorta:    { id: "aorta",    label: "الأبهر",    order: 2 },
+    pulmonary:{ id: "pulmonary",label: "الرئة",order: 3 },
+    pleural:  { id: "pleural",  label: "الغشاء البلوري",   order: 4 },
+    chestWall:{ id: "chestWall",label: "جدار الصدر",order: 5 },
+    oesophagus:{id: "oesophagus",label:"المريء",order: 6},
+    neuro:    { id: "neuro",    label: "الجهاز العصبي",order: 7 },
+    peripheral:{id: "peripheral",label:"الأوعية المحيطية",order: 8},
+    hema:     { id: "hema",     label: "أمراض الدم",order: 9 },
+    psych:    { id: "psych",    label: "نفسي/نفساني",order: 10 }
   };
 
   const DIAGNOSES = [
-    { id: "IHD",        label: "Ischemic heart disease", group: "cardiac" },
-    { id: "StableAngina", label: "Stable angina",        group: "cardiac" },
-    { id: "UnstableAngina", label: "Unstable angina",    group: "cardiac" },
-    { id: "MI",         label: "Myocardial infarction",  group: "cardiac" },
-    { id: "Myocarditis",label: "Myocarditis",            group: "cardiac" },
-    { id: "Pericarditis",label:"Pericarditis",           group: "cardiac" },
-    { id: "MVP",        label: "Mitral valve prolapse",  group: "cardiac" },
-    { id: "HF",         label: "Heart failure",          group: "cardiac" },
+    { 
+      id: "IHD",        
+      label: "مرض القلب الإقفاري (Ischemic Heart Disease)", 
+      group: "cardiac",
+      keyMissingFeatures: [
+        "تغيرات تخطيط القلب (ECG changes)",
+        "ارتفاع تروبونين القلب (Elevated Troponin)",
+        "علامات فشل القلب (Signs of Heart Failure)"
+      ]
+    },
+    { 
+      id: "StableAngina", 
+      label: "الذبحة الصدرية المستقرة (Stable Angina)",        
+      group: "cardiac",
+      keyMissingFeatures: [
+        "تخطيط قلب طبيعي وقت الراحة (Normal resting ECG)",
+        "تروبونين قلب طبيعي (Normal Troponin)",
+        "فحص الجهد إيجابي (Positive Stress Test)"
+      ]
+    },
+    { 
+      id: "UnstableAngina", 
+      label: "الذبحة الصدرية غير المستقرة (Unstable Angina)",    
+      group: "cardiac",
+      keyMissingFeatures: [
+        "تغيرات تخطيط القلب (ECG changes: ST depression)",
+        "تروبونين القلب غالباً سلبي (Troponin often negative)"
+      ]
+    },
+    { 
+      id: "MI",         
+      label: "احتشاء عضلة القلب (Myocardial Infarction)",  
+      group: "cardiac",
+      keyMissingFeatures: [
+        "ارتفاع مقطع ST أو حصار حزمة أيسر جديد في تخطيط القلب (ST elevation or new LBBB)",
+        "ارتفاع التروبونين بشكل كبير (Marked Troponin elevation)"
+      ]
+    },
+    { 
+      id: "ACS",        
+      label: "متلازمة الشريان التاجي الحادة (Acute Coronary Syndrome)", 
+      group: "cardiac",
+      keyMissingFeatures: [
+        "تغيرات تخطيط القلب الدالة على نقص التروية (ECG changes)",
+        "حالة تروبونين القلب (Troponin status)",
+        "تأكيد نقص التروية بالتصوير/الفحوصات (Ischemia confirmed by imaging/labs)"
+      ]
+    },
+    { id: "Myocarditis",label: "التهاب عضلة القلب (Myocarditis)", group: "cardiac" },
+    { 
+      id: "Pericarditis",
+      label:"التهاب التامور (Pericarditis)",           
+      group: "cardiac",
+      keyMissingFeatures: [
+        "احتكاك تاموري في السمع (Pericardial friction rub)",
+        "ارتفاع ST منتشر في تخطيط القلب (Diffuse ST elevation)",
+        "انصباب تاموري في الصدى (Pericardial effusion)"
+      ]
+    },
+    { id: "MVP",        label: "تدلي الصمام التاجي (Mitral Valve Prolapse)",  group: "cardiac" },
+    { id: "HF",         label: "فشل القلب (Heart Failure)",          group: "cardiac" },
 
-    { id: "AorticAneurysm", label: "Aortic aneurysm",    group: "aorta" },
-    { id: "AorticDissection", label: "Aortic dissection",group: "aorta" },
+    { id: "AorticAneurysm", label: "توسع الأبهر (Aortic Aneurysm)",    group: "aorta" },
+    { 
+      id: "AorticDissection", 
+      label: "تسلخ الأبهر (Aortic Dissection)",
+      group: "aorta",
+      keyMissingFeatures: [
+        "اختلاف ضغط الدم بين الذراعين (> 20 مم زئبقي) (Inter-arm BP difference)",
+        "نفخة قلس أبهري جديدة (New Aortic Regurgitation)",
+        "نقص النبضات (Pulse deficits)"
+      ]
+    },
 
-    { id: "PE",         label: "Pulmonary embolism",     group: "pulmonary" },
-    { id: "PEMajor",    label: "Pulmonary embolism (major)", group: "pulmonary" },
-    { id: "Pneumonia",  label: "Pneumonia",              group: "pulmonary" },
-    { id: "PulmInfarct",label: "Pulmonary infarction",   group: "pulmonary" },
+    { id: "PE",         label: "انصمام رئوي (Pulmonary Embolism)",     group: "pulmonary" },
+    { 
+      id: "PEMajor",    
+      label: "انصمام رئوي كبير (Pulmonary Embolism - Major)", 
+      group: "pulmonary",
+      keyMissingFeatures: [
+        "زيادة سرعة التنفس (Tachypnea)",
+        "تسرع القلب (Tachycardia)",
+        "علامات جلطة الأوردة العميقة (Signs of DVT)",
+        "انخفاض إشباع الأكسجين (Low O2 Saturation)"
+      ]
+    },
+    { id: "Pneumonia",  label: "التهاب رئوي (Pneumonia)",              group: "pulmonary" },
+    { id: "PulmInfarct",label: "احتشاء رئوي (Pulmonary Infarct)",   group: "pulmonary" },
 
-    { id: "Pleurisy",   label: "Pleurisy",               group: "pleural" },
-    { id: "Pneumothorax", label: "Pneumothorax",         group: "pleural" },
+    { id: "Pleurisy",   label: "التهاب الغشاء البلوري (Pleurisy)",               group: "pleural" },
+    { id: "Pneumothorax", label: "استرواح الصدر (Pneumothorax)",         group: "pleural" },
 
-    { id: "ChestWallPain", label: "Chest wall / costochondritis", group: "chestWall" },
-    { id: "RibFracture", label: "Rib fracture",          group: "chestWall" },
-    { id: "HerpesZoster", label: "Herpes zoster",        group: "chestWall" },
+    { id: "ChestWallPain", label: "ألم جدار الصدر / التهاب الغضاريف الضلعية (Chest Wall Pain)", group: "chestWall" },
+    { id: "RibFracture", label: "كسر ضلعي (Rib Fracture)",          group: "chestWall" },
+    { id: "HerpesZoster", label: "الهربس النطاقي (Herpes Zoster)",        group: "chestWall" },
 
-    { id: "Oesophagitis", label: "Oesophagitis",         group: "oesophagus" },
-    { id: "EsophagealSpasm", label: "Esophageal spasm",  group: "oesophagus" },
+    { id: "Oesophagitis", label: "التهاب المريء (Oesophagitis)",         group: "oesophagus" },
+    { id: "EsophagealSpasm", label: "تشنج المريء (Esophageal Spasm)",  group: "oesophagus" },
 
-    { id: "Stroke",     label: "Stroke (CVA)",           group: "neuro" },
+    { id: "Stroke",     label: "سكتة دماغية (Stroke)",           group: "neuro" },
 
-    { id: "PAD",        label: "Peripheral arterial disease", group: "peripheral" },
+    { id: "PAD",        label: "مرض الشريان المحيطي (Peripheral Arterial Disease)", group: "peripheral" },
 
-    { id: "Anemia",     label: "Anemia",                 group: "hema" }
+    { id: "Anemia",     label: "فقر الدم (Anemia)",                 group: "hema" },
+    
+    { 
+      id: "PanicAttack", 
+      label: "نوبة هلع / قلق (Panic Attack / Anxiety)", 
+      group: "psych",
+      keyMissingFeatures: [
+        "فحص سريري طبيعي (Normal physical exam)",
+        "نتائج تحاليل واستقصاءات طبيعية (Normal investigations)",
+        "غياب عوامل الخطر للأسباب العضوية (Absence of organic risk factors)"
+      ]
+    }
   ];
 
   // Helper to create reasoning bullets
@@ -75,56 +159,58 @@
   const SECTIONS = [
   {
     id: "personal",
-    label: "Personal data",
+    label: "البيانات الشخصية",
     steps: [
 
       {
         id: "name",
         sectionId: "personal",
-        sectionLabel: "Personal data",
-        question: "What is the patient's name?",
+        sectionLabel: "البيانات الشخصية",
+        question: "ما هو اسم المريض؟",
         type: "text"
       },
 
       {
         id: "ageGroup",
         sectionId: "personal",
-        sectionLabel: "Personal data",
-        question: "Enter the patient's age:",
-        type: "text",
+        sectionLabel: "البيانات الشخصية",
+        question: "أدخل عمر المريض (بالسنوات):",
+        type: "numeric",
 
         getDxFromValue: function (value) {
 
-  const n = parseInt(value);   // ← نحول النص إلى رقم
+          const n = parseInt(value);
+          if (isNaN(n) || n < 0) return [];
 
-  if (isNaN(n)) return [];     // إذا مو رقم → لا شي
+          const dxList = [];
 
-  const dxList = [];
+          if (n < 30) {
+            dxList.push({
+              add: ["Myocarditis", "Pericarditis", "Pneumothorax"],
+              remove: ["IHD", "MI", "ACS", "AorticDissection", "PAD"]
+            });
+          }
 
-  if (n < 40) {
-    dxList.push({ add: [], remove: ["IHD", "MI", "PAD"] });
-  }
+          if (n >= 40 && n <= 65) {
+            dxList.push({
+              add: ["IHD", "StableAngina", "UnstableAngina", "MI", "ACS", "PAD"],
+              remove: []
+            });
+          }
 
-  if (n >= 40 && n <= 65) {
-    dxList.push({
-      add: ["IHD", "StableAngina", "UnstableAngina", "MI", "PAD"],
-      remove: []
-    });
-  }
+          if (n > 65) {
+            dxList.push({
+              add: ["IHD", "MI", "HF", "AorticAneurysm", "AorticDissection", "ACS"],
+              remove: []
+            });
+          }
 
-  if (n > 65) {
-    dxList.push({
-      add: ["IHD", "MI", "HF", "AorticAneurysm", "AorticDissection"],
-      remove: []
-    });
-  }
-
-  return dxList;
-},
+          return dxList;
+        },
 
         reasoningForNumeric: [
           r(
-            "Age affects the probability of cardiac and vascular causes of chest pain.",
+            "يؤثر العمر على احتمالية الأسباب القلبية والوعائية لألم الصدر.",
             ["IHD", "MI", "AorticDissection"]
           )
         ]
@@ -133,29 +219,29 @@
       {
         id: "sex",
         sectionId: "personal",
-        sectionLabel: "Personal data",
-        question: "What is the patient's sex?",
+        sectionLabel: "البيانات الشخصية",
+        question: "ما هو جنس المريض؟",
         type: "single",
 
         options: {
           male: {
-            label: "Male",
-            dxAdd: addDx(["IHD", "MI", "PAD"]),
+            label: "ذكر (Male)",
+            dxAdd: addDx(["IHD", "MI", "ACS", "PAD"]),
             dxRemove: addDx([]),
             reasoning: [
               r(
-                "Male sex is a classical risk factor for atherosclerotic ischemic heart disease.",
-                ["IHD", "MI"]
+                "الجنس الذكري هو عامل خطر كلاسيكي لمرض القلب الإقفاري التصلبي الشرياني.",
+                ["IHD", "MI", "ACS"]
               )
             ]
           },
           female: {
-            label: "Female",
+            label: "أنثى (Female)",
             dxAdd: addDx([]),
             dxRemove: addDx([]),
             reasoning: [
               r(
-                "Female sex does not exclude cardiac pain, but pre-menopausal women have lower IHD risk.",
+                "الجنس الأنثوي لا يستبعد الألم القلبي، لكن النساء قبل سن اليأس لديهن خطر أقل للإقفار.",
                 ["IHD"]
               )
             ]
@@ -168,22 +254,22 @@
 
   {
     id: "cc",
-    label: "Chief complaint",
+    label: "الشكوى الرئيسية",
     steps: [
 
       {
         id: "mainSymptom",
         sectionId: "cc",
-        sectionLabel: "Chief complaint",
-        question: "What is the chief complaint?",
+        sectionLabel: "الشكوى الرئيسية",
+        question: "ما هي الشكوى الرئيسية؟",
         type: "text"
       },
 
       {
         id: "ccDuration",
         sectionId: "cc",
-        sectionLabel: "Chief complaint",
-        question: "For how long has the chief complaint been present?",
+        sectionLabel: "الشكوى الرئيسية",
+        question: "منذ متى والشكوى الرئيسية موجودة؟",
         type: "text",
 
         getDxFromText: function (value) {
@@ -191,24 +277,24 @@
 
           const v = value.toLowerCase();
 
-          // Acute (minutes → hours)
-          if (v.includes("min") || v.includes("minute") || v.includes("hour") || v.includes("hr")) {
+                   // Acute (minutes → hours)
+          if (v.includes("min") || v.includes("minute") || v.includes("hour") || v.includes("hr") || v.includes("ساعة") || v.includes("دقيقة")) {
             return [
-              { add: ["MI", "UnstableAngina", "Pneumothorax", "PEMajor"], remove: [] }
+              { add: ["MI", "UnstableAngina", "ACS", "Pneumothorax", "PEMajor", "AorticDissection"], remove: [], featureText: "بدء حاد (دقائق/ساعات) (Acute onset)" }
             ];
           }
 
           // Subacute (days)
-          if (v.includes("day") || v.includes("yesterday")) {
+          if (v.includes("day") || v.includes("yesterday") || v.includes("يوم")) {
             return [
-              { add: ["Pneumonia", "Pericarditis"], remove: [] }
+              { add: ["Pneumonia", "Pericarditis"], remove: [] , featureText: "بدء تحت حاد (أيام) (Subacute onset)" }
             ];
           }
 
           // Chronic (weeks)
-          if (v.includes("week") || v.includes("month")) {
+          if (v.includes("week") || v.includes("month") || v.includes("أسبوع") || v.includes("شهر")) {
             return [
-              { add: ["StableAngina", "HF", "PAD", "Anemia"], remove: [] }
+              { add: ["StableAngina", "HF", "PAD", "Anemia", "ChestWallPain"], remove: [], featureText: "مدة مزمنة (أسابيع/أشهر) (Chronic duration)" }
             ];
           }
 
@@ -221,46 +307,46 @@
   
     {
       id: "hpi",
-      label: "History of present illness",
+      label: "تاريخ المرض الحالي",
       steps: [
         {
           id: "site",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "Where exactly is the chest pain?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "أين يقع ألم الصدر بالضبط؟",
           type: "single",
           options: {
             central: {
-              label: "Central retrosternal pain",
-              dxAdd: addDx(["IHD", "StableAngina", "UnstableAngina", "MI", "Myocarditis", "Pericarditis", "MVP", "AorticDissection", "AorticAneurysm", "Oesophagitis", "PEMajor"]),
+              label: "ألم خلف القص مركزي (Central retrosternal pain)",
+              dxAdd: addDx(["IHD", "StableAngina", "UnstableAngina", "MI", "ACS", "Myocarditis", "Pericarditis", "MVP", "AorticDissection", "AorticAneurysm", "Oesophagitis", "PEMajor"]),
               dxRemove: addDx(["Pleurisy", "Pneumothorax", "Pneumonia", "ChestWallPain", "HerpesZoster"]),
               reasoning: [
-                r("Central retrosternal pain is classic for myocardial ischemia and other mediastinal causes.", ["IHD", "MI"]),
-                r("Non-localized central pain makes pleural, chest wall and dermatomal causes less likely.", [])
+                r("الألم خلف القص الكلاسيكي يشير للإقفار القلبي وأسباب المنصف الأخرى.", ["IHD", "MI", "ACS"]),
+                r("الألم المركزي يقلل من احتمالية الأسباب البلورية أو جدار الصدر.", [])
               ]
             },
             peripheral: {
-              label: "Lateral chest pain on one side",
+              label: "ألم صدري جانبي أحادي الجانب (Lateral chest pain)",
               dxAdd: addDx(["Pleurisy", "Pneumothorax", "Pneumonia", "PulmInfarct", "HerpesZoster"]),
-              dxRemove: addDx(["IHD", "MI", "AorticDissection", "Oesophagitis"]),
+              dxRemove: addDx(["IHD", "MI", "ACS", "AorticDissection", "Oesophagitis"]),
               reasoning: [
-                r("Unilateral peripheral pain is often pleuritic, suggesting pleurisy, pneumothorax or pneumonia.", ["Pleurisy", "Pneumothorax", "Pneumonia"])
+                r("الألم الجانبي أحادي الجانب غالباً ما يكون بلورياً (يزداد مع التنفس).", ["Pleurisy", "Pneumothorax", "Pneumonia"])
               ]
             },
             localized: {
-              label: "Very localized point pain (finger tip area)",
+              label: "ألم نقطي موضعي جداً (Localized point pain)",
               dxAdd: addDx(["ChestWallPain", "RibFracture"]),
-              dxRemove: addDx(["MI", "Pleurisy", "Pneumothorax", "AorticDissection"]),
+              dxRemove: addDx(["MI", "ACS", "Pleurisy", "Pneumothorax", "AorticDissection"]),
               reasoning: [
-                r("Very localized pain is more typical of chest wall pathology such as costochondritis or rib fracture.", ["ChestWallPain", "RibFracture"])
+                r("الألم الموضعي جداً (كطرف الإصبع) نموذجي لآفة جدار الصدر.", ["ChestWallPain", "RibFracture"])
               ]
             },
             band: {
-              label: "Band-like pain following a dermatome",
+              label: "ألم شريطي يتبع توزع جلدي (Band-like pain)",
               dxAdd: addDx(["HerpesZoster"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Band-like pain in a dermatomal distribution strongly suggests herpes zoster.", ["HerpesZoster"])
+                r("الألم الشريطي في توزع جلدي معين يشير بقوة إلى الهربس النطاقي.", ["HerpesZoster"])
               ]
             }
           }
@@ -269,24 +355,24 @@
         {
           id: "onset",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "How did the pain start?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "كيف بدأ الألم؟",
           type: "single",
           options: {
             sudden: {
-              label: "Suddenly (seconds to minutes)",
-              dxAdd: addDx(["MI", "UnstableAngina", "PEMajor", "Pneumothorax", "AorticDissection"]),
+              label: "فجأة (خلال ثوانٍ إلى دقائق) (Suddenly)",
+              dxAdd: addDx(["MI", "ACS", "UnstableAngina", "PEMajor", "Pneumothorax", "AorticDissection"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Sudden onset chest pain is typical of myocardial infarction, pulmonary embolism, pneumothorax or aortic dissection.", ["MI", "PEMajor", "Pneumothorax", "AorticDissection"])
+                r("البدء المفاجئ نموذجي لاحتشاء القلب، الانصمام الرئوي، استرواح الصدر، أو تسلخ الأبهر.", ["MI", "ACS", "PEMajor", "Pneumothorax", "AorticDissection"])
               ]
             },
             gradual: {
-              label: "Gradually over hours or days",
+              label: "تدريجياً خلال ساعات أو أيام (Gradually)",
               dxAdd: addDx(["StableAngina", "Myocarditis", "Pericarditis", "Pneumonia", "Oesophagitis", "ChestWallPain"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Gradual onset pain fits better with stable angina, pericarditis, pneumonia or oesophagitis.", ["StableAngina", "Pericarditis", "Pneumonia", "Oesophagitis"])
+                r("البدء التدريجي يتناسب مع الذبحة المستقرة، التهاب التامور، التهاب الرئة، أو التهاب المريء.", ["StableAngina", "Pericarditis", "Pneumonia", "Oesophagitis"])
               ]
             }
           }
@@ -295,40 +381,48 @@
         {
           id: "character",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "How would you describe the character of the pain?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "كيف تصف طبيعة الألم؟",
           type: "single",
           options: {
             tight: {
-              label: "Tightness/heaviness/pressure",
-              dxAdd: addDx(["IHD", "StableAngina", "UnstableAngina", "MI", "Myocarditis"]),
-              dxRemove: addDx([]),
+              label: "ضيق / ثقل / ضغط (Tightness/Heaviness/Pressure)",
+              dxAdd: addDx(["IHD", "StableAngina", "UnstableAngina", "MI", "ACS", "Myocarditis"]),
+              dxRemove: addDx(["ChestWallPain", "Pleurisy"]),
               reasoning: [
-                r("Classical heavy or tight chest pain is strongly suggestive of myocardial ischemia.", ["IHD", "MI"])
+                r("الألم الكلاسيكي الثقيل أو الضيق يشير بقوة لنقص التروية القلبية.", ["IHD", "MI", "ACS"])
               ]
             },
             sharp: {
-              label: "Sharp or stabbing pain worse with breathing",
+              label: "ألم حاد أو طاعن يزداد مع التنفس (Sharp or Stabbing)",
               dxAdd: addDx(["Pleurisy", "Pericarditis", "Pneumothorax", "Pneumonia"]),
-              dxRemove: addDx([]),
+              dxRemove: addDx(["MI", "ACS", "AorticDissection"]),
               reasoning: [
-                r("Sharp, pleuritic pain worsened by inspiration suggests pleurisy, pericarditis, pneumothorax or pneumonia.", ["Pleurisy", "Pericarditis", "Pneumothorax", "Pneumonia"])
+                r("الألم الحاد الذي يزداد مع الشهيق يوحي بمرض بلوري أو تاموري.", ["Pleurisy", "Pericarditis", "Pneumothorax", "Pneumonia"])
               ]
             },
             burning: {
-              label: "Burning pain similar to heartburn",
+              label: "ألم حارق مشابه لحرقة المعدة (Burning pain)",
               dxAdd: addDx(["Oesophagitis", "EsophagealSpasm"]),
-              dxRemove: addDx([]),
+              dxRemove: addDx(["MI", "ACS"]),
               reasoning: [
-                r("Burning retrosternal pain is typical of oesophagitis or oesophageal spasm.", ["Oesophagitis", "EsophagealSpasm"])
+                r("الألم خلف القص الحارق هو نموذجي لالتهاب أو تشنج المريء.", ["Oesophagitis", "EsophagealSpasm"])
               ]
             },
             tearing: {
-              label: "Tearing pain radiating to the back",
+              label: "ألم تمزيقي يشع إلى الظهر (Tearing pain)",
               dxAdd: addDx(["AorticDissection"]),
-              dxRemove: addDx([]),
+              dxRemove: addDx(["MI", "ACS"]),
               reasoning: [
-                r("Tearing, back-radiating pain is classical for aortic dissection until proven otherwise.", ["AorticDissection"])
+                r("الألم التمزيقي الذي يشع إلى الظهر هو علامة كلاسيكية لتسلخ الأبهر.", ["AorticDissection"])
+              ]
+            },
+            nonSpecific: {
+              label: "غير نوعي، متقطع، عابر، أو حاد غير بلوري (Non-specific/Fleeting)",
+              dxAdd: addDx(["PanicAttack"]),
+              dxRemove: addDx(["MI", "ACS", "AorticDissection"]),
+              reasoning: [
+                r("الألم العابر (Fleeting pain) غير النموذجي يشير أكثر لنوبة الهلع أو جدار الصدر.", ["PanicAttack", "ChestWallPain"])
               ]
             }
           }
@@ -337,32 +431,32 @@
         {
           id: "radiation",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "Does the pain radiate anywhere?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "هل يشع الألم إلى أي مكان؟",
           type: "single",
           options: {
             arm: {
-              label: "To jaw, neck, left arm or epigastrium",
-              dxAdd: addDx(["IHD", "StableAngina", "UnstableAngina", "MI"]),
-              dxRemove: addDx([]),
+              label: "إلى الفك، الرقبة، الذراع اليسرى، أو الشرسوف (To jaw, neck, left arm/epigastrium)",
+              dxAdd: addDx(["IHD", "StableAngina", "UnstableAngina", "MI", "ACS"]),
+              dxRemove: addDx(["ChestWallPain"]),
               reasoning: [
-                r("Radiation to jaw, neck or left arm is classical for ischemic cardiac pain.", ["IHD", "MI"])
+                r("الإشعاع للفك أو الذراع اليسرى كلاسيكي للألم القلبي الإقفاري.", ["IHD", "MI", "ACS"])
               ]
             },
             back: {
-              label: "To the back between the scapulae",
+              label: "إلى الظهر بين لوحي الكتف (To the back between the scapulae)",
               dxAdd: addDx(["AorticDissection"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Inter-scapular radiation fits with aortic dissection.", ["AorticDissection"])
+                r("الإشعاع بين لوحي الكتف يتناسب مع تسلخ الأبهر.", ["AorticDissection"])
               ]
             },
             none: {
-              label: "No radiation",
-              dxAdd: addDx(["ChestWallPain", "HerpesZoster"]),
-              dxRemove: addDx([]),
+              label: "لا يوجد إشعاع (No radiation)",
+              dxAdd: addDx(["ChestWallPain", "HerpesZoster", "PanicAttack"]),
+              dxRemove: addDx(["MI", "ACS"]),
               reasoning: [
-                r("Pain without radiation is more typical of chest wall or localized dermatomal pain.", ["ChestWallPain", "HerpesZoster"])
+                r("الألم بدون إشعاع هو أكثر شيوعاً في ألم جدار الصدر أو نوبات الهلع.", ["ChestWallPain", "HerpesZoster", "PanicAttack"])
               ]
             }
           }
@@ -371,48 +465,48 @@
         {
           id: "relief",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "What relieves the pain?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "ما الذي يخفف الألم؟",
           type: "single",
           options: {
             rest: {
-              label: "Relieved by rest or nitroglycerin",
+              label: "يخف بالراحة أو باستخدام النتروغليسرين (Relieved by rest or nitroglycerin)",
               dxAdd: addDx(["StableAngina"]),
-              dxRemove: addDx([]),
+              dxRemove: addDx(["MI", "ACS"]),
               reasoning: [
-                r("Pain relieved by rest or nitrates is very typical of stable angina.", ["StableAngina"])
+                r("الألم الذي يخف بالراحة والنترات نموذجي للذبحة الصدرية المستقرة.", ["StableAngina"])
               ]
             },
             forward: {
-              label: "Relieved by sitting up and leaning forward",
+              label: "يخف بالجلوس والإنحناء للأمام (Relieved by leaning forward)",
               dxAdd: addDx(["Pericarditis"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Pericarditic pain characteristically improves when leaning forward.", ["Pericarditis"])
+                r("الألم التاموري يتحسن بالانحناء للأمام بشكل مميز.", ["Pericarditis"])
               ]
             },
             antacid: {
-              label: "Relieved by antacids or sitting upright",
+              label: "يخف بمضادات الحموضة أو الجلوس منتصباً (Relieved by antacids or sitting upright)",
               dxAdd: addDx(["Oesophagitis"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Improvement with antacids or upright posture suggests oesophageal reflux/oesophagitis.", ["Oesophagitis"])
+                r("التحسن بمضادات الحموضة يقترح الارتجاع المريئي/التهاب المريء.", ["Oesophagitis"])
               ]
             },
             avoidMovement: {
-              label: "Relieved by avoiding chest wall movement",
+              label: "يخف بتجنب حركة جدار الصدر (Relieved by avoiding movement)",
               dxAdd: addDx(["ChestWallPain"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Pain that improves when the chest wall is kept still suggests musculoskeletal pain.", ["ChestWallPain"])
+                r("الألم الذي يتحسن عند تثبيت الصدر يشير إلى ألم هيكلي عضلي.", ["ChestWallPain"])
               ]
             },
             nothing: {
-              label: "Nothing really relieves the pain",
-              dxAdd: addDx(["MI", "PEMajor"]),
-              dxRemove: addDx([]),
+              label: "لا يخف بأي شيء تقريباً (Nothing relieves the pain)",
+              dxAdd: addDx(["MI", "ACS", "PEMajor", "AorticDissection"]),
+              dxRemove: addDx(["StableAngina"]),
               reasoning: [
-                r("Severe pain not relieved by rest raises concern for myocardial infarction or major pulmonary embolism.", ["MI", "PEMajor"])
+                r("الألم الشديد الذي لا يخف يثير القلق لاحتشاء القلب أو تسلخ الأبهر.", ["MI", "ACS", "PEMajor"])
               ]
             }
           }
@@ -421,40 +515,40 @@
         {
           id: "aggravating",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "What makes the pain worse?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "ما الذي يزيد الألم سوءاً؟",
           type: "single",
           options: {
             effort: {
-              label: "Worse with exertion, emotion or cold",
-              dxAdd: addDx(["StableAngina", "UnstableAngina"]),
+              label: "يزداد مع الجهد، العاطفة أو البرد (Worse with exertion, emotion or cold)",
+              dxAdd: addDx(["StableAngina", "UnstableAngina", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Effort-related pain is classical for angina pectoris.", ["StableAngina", "UnstableAngina"])
+                r("الألم المرتبط بالجهد كلاسيكي للذبحة الصدرية.", ["StableAngina", "UnstableAngina", "ACS"])
               ]
             },
             breath: {
-              label: "Worse with inspiration, cough or breathing",
+              label: "يزداد مع الشهيق، السعال أو التنفس (Worse with inspiration, cough or breathing)",
               dxAdd: addDx(["Pleurisy", "Pericarditis", "Pneumothorax", "Pneumonia"]),
-              dxRemove: addDx([]),
+              dxRemove: addDx(["MI", "ACS"]),
               reasoning: [
-                r("Pain aggravated by inspiration or cough points to pleural or pericardial disease or pneumothorax.", ["Pleurisy", "Pericarditis", "Pneumothorax", "Pneumonia"])
+                r("الألم الذي يتفاقم مع التنفس يشير إلى مرض بلوري أو تاموري.", ["Pleurisy", "Pericarditis", "Pneumothorax", "Pneumonia"])
               ]
             },
             meal: {
-              label: "Worse after heavy fatty meal or lying flat",
+              label: "يزداد بعد وجبة دسمة أو عند الاستلقاء (Worse after meal or lying flat)",
               dxAdd: addDx(["Oesophagitis"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Worsening with heavy meals and lying flat suggests reflux oesophagitis.", ["Oesophagitis"])
+                r("التفاقم مع الوجبات والاستلقاء يشير إلى التهاب المريء الارتجاعي.", ["Oesophagitis"])
               ]
             },
             motion: {
-              label: "Worse with chest wall movement or palpation",
+              label: "يزداد مع حركة جدار الصدر أو بالجس (Worse with movement or palpation)",
               dxAdd: addDx(["ChestWallPain", "RibFracture"]),
-              dxRemove: addDx([]),
+              dxRemove: addDx(["MI", "ACS", "AorticDissection"]),
               reasoning: [
-                r("Pain reproduced by movement or palpation indicates musculoskeletal chest wall origin.", ["ChestWallPain", "RibFracture"])
+                r("الألم الذي يُستنسخ بالحركة أو الجس يدل على مصدر هيكلي عضلي.", ["ChestWallPain", "RibFracture"])
               ]
             }
           }
@@ -463,64 +557,72 @@
         {
           id: "associated",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "Are there any associated symptoms?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "هل توجد أي أعراض مرافقة؟",
           type: "multi",
           options: {
             dyspnea: {
-              label: "Shortness of breath",
-              dxAdd: addDx(["MI", "UnstableAngina", "HF", "PEMajor"]),
+              label: "ضيق التنفس (Shortness of breath)",
+              dxAdd: addDx(["MI", "ACS", "UnstableAngina", "HF", "PEMajor", "Pneumothorax"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Dyspnea accompanying chest pain suggests acute ischemia, pulmonary embolism or evolving heart failure.", ["MI", "PEMajor", "HF"])
+                r("ضيق التنفس المرافق يوحي بإقفار حاد، انصمام رئوي، أو فشل قلب متطور.", ["MI", "ACS", "PEMajor", "HF"])
               ]
             },
             sweating: {
-              label: "Profuse sweating",
-              dxAdd: addDx(["MI", "UnstableAngina"]),
+              label: "تعرق غزير (Profuse sweating)",
+              dxAdd: addDx(["MI", "ACS", "UnstableAngina"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Autonomic symptoms such as heavy sweating are typical of acute myocardial infarction.", ["MI"])
+                r("الأعراض الودية مثل التعرق الغزير نموذجية لاحتشاء عضلة القلب الحاد.", ["MI", "ACS"])
               ]
             },
             vomiting: {
-              label: "Nausea or vomiting",
-              dxAdd: addDx(["MI", "Oesophagitis"]),
+              label: "غثيان أو إقياء (Nausea or vomiting)",
+              dxAdd: addDx(["MI", "ACS", "Oesophagitis"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Nausea and vomiting may occur in acute MI or severe oesophageal reflux.", ["MI", "Oesophagitis"])
+                r("الغثيان والإقياء قد يحدثان في احتشاء القلب الحاد أو الارتجاع المريئي الشديد.", ["MI", "ACS", "Oesophagitis"])
               ]
             },
             coughFever: {
-              label: "Cough and fever",
+              label: "سعال وحمى (Cough and fever)",
               dxAdd: addDx(["Pneumonia", "Pleurisy", "HF"]),
-              dxRemove: addDx([]),
+              dxRemove: addDx(["MI", "ACS"]),
               reasoning: [
-                r("Cough with fever is more suggestive of pneumonia or pleurisy; in heart failure it indicates pulmonary congestion.", ["Pneumonia", "Pleurisy", "HF"])
+                r("السعال مع الحمى يوحي بالتهاب الرئة أو الغشاء البلوري.", ["Pneumonia", "Pleurisy", "HF"])
               ]
             },
             hemoptysis: {
-              label: "Coughing up blood",
+              label: "سعال مصحوب بدم (Hemoptysis)",
               dxAdd: addDx(["PEMajor", "Pneumonia"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Hemoptysis in the context of chest pain is a red flag for pulmonary embolism.", ["PEMajor"])
+                r("نفث الدم مع ألم الصدر هو علامة حمراء (Red Flag) للانصمام الرئوي.", ["PEMajor"])
               ]
             },
             reflux: {
-              label: "Regurgitation or sour/bitter taste in the mouth",
+              label: "قلس أو طعم حامض/مر في الفم (Regurgitation or sour/bitter taste)",
               dxAdd: addDx(["Oesophagitis"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Water-brash and regurgitation strongly support oesophageal reflux.", ["Oesophagitis"])
+                r("القلس والحموضة يدعمان بقوة الارتجاع المريئي.", ["Oesophagitis"])
               ]
             },
             rash: {
-              label: "Vesicular rash over the painful area",
+              label: "طفح حويصلي فوق المنطقة المؤلمة (Vesicular rash)",
               dxAdd: addDx(["HerpesZoster"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("A vesicular rash in the same dermatome confirms herpes zoster as the cause of pain.", ["HerpesZoster"])
+                r("الطفح الحويصلي في نفس التوزع الجلدي يؤكد الهربس النطاقي.", ["HerpesZoster"])
+              ]
+            },
+            anxiety: {
+              label: "خفقان، رعشة، شعور بهلاك وشكاوى تنمل (Palpitations, tremor, sense of doom)",
+              dxAdd: addDx(["PanicAttack"]),
+              dxRemove: addDx(["AorticDissection"]),
+              reasoning: [
+                r("أعراض فرط التهوية والشعور بالهلاك تشير بقوة لنوبة الهلع.", ["PanicAttack"])
               ]
             }
           }
@@ -529,32 +631,40 @@
         {
           id: "episodeDuration",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "How long does each pain episode usually last?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "كم تستمر نوبة الألم الواحدة عادةً؟",
           type: "single",
           options: {
-            short: {
-              label: "5–20 minutes and relieved by rest",
-              dxAdd: addDx(["StableAngina"]),
-              dxRemove: addDx([]),
+            seconds: {
+              label: "بضع ثوانٍ (عابر) (Fleeting seconds)",
+              dxAdd: addDx(["PanicAttack", "ChestWallPain"]),
+              dxRemove: addDx(["MI", "ACS", "StableAngina"]),
               reasoning: [
-                r("Brief episodes lasting 5–20 minutes and relieved by rest are typical of stable angina.", ["StableAngina"])
+                r("الألم العابر الذي يستمر لثوانٍ فقط يستبعد بشكل شبه كامل الألم القلبي الإقفاري.", ["PanicAttack", "ChestWallPain"])
+              ]
+            },
+            short: {
+              label: "5–20 دقيقة ويخف بالراحة (5–20 minutes and relieved by rest)",
+              dxAdd: addDx(["StableAngina"]),
+              dxRemove: addDx(["MI", "ACS"]),
+              reasoning: [
+                r("النوبات القصيرة التي تخف بالراحة نموذجية للذبحة المستقرة.", ["StableAngina"])
               ]
             },
             long: {
-              label: "More than 30 minutes and not relieved by rest",
-              dxAdd: addDx(["MI", "UnstableAngina"]),
-              dxRemove: addDx([]),
+              label: "أكثر من 30 دقيقة ولا يخف بالراحة (More than 30 minutes, not relieved by rest)",
+              dxAdd: addDx(["MI", "ACS", "UnstableAngina", "AorticDissection", "PEMajor"]),
+              dxRemove: addDx(["StableAngina", "ChestWallPain"]),
               reasoning: [
-                r("Prolonged pain >30 minutes not relieved by rest suggests myocardial infarction or unstable angina.", ["MI", "UnstableAngina"])
+                r("الألم المطول (> 30 دقيقة) الذي لا يخف بالراحة يقترح احتشاء قلب أو ذبحة غير مستقرة.", ["MI", "ACS", "UnstableAngina"])
               ]
             },
             hours: {
-              label: "Lasting for hours or days",
-              dxAdd: addDx(["Pericarditis", "Pneumonia"]),
+              label: "يستمر لساعات أو أيام (Lasting for hours or days)",
+              dxAdd: addDx(["Pericarditis", "Pneumonia", "Pleurisy"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Pain lasting hours to days is more in favour of pericarditis or pneumonia.", ["Pericarditis", "Pneumonia"])
+                r("الألم الذي يستمر لساعات أو أيام يرجح التهاب التامور أو الرئة.", ["Pericarditis", "Pneumonia"])
               ]
             }
           }
@@ -563,32 +673,32 @@
         {
           id: "course",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "How has the pain evolved since it started?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "كيف تطور الألم منذ بدايته؟",
           type: "single",
           options: {
             regressive: {
-              label: "Improving over time",
+              label: "يتحسن بمرور الوقت (Improving over time)",
               dxAdd: addDx(["StableAngina"]),
-              dxRemove: addDx([]),
+              dxRemove: addDx(["MI", "ACS"]),
               reasoning: [
-                r("Regressive pain fits a self-limited episode of stable angina.", ["StableAngina"])
+                r("الألم التراجعي يتناسب مع نوبة محددة ذاتياً من الذبحة المستقرة.", ["StableAngina"])
               ]
             },
             constant: {
-              label: "Constant, unchanged",
-              dxAdd: addDx(["Pleurisy", "Pericarditis"]),
+              label: "ثابت، لم يتغير (Constant, unchanged)",
+              dxAdd: addDx(["Pleurisy", "Pericarditis", "ChestWallPain"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Constant pleuritic chest pain can be seen in pleurisy or pericarditis.", ["Pleurisy", "Pericarditis"])
+                r("الألم الصدري البلوري الثابت يمكن رؤيته في التهاب الغشاء البلوري أو التامور.", ["Pleurisy", "Pericarditis"])
               ]
             },
             progressive: {
-              label: "Getting progressively worse",
-              dxAdd: addDx(["MI", "AorticDissection"]),
-              dxRemove: addDx([]),
+              label: "يزداد سوءاً تدريجياً (Getting progressively worse)",
+              dxAdd: addDx(["MI", "ACS", "AorticDissection", "PEMajor"]),
+              dxRemove: addDx(["StableAngina"]),
               reasoning: [
-                r("Progressively worsening chest pain is worrying for evolving MI or aortic dissection.", ["MI", "AorticDissection"])
+                r("الألم المتفاقم مقلق لتطور احتشاء القلب أو تسلخ الأبهر.", ["MI", "ACS", "AorticDissection"])
               ]
             }
           }
@@ -597,18 +707,19 @@
         {
           id: "severity",
           sectionId: "hpi",
-          sectionLabel: "History of present illness",
-          question: "How severe is the pain on a scale from 0 to 10?",
+          sectionLabel: "تاريخ المرض الحالي",
+          question: "ما هي شدة الألم على مقياس من 0 إلى 10؟",
           type: "numeric",
           getDxFromValue: function (n) {
             if (isNaN(n)) return [];
+            // Red Flag Score for severity
             if (n >= 8) {
-              return ["MI", "AorticDissection", "PEMajor"];
+              return ["MI", "ACS", "AorticDissection", "PEMajor"];
             }
             return [];
           },
           reasoningForNumeric: [
-            r("Very severe pain (≥ 8/10) suggests a serious, potentially life-threatening cause.", ["MI", "AorticDissection", "PEMajor"])
+            r("الألم الشديد جداً (8/10 فما فوق) يوحي بسبب خطير يهدد الحياة.", ["MI", "ACS", "AorticDissection", "PEMajor"])
           ]
         }
       ]
@@ -616,45 +727,45 @@
 
     {
       id: "ros",
-      label: "Review of systems",
+      label: "مراجعة الأجهزة (Review of Systems)",
       steps: [
         {
           id: "rosCVS",
           sectionId: "ros",
-          sectionLabel: "Review of systems",
-          question: "From the cardiovascular system, do you have any of the following?",
+          sectionLabel: "مراجعة الأجهزة",
+          question: "من الجهاز القلبي الوعائي، هل لديك أي مما يلي؟",
           type: "multi",
           options: {
             palp: {
-              label: "Palpitations",
+              label: "خفقان (Palpitations)",
               dxAdd: addDx([]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Palpitations may indicate arrhythmia, which often complicates myocardial infarction.", ["MI"])
+                r("الخفقان قد يشير إلى اضطراب نظم، وهو ما يعقد احتشاء القلب غالباً.", ["MI"])
               ]
             },
             orthopnea: {
-              label: "Shortness of breath when lying flat (orthopnea)",
+              label: "ضيق التنفس عند الاستلقاء (Orthopnea)",
               dxAdd: addDx(["HF"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Orthopnea is a hallmark of left-sided heart failure.", ["HF"])
+                r("ضيق التنفس الاضطجاعي هو سمة مميزة لفشل القلب الأيسر.", ["HF"])
               ]
             },
             pnd: {
-              label: "Sudden night attacks of breathlessness (PND)",
+              label: "نوبات ضيق تنفس ليلي انتيابي (PND)",
               dxAdd: addDx(["HF"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Paroxysmal nocturnal dyspnea is strongly suggestive of heart failure.", ["HF"])
+                r("ضيق التنفس الليلي الانتيابي يشير بقوة إلى فشل القلب.", ["HF"])
               ]
             },
             legEdema: {
-              label: "Swelling of the legs",
+              label: "تورم الساقين (Swelling of the legs)",
               dxAdd: addDx(["HF"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Peripheral edema points to right-sided or global heart failure.", ["HF"])
+                r("الوذمة المحيطية تشير إلى فشل القلب الأيمن أو العالمي.", ["HF"])
               ]
             }
           }
@@ -663,32 +774,32 @@
         {
           id: "rosResp",
           sectionId: "ros",
-          sectionLabel: "Review of systems",
-          question: "From the respiratory system, do you have any of the following?",
+          sectionLabel: "مراجعة الأجهزة",
+          question: "من الجهاز التنفسي، هل لديك أي مما يلي؟",
           type: "multi",
           options: {
             cough: {
-              label: "Cough",
+              label: "سعال (Cough)",
               dxAdd: addDx(["Pneumonia", "HF"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Cough in chest pain may be due to pneumonia or pulmonary congestion from heart failure.", ["Pneumonia", "HF"])
+                r("السعال مع ألم الصدر قد يكون بسبب التهاب الرئة أو احتقان رئوي من فشل القلب.", ["Pneumonia", "HF"])
               ]
             },
             wheeze: {
-              label: "Wheeze",
+              label: "أزيز (Wheeze)",
               dxAdd: addDx(["HF"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Wheeze can appear in acute pulmonary congestion from left-sided heart failure.", ["HF"])
+                r("الأزيز قد يظهر في الاحتقان الرئوي الحاد من فشل القلب الأيسر.", ["HF"])
               ]
             },
             exertDyspnea: {
-              label: "Exertional shortness of breath",
+              label: "ضيق تنفس جهدي (Exertional shortness of breath)",
               dxAdd: addDx(["HF", "PE"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Exertional dyspnea suggests impaired cardiac output or pulmonary vascular obstruction.", ["HF", "PE"])
+                r("ضيق التنفس الجهدي يشير إلى ضعف النتاج القلبي أو انسداد الأوعية الرئوية.", ["HF", "PE"])
               ]
             }
           }
@@ -697,32 +808,32 @@
         {
           id: "rosGIT",
           sectionId: "ros",
-          sectionLabel: "Review of systems",
-          question: "From the gastrointestinal system, do you have any of the following?",
+          sectionLabel: "مراجعة الأجهزة",
+          question: "من الجهاز الهضمي، هل لديك أي مما يلي؟",
           type: "multi",
           options: {
             distension: {
-              label: "Abdominal distension (possible ascites)",
+              label: "انتفاخ بطني (استسقاء محتمل) (Abdominal distension)",
               dxAdd: addDx(["HF"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Ascites and abdominal distension can result from right-sided heart failure with hepatic congestion.", ["HF"])
+                r("الاستسقاء والانتفاخ البطني ينتجان عن فشل القلب الأيمن مع احتقان كبدي.", ["HF"])
               ]
             },
             rhPain: {
-              label: "Right hypochondrial pain",
+              label: "ألم في منطقة المراق الأيمن (Right hypochondrial pain)",
               dxAdd: addDx(["HF"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Right hypochondrial discomfort reflects painful hepatomegaly from hepatic congestion.", ["HF"])
+                r("الانزعاج في المراق الأيمن يعكس تضخماً كبدياً مؤلماً بسبب الاحتقان.", ["HF"])
               ]
             },
             epigastric: {
-              label: "Epigastric pain",
-              dxAdd: addDx(["MI", "Oesophagitis"]),
+              label: "ألم شرسوفي (Epigastric pain)",
+              dxAdd: addDx(["MI", "ACS", "Oesophagitis"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Epigastric pain may be a gastric-type presentation of myocardial infarction or oesophagitis.", ["MI", "Oesophagitis"])
+                r("الألم الشرسوفي قد يكون مظهراً معدياً لاحتشاء القلب أو التهاب المريء.", ["MI", "ACS", "Oesophagitis"])
               ]
             }
           }
@@ -731,24 +842,24 @@
         {
           id: "rosCNS",
           sectionId: "ros",
-          sectionLabel: "Review of systems",
-          question: "From the nervous system, do you have any of the following?",
+          sectionLabel: "مراجعة الأجهزة",
+          question: "من الجهاز العصبي، هل لديك أي مما يلي؟",
           type: "multi",
           options: {
             weakRight: {
-              label: "Sudden weakness of the right side",
+              label: "ضعف مفاجئ في الجانب الأيمن (Sudden weakness of the right side)",
               dxAdd: addDx(["Stroke"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Sudden unilateral weakness indicates stroke, which shares atherosclerotic risk factors with IHD.", ["Stroke", "IHD"])
+                r("الضعف المفاجئ أحادي الجانب يدل على سكتة دماغية، والتي تشترك بعوامل الخطر مع مرض القلب الإقفاري.", ["Stroke", "IHD"])
               ]
             },
             weakLeft: {
-              label: "Sudden weakness of the left side",
+              label: "ضعف مفاجئ في الجانب الأيسر (Sudden weakness of the left side)",
               dxAdd: addDx(["Stroke"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Any acute hemiparesis must raise suspicion of cerebrovascular accident.", ["Stroke"])
+                r("أي شلل نصفي حاد يجب أن يثير الشك بسكتة دماغية وعائية.", ["Stroke"])
               ]
             }
           }
@@ -757,16 +868,16 @@
         {
           id: "rosLM",
           sectionId: "ros",
-          sectionLabel: "Review of systems",
-          question: "From the locomotor/peripheral vascular system:",
+          sectionLabel: "مراجعة الأجهزة",
+          question: "من الجهاز الحركي/الوعائي المحيطي:",
           type: "multi",
           options: {
             claudication: {
-              label: "Leg pain while walking that relieves with rest",
-              dxAdd: addDx(["PAD", "IHD"]),
+              label: "ألم في الساق أثناء المشي يخف بالراحة (Intermittent claudication)",
+              dxAdd: addDx(["PAD", "IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Intermittent claudication reflects peripheral arterial disease, which has the same atherosclerotic basis as IHD.", ["PAD", "IHD"])
+                r("العرج المتقطع يعكس مرض الشريان المحيطي، الذي له نفس الأساس التصلبي الشرياني لمرض القلب الإقفاري.", ["PAD", "IHD", "ACS"])
               ]
             }
           }
@@ -775,148 +886,80 @@
         {
           id: "rosHema",
           sectionId: "ros",
-          sectionLabel: "Review of systems",
-          question: "From the hematologic system:",
+          sectionLabel: "مراجعة الأجهزة",
+          question: "من الجهاز الدموي:",
           type: "multi",
           options: {
             fatigue: {
-              label: "General fatigue",
+              label: "إرهاق عام (General fatigue)",
               dxAdd: addDx(["Anemia"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Generalised fatigability suggests anemia, which can aggravate myocardial ischemia.", ["Anemia", "IHD"])
+                r("الإرهاق العام يوحي بفقر الدم، والذي يمكن أن يفاقم نقص التروية القلبية.", ["Anemia", "IHD"])
               ]
             },
             dizzy: {
-              label: "Dizziness",
+              label: "دوار (Dizziness)",
               dxAdd: addDx(["Anemia"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Dizziness and light-headedness may be due to reduced oxygen delivery from anemia.", ["Anemia"])
+                r("الدوار والدوران قد يكونان بسبب نقص إيصال الأكسجين من فقر الدم.", ["Anemia"])
               ]
             },
             pallor: {
-              label: "Pale skin or mucosa",
+              label: "شحوب الجلد أو الأغشية المخاطية (Pale skin or mucosa)",
               dxAdd: addDx(["Anemia"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Pallor is a classic sign of anemia.", ["Anemia"])
+                r("الشحوب علامة كلاسيكية لفقر الدم.", ["Anemia"])
               ]
             }
           }
         }
       ]
     },
-  {
-    id: "pmh",
-    label: "Past medical history",
-    steps: [
-      {
-        id: "pmhMain",
-        sectionId: "pmh",
-        sectionLabel: "Past medical history",
-        question: "Does the patient have any chronic illnesses?",
-        type: "text"
-      }
-    ]
-  },
 
-  {
-    id: "psh",
-    label: "Past surgical history",
-    steps: [
-      {
-        id: "pshMain",
-        sectionId: "psh",
-        sectionLabel: "Past surgical history",
-        question: "Has the patient undergone any surgeries before?",
-        type: "text"
-      }
-    ]
-  },
-
-  {
-    id: "dh",
-    label: "Drug history",
-    steps: [
-      {
-        id: "dhMain",
-        sectionId: "dh",
-        sectionLabel: "Drug history",
-        question: "Is the patient taking any medications regularly?",
-        type: "text"
-      }
-    ]
-  },
-
-  {
-    id: "fh",
-    label: "Family history",
-    steps: [
-      {
-        id: "fhMain",
-        sectionId: "fh",
-        sectionLabel: "Family history",
-        question: "Is there any family history of heart or lung diseases?",
-        type: "text"
-      }
-    ]
-  },
-
-  {
-    id: "sh",
-    label: "Social history",
-    steps: [
-      {
-        id: "shMain",
-        sectionId: "sh",
-        sectionLabel: "Social history",
-        question: "What is the patient's lifestyle? (smoking, alcohol, occupation)",
-        type: "text"
-      }
-    ]
-  },
     {
       id: "pmh",
-      label: "Past medical history",
+      label: "التاريخ المرضي السابق",
       steps: [
         {
           id: "pmhChronic",
           sectionId: "pmh",
-          sectionLabel: "Past medical history",
-          question: "Do you have any chronic illnesses?",
+          sectionLabel: "التاريخ المرضي السابق",
+          question: "هل لديك أي أمراض مزمنة؟",
           type: "multi",
           options: {
             dm: {
-              label: "Diabetes mellitus",
-              dxAdd: addDx(["IHD", "PAD"]),
+              label: "داء السكري (Diabetes Mellitus)",
+              dxAdd: addDx(["IHD", "ACS", "PAD"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Diabetes is a major risk factor for atherosclerosis leading to ischemic heart disease and PAD.", ["IHD", "PAD"])
+                r("السكري هو عامل خطر رئيسي للتصلب الشرياني المؤدي للإقفار القلبي ومرض الشريان المحيطي.", ["IHD", "ACS", "PAD"])
               ]
             },
             htn: {
-              label: "Hypertension",
-              dxAdd: addDx(["IHD", "AorticAneurysm", "AorticDissection"]),
+              label: "ارتفاع ضغط الدم (Hypertension)",
+              dxAdd: addDx(["IHD", "ACS", "AorticAneurysm", "AorticDissection"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Hypertension predisposes to both ischemic heart disease and aortic aneurysm/dissection.", ["IHD", "AorticDissection"])
+                r("ارتفاع ضغط الدم يهيئ لكل من مرض القلب الإقفاري وتسلخ/توسع الأبهر.", ["IHD", "AorticDissection"])
               ]
             },
             dyslipidemia: {
-              label: "Dyslipidemia",
-              dxAdd: addDx(["IHD", "PAD"]),
+              label: "اضطراب شحوم الدم (Dyslipidemia)",
+              dxAdd: addDx(["IHD", "ACS", "PAD"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Hyperlipidemia drives atherosclerotic disease in coronary and peripheral arteries.", ["IHD", "PAD"])
+                r("فرط شحوم الدم يدفع مرض التصلب الشرياني في الشرايين التاجية والمحيطية.", ["IHD", "ACS", "PAD"])
               ]
             },
             ckd: {
-              label: "Chronic kidney disease",
+              label: "مرض الكلى المزمن (Chronic Kidney Disease)",
               dxAdd: addDx(["HF", "Anemia"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Chronic kidney disease is associated with anemia and accelerated atherosclerosis.", ["HF", "Anemia"])
+                r("مرض الكلى المزمن يرتبط بفقر الدم وتسارع التصلب الشرياني.", ["HF", "Anemia"])
               ]
             }
           }
@@ -926,45 +969,45 @@
 
     {
       id: "psh",
-      label: "Past surgical history",
+      label: "التاريخ الجراحي السابق",
       steps: [
         {
           id: "pshOps",
           sectionId: "psh",
-          sectionLabel: "Past surgical history",
-          question: "Have you ever had any of the following procedures?",
+          sectionLabel: "التاريخ الجراحي السابق",
+          question: "هل خضعت لأي من الإجراءات التالية؟",
           type: "multi",
           options: {
             cabg: {
-              label: "Open-heart surgery / CABG",
-              dxAdd: addDx(["IHD"]),
+              label: "عملية قلب مفتوح / مجازة تاجية (CABG)",
+              dxAdd: addDx(["IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Previous CABG indicates established ischemic heart disease.", ["IHD"])
+                r("جراحة المجازة التاجية السابقة تشير إلى مرض قلب إقفاري مؤكد.", ["IHD", "ACS"])
               ]
             },
             pci: {
-              label: "Coronary angioplasty / PCI",
-              dxAdd: addDx(["IHD"]),
+              label: "توسيع شريان تاجي / قسطرة (PCI)",
+              dxAdd: addDx(["IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Previous PCI confirms significant coronary artery disease.", ["IHD"])
+                r("القسطرة التاجية السابقة تؤكد وجود مرض شريان تاجي هام.", ["IHD", "ACS"])
               ]
             },
             amputation: {
-              label: "Limb amputation due to diabetic gangrene",
+              label: "بتر طرف بسبب الغرغرينا السكرية (Limb amputation)",
               dxAdd: addDx(["PAD"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Amputation for diabetic foot gangrene reflects severe peripheral arterial disease.", ["PAD"])
+                r("البتر بسبب القدم السكرية يعكس مرض شريان محيطي شديد.", ["PAD"])
               ]
             },
             majorSurgery: {
-              label: "Recent major surgery or prolonged immobilization",
+              label: "جراحة كبرى حديثة أو تثبيت لفترة طويلة (Recent major surgery or prolonged immobilization)",
               dxAdd: addDx(["PEMajor"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Major surgery and immobility are strong provoking factors for pulmonary embolism.", ["PEMajor"])
+                r("الجراحة الكبرى والجمود عوامل محرضة قوية للانصمام الرئوي.", ["PEMajor"])
               ]
             }
           }
@@ -974,53 +1017,53 @@
 
     {
       id: "dh",
-      label: "Drug history",
+      label: "تاريخ الأدوية",
       steps: [
         {
           id: "drugHistory",
           sectionId: "dh",
-          sectionLabel: "Drug history",
-          question: "What chronic medications are you taking?",
+          sectionLabel: "تاريخ الأدوية",
+          question: "ما هي الأدوية المزمنة التي تتناولها؟",
           type: "multi",
           options: {
             insulin: {
-              label: "Insulin",
-              dxAdd: addDx(["IHD"]),
+              label: "الأنسولين (Insulin)",
+              dxAdd: addDx(["IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Insulin use implies long-standing diabetes, a major risk factor for IHD.", ["IHD"])
+                r("استخدام الأنسولين يدل على سكري طويل الأمد، وهو عامل خطر رئيسي للإقفار القلبي.", ["IHD", "ACS"])
               ]
             },
             acei: {
-              label: "ACE inhibitor",
-              dxAdd: addDx(["HF", "IHD"]),
+              label: "مثبط الإنزيم المحول للأنجيوتنسين (ACE inhibitor)",
+              dxAdd: addDx(["HF", "IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("ACE inhibitors are commonly used for heart failure and ischemic heart disease.", ["HF", "IHD"])
+                r("تستخدم مثبطات ACE عادةً لفشل القلب ومرض القلب الإقفاري.", ["HF", "IHD", "ACS"])
               ]
             },
             aspirin: {
-              label: "Aspirin",
-              dxAdd: addDx(["IHD"]),
+              label: "الأسبرين (Aspirin)",
+              dxAdd: addDx(["IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Chronic aspirin use suggests secondary prevention for ischemic heart disease.", ["IHD"])
+                r("الاستخدام المزمن للأسبرين يشير إلى وقاية ثانوية لمرض القلب الإقفاري.", ["IHD", "ACS"])
               ]
             },
             statin: {
-              label: "Statin",
-              dxAdd: addDx(["IHD"]),
+              label: "الستاتين (Statin)",
+              dxAdd: addDx(["IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Statins are given for dyslipidemia and prevention of atherosclerotic events.", ["IHD"])
+                r("تُعطى الستاتينات لاضطراب شحوم الدم والوقاية من أحداث التصلب الشرياني.", ["IHD", "ACS"])
               ]
             },
             anticoag: {
-              label: "Oral anticoagulant",
+              label: "مضاد تخثر فموي (Oral anticoagulant)",
               dxAdd: addDx(["PE", "Stroke"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Long-term anticoagulation suggests previous thromboembolism or atrial fibrillation.", ["PE", "Stroke"])
+                r("مضادات التخثر تشير إلى خثار صمي سابق أو رجفان أذيني.", ["PE", "Stroke"])
               ]
             }
           }
@@ -1030,37 +1073,37 @@
 
     {
       id: "fh",
-      label: "Family history",
+      label: "التاريخ العائلي",
       steps: [
         {
           id: "familyHistory",
           sectionId: "fh",
-          sectionLabel: "Family history",
-          question: "Is there any relevant family history?",
+          sectionLabel: "التاريخ العائلي",
+          question: "هل يوجد تاريخ عائلي ذي صلة؟",
           type: "multi",
           options: {
             ihdFamily: {
-              label: "Ischemic heart disease in a first-degree relative",
-              dxAdd: addDx(["IHD"]),
+              label: "مرض القلب الإقفاري لدى قريب من الدرجة الأولى (IHD in a first-degree relative)",
+              dxAdd: addDx(["IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Family history of IHD in first-degree relatives indicates strong genetic predisposition.", ["IHD"])
+                r("التاريخ العائلي لمرض القلب الإقفاري يشير إلى استعداد وراثي قوي.", ["IHD", "ACS"])
               ]
             },
             suddenDeath: {
-              label: "Sudden unexplained cardiac death in the family",
-              dxAdd: addDx(["IHD"]),
+              label: "وفاة قلبية مفاجئة غير مفسرة في العائلة (Sudden unexplained cardiac death)",
+              dxAdd: addDx(["IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Sudden cardiac deaths in the family may reflect inherited arrhythmia or severe ischemic disease.", ["IHD"])
+                r("الوفيات القلبية المفاجئة في العائلة قد تعكس اضطراب نظم موروث أو مرض إقفاري شديد.", ["IHD", "ACS"])
               ]
             },
             dmHtnFamily: {
-              label: "Diabetes or hypertension in the family",
-              dxAdd: addDx(["IHD", "PAD", "Stroke"]),
+              label: "سكري أو ارتفاع ضغط دم في العائلة (Diabetes or Hypertension in the family)",
+              dxAdd: addDx(["IHD", "ACS", "PAD", "Stroke"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Family clustering of diabetes and hypertension supports atherosclerotic cardiovascular risk.", ["IHD", "Stroke"])
+                r("تجمع السكري وارتفاع الضغط في العائلة يدعم خطر الأوعية القلبية التصلبية.", ["IHD", "ACS", "Stroke"])
               ]
             }
           }
@@ -1070,61 +1113,60 @@
 
     {
       id: "sh",
-      label: "Social history",
+      label: "التاريخ الاجتماعي",
       steps: [
         {
           id: "socialHistory",
           sectionId: "sh",
-          sectionLabel: "Social history",
-          question: "What about lifestyle and habits?",
+          sectionLabel: "التاريخ الاجتماعي",
+          question: "ماذا عن نمط الحياة والعادات؟ (التدخين، الكحول، المهنة)",
           type: "multi",
           options: {
             smoker: {
-              label: "Current smoker",
-              dxAdd: addDx(["IHD", "PAD", "PE", "Pneumothorax"]),
+              label: "مدخن حالي (Current smoker)",
+              dxAdd: addDx(["IHD", "ACS", "PAD", "PE", "Pneumothorax"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Smoking accelerates atherosclerosis and increases risk of IHD, PAD and pulmonary embolism; it is also a risk for pneumothorax.", ["IHD", "PAD", "PE", "Pneumothorax"])
+                r("التدخين يسرّع التصلب الشرياني ويزيد خطر الإقفار، وهو أيضاً عامل خطر لاسترواح الصدر.", ["IHD", "ACS", "PAD", "PE", "Pneumothorax"])
               ]
             },
             exSmoker: {
-              label: "Ex-smoker",
-              dxAdd: addDx(["IHD"]),
+              label: "مدخن سابق (Ex-smoker)",
+              dxAdd: addDx(["IHD", "ACS"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Ex-smokers retain cardiovascular risk for many years after quitting.", ["IHD"])
+                r("المدخنون السابقون يحتفظون بخطر قلبي وعائي لسنوات عديدة بعد الإقلاع.", ["IHD", "ACS"])
               ]
             },
             alcohol: {
-              label: "Regular alcohol intake",
-              dxAdd: addDx([]),
+              label: "تناول منتظم للكحول (Regular alcohol intake)",
+              dxAdd: addDx(["HF"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Heavy alcohol consumption may contribute to cardiomyopathy and arrhythmia.", [])
+                r("الاستهلاك المفرط للكحول قد يساهم في اعتلال عضلة القلب وفشل القلب.", ["HF"])
               ]
             },
             sedentary: {
-              label: "Sedentary lifestyle",
-              dxAdd: addDx(["IHD", "PAD"]),
+              label: "نمط حياة خامل (Sedentary lifestyle)",
+              dxAdd: addDx(["IHD", "ACS", "PAD"]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Sedentary lifestyle promotes obesity and atherosclerotic cardiovascular disease.", ["IHD", "PAD"])
+                r("نمط الحياة الخامل يعزز السمنة وأمراض القلب الوعائية التصلبية.", ["IHD", "ACS", "PAD"])
               ]
             },
             active: {
-              label: "Regular physical activity",
+              label: "نشاط بدني منتظم (Regular physical activity)",
               dxAdd: addDx([]),
               dxRemove: addDx([]),
               reasoning: [
-                r("Regular exercise is protective but does not fully exclude cardiac disease.", [])
+                r("التمارين المنتظمة واقية ولكنها لا تستبعد تماماً أمراض القلب.", [])
               ]
             }
           }
         }
       ]
     }
-
-    // Section "case presentation" ممكن إضافته لاحقاً لعمل summary تلقائي
+    
   ];
 
   // Expose as global
