@@ -64,7 +64,7 @@ function renderDDx() {
 
     const header = document.createElement("div");
     header.className = "dd-group-header";
-    header.textContent = g.label;
+    header.textContent = g.label; // English
     groupDiv.appendChild(header);
 
     const body = document.createElement("div");
@@ -83,7 +83,7 @@ function renderDDx() {
 
       const scoreSpan = document.createElement("span");
       scoreSpan.className = "dd-score";
-      scoreSpan.textContent = `Score: ${item.score}`;
+      scoreSpan.textContent = `Score: ${item.score}`; // English
 
       dHeader.appendChild(nameSpan);
       dHeader.appendChild(scoreSpan);
@@ -93,7 +93,7 @@ function renderDDx() {
       if (item.wells) {
           const wellsDiv = document.createElement("div");
           wellsDiv.className = "dd-wells-score";
-          wellsDiv.textContent = item.wells; 
+          wellsDiv.textContent = item.wells; // English
           diseaseDiv.appendChild(wellsDiv);
           
           if (item.wells.includes('High Risk')) {
@@ -114,7 +114,7 @@ function renderDDx() {
 
         const toggleBtn = document.createElement("button");
         toggleBtn.className = "dd-toggle";
-        toggleBtn.textContent = "Show Positive Features";
+        toggleBtn.textContent = "Show Positive Features"; // English
 
         toggleBtn.addEventListener("click", () => {
           ul.classList.toggle("hidden");
@@ -134,7 +134,7 @@ function renderDDx() {
         
         const missingHeader = document.createElement("div");
         missingHeader.className = "dd-missing-header";
-        missingHeader.textContent = "Key Next Steps:";
+        missingHeader.textContent = "Key Next Steps:"; // English
         missingDiv.appendChild(missingHeader);
 
         const missingUl = document.createElement("ul");
@@ -174,7 +174,7 @@ function renderDDx() {
 
         const t = engine.getStepType(step);
         
-        // Keep selected label (Arabic)
+        // Keep selected label (Arabic + English Key Term)
         if (t === "single" && step.options && step.options[val]) {
            answers[step.id] = step.options[val].label;
         } else if (t === "multi" && step.options) {
@@ -182,7 +182,7 @@ function renderDDx() {
               .map((key) => step.options[key])
               .filter(Boolean)
               .map((opt) => opt.label)
-              .join("، "); // Use Arabic comma separator
+              .join(", "); 
         } else {
            answers[step.id] = val;
         }
@@ -210,9 +210,8 @@ function renderDDx() {
       if (personal.name) line += `Patient **${personal.name}**`;
       
       const age = personal.ageGroup || "unknown age";
-      const sex = personal.sex || "unknown sex";
+      const sex = personal.sex ? personal.sex.split('(')[0].trim() : "unknown sex"; // Use only Arabic part
 
-      // Note: We use English structure for the case presentation output
       line += ` is a **${age}** year old **${sex}** presenting with chest pain.`;
       
       parts.push({ title: "Patient Data", lines: [line] });
@@ -378,7 +377,7 @@ function renderDDx() {
     if (!elCaseModal) return;
     elCaseModal.classList.add("hidden");
   }
-    // ===== CASE MODAL EVENTS (Arabic) =====
+    // ===== CASE MODAL EVENTS =====
   if (elCaseClose) {
     elCaseClose.addEventListener("click", closeCaseModal);
   }
@@ -484,6 +483,7 @@ function renderReasoning(step) {
   Object.entries(step.options).forEach(([key, opt]) => {
     const row = document.createElement("label");
     row.className = "option-row";
+    row.dir = "rtl"; // Ensure question options are RTL
 
     const input = document.createElement("input");
     input.type = t === "multi" ? "checkbox" : "radio";
@@ -514,7 +514,7 @@ function renderReasoning(step) {
 
     const span = document.createElement("span");
     span.className = "option-label";
-    span.textContent = opt.label || key;
+    span.textContent = opt.label || key; // Arabic Q text
 
     row.appendChild(input);
     row.appendChild(span);
@@ -530,8 +530,8 @@ function renderCurrentStep() {
   const prog = engine.getProgressInfo();
 
   // labels
-  elSectionLabel.textContent = step.sectionLabel || "";
-  elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
+  elSectionLabel.textContent = step.sectionLabel || ""; // Arabic
+  elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`; // English
 
   const totalInSection = engine.steps.filter(
     (s) => s.sectionId === step.sectionId
@@ -542,9 +542,11 @@ function renderCurrentStep() {
       .findIndex((s) => s.id === step.id) + 1;
 
   elSectionStepCtr.textContent =
-    `${step.sectionLabel} – Question ${indexInSection}/${totalInSection}`;
+    `${step.sectionLabel} – Question ${indexInSection}/${totalInSection}`; // Mix of Arabic/English
 
-  elQuestionText.textContent = step.question || "";
+  elQuestionText.textContent = step.question || ""; // Arabic Question
+  elQuestionText.dir = "rtl";
+
   renderReasoning(step);      
   renderClinicalReasoning(step);
 
@@ -553,11 +555,10 @@ function renderCurrentStep() {
 
   elBtnPrev.disabled = isFirst;
   elBtnNext.disabled = false;
-  elBtnNext.textContent = isLast ? "Case Presentation" : "Next";
   
-  // Update Arabic button texts in footer
-  document.getElementById("btnPrev").textContent = "السابق";
-  document.getElementById("btnNext").textContent = isLast ? "عرض الحالة" : "التالي";
+  // English button labels
+  document.getElementById("btnPrev").textContent = "Previous";
+  document.getElementById("btnNext").textContent = isLast ? "Case Presentation" : "Next";
 }
 
   // ---------- Button handlers ----------

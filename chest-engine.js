@@ -167,7 +167,7 @@ function calculateWellsScore() {
     score += 1.5;
   }
 
-  // 5. Previous DVT/PE (1.5 points) - نستخدم مضادات التخثر كبديل مقترح
+  // 5. Previous DVT/PE (1.5 points)
   if (Array.isArray(ans.drugHistory) && ans.drugHistory.includes('anticoag')) {
     score += 1.5;
   }
@@ -177,14 +177,11 @@ function calculateWellsScore() {
     score += 1;
   }
   
-  // 7. Malignancy (1 point) - غير متوفرة في الأسئلة الحالية
+  // 7. Malignancy (1 point) - not available
 
   state.wellsScore = score;
   
-  // تطبيق نقاط إضافية على PE بناءً على نتيجة Wells Score
-  // Low Risk: (Score < 2) -> لا يوجد نقاط إضافية
-  // Moderate Risk: (Score 2 - 6) -> +5
-  // High Risk: (Score > 6) -> +10
+  // Apply additional points based on Wells Score result
   if (score > 6) {
     bumpDx('PE', 10, `Wells Score High Risk: ${score} points`);
     bumpDx('PEMajor', 10, `Wells Score High Risk: ${score} points`);
