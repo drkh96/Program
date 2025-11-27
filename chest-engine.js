@@ -1,6 +1,6 @@
 // ========================================
 // chest-engine.js
-// Core logic for chest pain history engine (Updated with Wells Score)
+// Core logic for chest pain history engine (Updated with HEART & Wells Score)
 // ========================================
 
 "use strict";
@@ -29,6 +29,7 @@
   });
 
   // Diagnosis index
+  // PRETTY_NAME is used for English display in Clinical Reasoning Card
   const PRETTY_NAME = {
       IHD: "Ischemic Heart Disease",
       StableAngina: "Stable Angina",
@@ -62,7 +63,8 @@
     currentIndex: 0,
     answers: {},
     dxScores: {},
-    wellsScore: 0
+    wellsScore: 0,
+    heartScore: 0 // HEART Score
   };
 
   function resetDxScores() {
@@ -74,6 +76,7 @@
       };
     });
     state.wellsScore = 0;
+    state.heartScore = 0;
   }
 
   // helper to add score/feature
@@ -107,12 +110,12 @@ function applyOptionEffect(step, optKey) {
   const opt = step.options[optKey];
   if (!opt) return;
 
-  const feature = opt.label || optKey;
+  const feature = opt.label || optKey; // The Arabic label with English key term
 
   (opt.dxAdd || []).forEach((dxId) => {
     let weight = 2; // Default weight
 
-    // Red Flags (+10)
+    // Red Flags (+10) - based on Arabic text (which includes the English key term)
     if (dxId === "AorticDissection" && (feature.includes("تمزيقي") || feature.includes("يشع إلى الظهر"))) {
         weight = 10; 
     }
@@ -143,42 +146,31 @@ function applyOptionEffect(step, optKey) {
 }
 
 // --------------------------------------
-// Wells' Criteria for Pulmonary Embolism (PE)
+// 🚨 Wells' Criteria for Pulmonary Embolism (PE)
 // --------------------------------------
 
 function calculateWellsScore() {
   let score = 0;
   const ans = state.answers;
   
-  // 1. Signs/symptoms of DVT (3 points)
-  if (Array.isArray(ans.rosCVS) && ans.rosCVS.includes('legEdema')) {
-    score += 3;
-  }
+  // 1. Signs/symptoms of DVT (3 points) - using leg swelling as proxy
+  if (Array.isArray(ans.rosCVS) && ans.rosCVS.includes('legEdema')) score += 3;
 
-  // 2. PE is #1 diagnosis OR equally likely (3 points)
+  // 2. PE is #1 diagnosis OR equally likely (3 points) - using sudden onset + sharp pain as proxy
   const onset = ans.onset;
   const character = ans.character;
-  if (onset === 'sudden' && character === 'sharp') {
-      score += 3; 
-  }
+  if (onset === 'sudden' && character === 'sharp') score += 3; 
 
   // 4. Immobilization (>= 3 days) or surgery in the previous 4 weeks (1.5 points)
-  if (Array.isArray(ans.pshOps) && ans.pshOps.includes('majorSurgery')) {
-    score += 1.5;
-  }
+  if (Array.isArray(ans.pshOps) && ans.pshOps.includes('majorSurgery')) score += 1.5;
 
-  // 5. Previous DVT/PE (1.5 points)
-  if (Array.isArray(ans.drugHistory) && ans.drugHistory.includes('anticoag')) {
-    score += 1.5;
-  }
+  // 5. Previous DVT/PE (1.5 points) - using anticoagulants as proxy
+  if (Array.isArray(ans.drugHistory) && ans.drugHistory.includes('anticoag')) score += 1.5;
   
   // 6. Hemoptysis (1 point)
-  if (Array.isArray(ans.associated) && ans.associated.includes('hemoptysis')) {
-    score += 1;
-  }
+  if (Array.isArray(ans.associated) && ans.associated.includes('hemoptysis')) score += 1;
   
-  // 7. Malignancy (1 point) - not available
-
+  // Total score calculation
   state.wellsScore = score;
   
   // Apply additional points based on Wells Score result
@@ -189,6 +181,62 @@ function calculateWellsScore() {
     bumpDx('PE', 5, `Wells Score Moderate Risk: ${score} points`);
     bumpDx('PEMajor', 5, `Wells Score Moderate Risk: ${score} points`);
   }
+}
+
+
+// --------------------------------------
+// ❤️ HEART Score for Major Adverse Cardiac Event (MACE) Risk
+// --------------------------------------
+
+function calculateHEARTScore() {
+    let heartScore = 0;
+    const ans = state.answers;
+    
+    // H: History (0-2 points)
+    let historyPoints = 0;
+    const isTypical = ans.character === 'tight' && ans.radiation === 'arm' && ans.relief === 'rest';
+    const isSuspicious = ans.character === 'tight' && (ans.radiation === 'arm' || ans.relief === 'rest');
+    
+    if (isTypical) historyPoints = 2; 
+    else if (isSuspicious) historyPoints = 1; 
+    
+    heartScore += historyPoints; 
+    
+    // E: ECG - 0 points (Data not available yet)
+
+    // A: Age (0-2 points)
+    const age = parseInt(ans.ageGroup);
+    if (!isNaN(age)) {
+        if (age >= 65) heartScore += 2;
+        else if (age >= 45) heartScore += 1;
+    }
+    
+    // R: Risk factors (0-2 points)
+    let riskFactorCount = 0;
+    const pmh = ans.pmhChronic || [];
+    const fh = ans.familyHistory || [];
+    const sh = ans.socialHistory || [];
+    
+    if (pmh.includes('dm')) riskFactorCount++;
+    if (pmh.includes('htn')) riskFactorCount++;
+    if (pmh.includes('dyslipidemia')) riskFactorCount++;
+    if (fh.includes('ihdFamily') || fh.includes('dmHtnFamily')) riskFactorCount++;
+    if (sh.includes('smoker') || sh.includes('exSmoker')) riskFactorCount++;
+    
+    if (riskFactorCount >= 3) heartScore += 2;
+    else if (riskFactorCount >= 1) heartScore += 1;
+    
+    // T: Troponin - 0 points (Data not available yet)
+
+    state.heartScore = heartScore;
+    
+    // Apply additional points based on HEART Score result
+    if (heartScore >= 7) { 
+        bumpDx('ACS', 10, `HEART Score High Risk (H/A/R): ${heartScore} points`);
+        bumpDx('MI', 5, `HEART Score High Risk (H/A/R): ${heartScore} points`);
+    } else if (heartScore >= 4) {
+        bumpDx('ACS', 5, `HEART Score Moderate Risk (H/A/R): ${heartScore} points`);
+    }
 }
   
   // --------------------------------------
@@ -244,8 +292,9 @@ function calculateWellsScore() {
       }
     });
     
-    // Run Wells Score Calculation
+    // Run all Clinical Scores
     calculateWellsScore();
+    calculateHEARTScore();
   }
 
   // --------------------------------------
@@ -275,6 +324,11 @@ function calculateWellsScore() {
   function getCurrentStep() {
     return STEPS[state.currentIndex] || null;
   }
+  
+  function goToStep(idx) {
+    if (idx < 0 || idx >= STEPS.length) return;
+    state.currentIndex = idx;
+  }
 
   function nextStep() {
     if (state.currentIndex < STEPS.length - 1) {
@@ -288,11 +342,6 @@ function calculateWellsScore() {
     }
   }
 
-  function goToStep(idx) {
-    if (idx < 0 || idx >= STEPS.length) return;
-    state.currentIndex = idx;
-  }
-
   function getProgressInfo() {
     const total = STEPS.length;
     const current = state.currentIndex + 1;
@@ -303,7 +352,7 @@ function calculateWellsScore() {
   }
 
   // --------------------------------------
-  // Build DDx list grouped by system (INCLUDE MISSING FEATURES)
+  // Build DDx list grouped by system (INCLUDE MISSING FEATURES & SCORES)
   // --------------------------------------
 
   function getDDxGrouped() {
@@ -334,15 +383,21 @@ function calculateWellsScore() {
         };
       }
       
-      let wellsStatus = null;
+      let statusScore = null;
       if (dxId === 'PE' || dxId === 'PEMajor') {
           const score = state.wellsScore;
           let risk = 'Low';
           if (score >= 2 && score <= 6) risk = 'Moderate';
           else if (score > 6) risk = 'High';
-          
-          wellsStatus = `Wells Score: ${score} (${risk} Risk)`;
+          statusScore = `Wells Score: ${score} (${risk} Risk)`;
+      } else if (dxId === 'ACS' || dxId === 'MI' || dxId === 'UnstableAngina') {
+          const score = state.heartScore;
+          let risk = 'Low';
+          if (score >= 4 && score <= 6) risk = 'Moderate';
+          else if (score >= 7) risk = 'High';
+          statusScore = `HEART Score (H,A,R): ${score} (${risk} Risk)`;
       }
+
 
       groups[gId].items.push({
         id: dxId,
@@ -350,7 +405,7 @@ function calculateWellsScore() {
         score: obj.score,
         features: obj.features || [],
         missing: dxMeta.keyMissingFeatures || [], 
-        wells: wellsStatus 
+        clinicalScore: statusScore 
       });
     });
 
@@ -416,8 +471,7 @@ function calculateWellsScore() {
   getCurrentStep,
   nextStep,
   prevStep,
-  goToStep,
-  setAnswer,
+  goToStep, 
   getProgressInfo,
   getDDxGrouped,
   getReasoningFor,

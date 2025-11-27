@@ -1,6 +1,6 @@
 // ========================================
 // chest-ui.js
-// Connect ChestEngine with the 3-card UI (Arabic Questions / English UI)
+// Connect ChestEngine with the 3-card UI (Arabic Questions / English UI / LTR Alignment)
 // ========================================
 
 "use strict";
@@ -27,10 +27,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const elReasonList      = document.getElementById("reasonList");
 
   const elDDxContainer    = document.getElementById("ddxContainer");
+  const elNavBar          = document.querySelector(".nav-bar");
 
   const elBtnPrev         = document.getElementById("btnPrev");
   const elBtnNext         = document.getElementById("btnNext");
-  // Case presentation modal elements
+  
   const elCaseModal    = document.getElementById("caseModal");
   const elCaseContent  = document.getElementById("caseModalContent");
   const elCaseClose    = document.getElementById("caseModalClose");
@@ -39,12 +40,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let lastCaseText = "";
   
-  if (!elQuestionText || !elOptions || !elDDxContainer) {
+  if (!elQuestionText || !elOptions || !elDDxContainer || !elNavBar) {
     console.error("UI elements missing.");
     return;
   }
 
-  // ---------- Helpers ----------
+  // --- Rendering Functions ---
+
 function renderDDx() {
   const groups = engine.getDDxGrouped();
   elDDxContainer.innerHTML = "";
@@ -58,13 +60,12 @@ function renderDDx() {
   }
 
   groups.forEach((g) => {
-    // Group card
     const groupDiv = document.createElement("div");
-    groupDiv.className = `dd-group-card dd-group-card--${g.id}`;
+    groupDiv.className = `dd-group-card dd-group-card--${g.id}`; 
 
     const header = document.createElement("div");
     header.className = "dd-group-header";
-    header.textContent = g.label; // English
+    header.textContent = g.label; 
     groupDiv.appendChild(header);
 
     const body = document.createElement("div");
@@ -79,32 +80,35 @@ function renderDDx() {
 
       const nameSpan = document.createElement("span");
       nameSpan.className = "dd-name";
-      nameSpan.textContent = item.label; // English Label
+      nameSpan.textContent = item.label; 
 
       const scoreSpan = document.createElement("span");
       scoreSpan.className = "dd-score";
-      scoreSpan.textContent = `Score: ${item.score}`; // English
+      scoreSpan.textContent = `Score: ${item.score}`; 
 
       dHeader.appendChild(nameSpan);
       dHeader.appendChild(scoreSpan);
       diseaseDiv.appendChild(dHeader);
       
-      // Display Wells Score if available
-      if (item.wells) {
-          const wellsDiv = document.createElement("div");
-          wellsDiv.className = "dd-wells-score";
-          wellsDiv.textContent = item.wells; // English
-          diseaseDiv.appendChild(wellsDiv);
+      // Display Clinical Scores (Wells or HEART)
+      if (item.clinicalScore) {
+          const scoreDiv = document.createElement("div");
+          scoreDiv.className = `dd-score-status dd-score-status--${item.clinicalScore.includes('HEART') ? 'heart' : 'wells'}`;
+          scoreDiv.textContent = item.clinicalScore;
+          diseaseDiv.appendChild(scoreDiv);
           
-          if (item.wells.includes('High Risk')) {
+          if (item.clinicalScore.includes('High Risk')) {
               scoreSpan.style.color = '#f87171';
+              scoreDiv.style.color = '#f87171'; 
+          } else if (item.clinicalScore.includes('Moderate Risk')) {
+              scoreDiv.style.color = '#ffc400'; 
           }
       }
 
       // LOGIC FOR POSITIVE FEATURES
       if (item.features && item.features.length) {
         const ul = document.createElement("ul");
-        ul.className = "dd-features hidden";
+        ul.className = "dd-features hidden"; 
 
         item.features.forEach((f) => {
           const li = document.createElement("li");
@@ -114,7 +118,7 @@ function renderDDx() {
 
         const toggleBtn = document.createElement("button");
         toggleBtn.className = "dd-toggle";
-        toggleBtn.textContent = "Show Positive Features"; // English
+        toggleBtn.textContent = "Show Positive Features"; 
 
         toggleBtn.addEventListener("click", () => {
           ul.classList.toggle("hidden");
@@ -134,7 +138,7 @@ function renderDDx() {
         
         const missingHeader = document.createElement("div");
         missingHeader.className = "dd-missing-header";
-        missingHeader.textContent = "Key Next Steps:"; // English
+        missingHeader.textContent = "Key Next Steps:"; 
         missingDiv.appendChild(missingHeader);
 
         const missingUl = document.createElement("ul");
@@ -158,39 +162,159 @@ function renderDDx() {
     elDDxContainer.appendChild(groupDiv);
   });
 }
-  // ===== Helpers to build Case Presentation (NARRATIVE SUMMARY) =====
-  
-  function getSectionNarrative(sectionId) {
-    const answers = {};
-    engine.steps
-      .filter((s) => s.sectionId === sectionId)
-      .forEach((step) => {
-        const val = engine.state.answers[step.id];
 
-        if (val === undefined || val === null || val === "" ||
-            (Array.isArray(val) && val.length === 0)) {
-          return;
-        }
+function renderClinicalReasoning(step) {
+  const val = engine.state.answers[step.id];
+  const reasons = engine.getReasoningFor(step, val);
 
-        const t = engine.getStepType(step);
-        
-        // Keep selected label (Arabic + English Key Term)
-        if (t === "single" && step.options && step.options[val]) {
-           answers[step.id] = step.options[val].label;
-        } else if (t === "multi" && step.options) {
-           answers[step.id] = (Array.isArray(val) ? val : [])
-              .map((key) => step.options[key])
-              .filter(Boolean)
-              .map((opt) => opt.label)
-              .join(", "); 
-        } else {
-           answers[step.id] = val;
-        }
-      });
-      return answers;
+  elReasonList.innerHTML = "";
+
+  if (!reasons.length) {
+    elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
+    return;
   }
 
-  function buildCasePresentation() {
+  elReasonQuestion.textContent = "Clinical Reasoning:";
+
+  reasons.forEach((r) => {
+    const li = document.createElement("li");
+    li.className = "reason-item";
+
+    const text = document.createElement("span");
+    text.className = "reason-text";
+    text.textContent = r.text; 
+
+    const dis = document.createElement("span");
+    dis.className = "reason-diseases";
+    dis.textContent = r.diseases
+  .map(d => engine.pretty[d] || d)
+  .join(", ");
+
+    li.appendChild(text);
+    li.appendChild(dis);
+
+    elReasonList.appendChild(li);
+  });
+}
+  
+function renderReasoning(step) {
+  elOptions.innerHTML = "";
+  const t = engine.getStepType(step);
+  const val = engine.state.answers[step.id];
+
+  if (t === "numeric") {
+    const input = document.createElement("input");
+    input.type = "number";
+    input.min = "0";
+    input.max = "100"; 
+    input.value = val !== undefined ? val : "";
+    input.placeholder = step.id === "severity" ? "0–10" : "Age in years"; 
+
+    input.addEventListener("input", () => {
+      engine.setAnswer(step.id, input.value);
+      renderDDx();
+      renderReasoning(step);
+      renderClinicalReasoning(step);
+    });
+
+    elOptions.appendChild(input);
+    return;
+  }
+
+  if (t === "text") {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = val || "";
+    input.placeholder = "Type your answer here...";
+
+    input.addEventListener("input", () => {
+      engine.setAnswer(step.id, input.value);
+      if (step.getDxFromText) {
+         renderDDx();
+      }
+      renderClinicalReasoning(step);
+    });
+
+    elOptions.appendChild(input);
+    return;
+  }
+
+  // single/multi choice
+  if (!step.options) return;
+
+  Object.entries(step.options).forEach(([key, opt]) => {
+    const row = document.createElement("label");
+    row.className = "option-row";
+    row.dir = "rtl"; 
+
+    const input = document.createElement("input");
+    input.type = t === "multi" ? "checkbox" : "radio";
+    input.name = step.id;
+    input.value = key;
+
+    if (t === "multi" && Array.isArray(val) && val.includes(key)) {
+      input.checked = true;
+    }
+    if (t === "single" && val === key) {
+      input.checked = true;
+    }
+
+    input.addEventListener("change", () => {
+      if (t === "multi") {
+        const selected = [];
+        const inputs = elOptions.querySelectorAll("input[type=checkbox]");
+        inputs.forEach((chk) => {
+          if (chk.checked) selected.push(chk.value);
+        });
+        engine.setAnswer(step.id, selected);
+      } else {
+        engine.setAnswer(step.id, key);
+      }
+      renderDDx();
+      renderClinicalReasoning(step);
+    });
+
+    const span = document.createElement("span");
+    span.className = "option-label";
+    span.textContent = opt.label || key; 
+
+    row.appendChild(input);
+    row.appendChild(span);
+
+    elOptions.appendChild(row);
+  });
+}
+
+function getSectionNarrative(sectionId) {
+    const answers = {};
+    engine.steps
+        .filter((s) => s.sectionId === sectionId)
+        .forEach((step) => {
+            const val = engine.state.answers[step.id];
+
+            if (val === undefined || val === null || val === "" ||
+                (Array.isArray(val) && val.length === 0)) {
+                return;
+            }
+
+            const t = engine.getStepType(step);
+            
+            if (t === "single" && step.options && step.options[val]) {
+                answers[step.id] = step.options[val].label;
+            } else if (t === "multi" && step.options) {
+                answers[step.id] = (Array.isArray(val) ? val : [])
+                    .map((key) => step.options[key])
+                    .filter(Boolean)
+                    .map((opt) => opt.label)
+                    .join(", "); 
+            } else {
+                answers[step.id] = val;
+            }
+        });
+        return answers;
+}
+
+function buildCasePresentation() {
     const parts = [];
     let textSummary = "";
     
@@ -210,7 +334,7 @@ function renderDDx() {
       if (personal.name) line += `Patient **${personal.name}**`;
       
       const age = personal.ageGroup || "unknown age";
-      const sex = personal.sex ? personal.sex.split('(')[0].trim() : "unknown sex"; // Use only Arabic part
+      const sex = personal.sex ? personal.sex.split('(')[0].trim() : "unknown sex";
 
       line += ` is a **${age}** year old **${sex}** presenting with chest pain.`;
       
@@ -320,8 +444,8 @@ function renderDDx() {
         );
       }
       
-      if (main.wells) {
-          dxLines.push(`**${main.wells}**.`);
+      if (main.clinicalScore) {
+          dxLines.push(`**Clinical Score Risk:** ${main.clinicalScore}.`);
       }
 
 
@@ -362,22 +486,115 @@ function renderDDx() {
     });
 
     return { html, text: rawText };
-  }
+}
 
-
-  function openCaseModal() {
+function openCaseModal() {
     if (!elCaseModal || !elCaseContent) return;
     const result = buildCasePresentation();
     elCaseContent.innerHTML = result.html;
     lastCaseText = result.text;
     elCaseModal.classList.remove("hidden");
-  }
+}
 
-  function closeCaseModal() {
+function closeCaseModal() {
     if (!elCaseModal) return;
     elCaseModal.classList.add("hidden");
-  }
-    // ===== CASE MODAL EVENTS =====
+}
+
+  
+// 💡 NEW: Render Navigation Bar
+function renderNavBar() {
+    elNavBar.innerHTML = '';
+    const sections = engine.sections;
+    const currentStep = engine.getCurrentStep();
+    
+    sections.forEach((sec) => {
+        // Find the index of the first step in this section
+        const firstStepInSection = engine.steps.find(s => s.sectionId === sec.id);
+        if (!firstStepInSection) return;
+
+        const stepIndex = engine.steps.indexOf(firstStepInSection);
+
+        const button = document.createElement('button');
+        button.textContent = sec.label; 
+        button.dir = "rtl";
+        button.classList.add('nav-button');
+
+        // Highlight the active section
+        if (currentStep && currentStep.sectionId === sec.id) {
+            button.classList.add('active');
+        }
+        
+        // Non-linear Navigation
+        button.addEventListener('click', () => {
+            engine.goToStep(stepIndex);
+            renderCurrentStep();
+        });
+
+        elNavBar.appendChild(button);
+    });
+}
+
+
+function renderCurrentStep() {
+  const step = engine.getCurrentStep();
+  if (!step) return;
+
+  const prog = engine.getProgressInfo();
+
+  // labels
+  elSectionLabel.textContent = step.sectionLabel || ""; 
+  elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`; 
+
+  const totalInSection = engine.steps.filter(
+    (s) => s.sectionId === step.sectionId
+  ).length;
+  const indexInSection =
+    engine.steps
+      .filter((s) => s.sectionId === step.sectionId)
+      .findIndex((s) => s.id === step.id) + 1;
+
+  elSectionStepCtr.textContent =
+    `${step.sectionLabel} – Question ${indexInSection}/${totalInSection}`; 
+
+  elQuestionText.textContent = step.question || ""; 
+  elQuestionText.dir = "rtl"; 
+
+  renderReasoning(step);      
+  renderClinicalReasoning(step);
+  renderNavBar(); // Render navigation bar on every step change
+
+  const isFirst = (engine.state.currentIndex === 0);
+  const isLast  = (engine.state.currentIndex >= engine.steps.length - 1);
+
+  elBtnPrev.disabled = isFirst;
+  elBtnNext.disabled = false;
+  
+  document.getElementById("btnPrev").textContent = "Previous";
+  document.getElementById("btnNext").textContent = isLast ? "Case Presentation" : "Next";
+}
+
+  // ---------- Button handlers ----------
+
+       elBtnNext.addEventListener("click", () => {
+    renderDDx(); 
+    
+    const isLast = (engine.state.currentIndex >= engine.steps.length - 1);
+    if (isLast) {
+      openCaseModal();
+    } else {
+      engine.nextStep();
+      renderCurrentStep();
+    }
+  });
+
+  elBtnPrev.addEventListener("click", () => {
+    engine.prevStep();
+    renderCurrentStep();
+  });
+
+
+  // ===== Event Listeners for Modal =====
   if (elCaseClose) {
     elCaseClose.addEventListener("click", closeCaseModal);
   }
@@ -399,188 +616,7 @@ function renderDDx() {
       alert("Case presentation copied to clipboard!");
     });
   }
-  
-function renderClinicalReasoning(step) {
-  const val = engine.state.answers[step.id];
-  const reasons = engine.getReasoningFor(step, val);
-
-  elReasonList.innerHTML = "";
-
-  if (!reasons.length) {
-    elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
-    return;
-  }
-
-  elReasonQuestion.textContent = "Clinical Reasoning:";
-
-  reasons.forEach((r) => {
-    const li = document.createElement("li");
-    li.className = "reason-item";
-
-    const text = document.createElement("span");
-    text.className = "reason-text";
-    text.textContent = r.text; // English Reasoning
-
-    const dis = document.createElement("span");
-    dis.className = "reason-diseases";
-    dis.textContent = r.diseases
-  .map(d => engine.pretty[d] || d)
-  .join(", ");
-
-    li.appendChild(text);
-    li.appendChild(dis);
-
-    elReasonList.appendChild(li);
-  });
-}
-// ===================================================================
-
-function renderReasoning(step) {
-  elOptions.innerHTML = "";
-  const t = engine.getStepType(step);
-  const val = engine.state.answers[step.id];
-
-  if (t === "numeric") {
-    const input = document.createElement("input");
-    input.type = "number";
-    input.min = "0";
-    input.max = "100"; 
-    input.value = val !== undefined ? val : "";
-    input.placeholder = step.id === "severity" ? "0–10" : "Age in years"; 
-
-    input.addEventListener("input", () => {
-      engine.setAnswer(step.id, input.value);
-      renderDDx();
-      renderReasoning(step);
-      renderClinicalReasoning(step);
-    });
-
-    elOptions.appendChild(input);
-    return;
-  }
-
-  if (t === "text") {
-    const input = document.createElement("input");
-    input.type = "text";
-    input.value = val || "";
-    input.placeholder = "Type your answer here...";
-
-    input.addEventListener("input", () => {
-      engine.setAnswer(step.id, input.value);
-      if (step.getDxFromText) {
-         renderDDx();
-      }
-      renderClinicalReasoning(step);
-    });
-
-    elOptions.appendChild(input);
-    return;
-  }
-
-  // single/multi choice
-  if (!step.options) return;
-
-  Object.entries(step.options).forEach(([key, opt]) => {
-    const row = document.createElement("label");
-    row.className = "option-row";
-    row.dir = "rtl"; // Ensure question options are RTL
-
-    const input = document.createElement("input");
-    input.type = t === "multi" ? "checkbox" : "radio";
-    input.name = step.id;
-    input.value = key;
-
-    if (t === "multi" && Array.isArray(val) && val.includes(key)) {
-      input.checked = true;
-    }
-    if (t === "single" && val === key) {
-      input.checked = true;
-    }
-
-    input.addEventListener("change", () => {
-      if (t === "multi") {
-        const selected = [];
-        const inputs = elOptions.querySelectorAll("input[type=checkbox]");
-        inputs.forEach((chk) => {
-          if (chk.checked) selected.push(chk.value);
-        });
-        engine.setAnswer(step.id, selected);
-      } else {
-        engine.setAnswer(step.id, key);
-      }
-      renderDDx();
-      renderClinicalReasoning(step);
-    });
-
-    const span = document.createElement("span");
-    span.className = "option-label";
-    span.textContent = opt.label || key; // Arabic Q text
-
-    row.appendChild(input);
-    row.appendChild(span);
-
-    elOptions.appendChild(row);
-  });
-}
-
-function renderCurrentStep() {
-  const step = engine.getCurrentStep();
-  if (!step) return;
-
-  const prog = engine.getProgressInfo();
-
-  // labels
-  elSectionLabel.textContent = step.sectionLabel || ""; // Arabic
-  elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`; // English
-
-  const totalInSection = engine.steps.filter(
-    (s) => s.sectionId === step.sectionId
-  ).length;
-  const indexInSection =
-    engine.steps
-      .filter((s) => s.sectionId === step.sectionId)
-      .findIndex((s) => s.id === step.id) + 1;
-
-  elSectionStepCtr.textContent =
-    `${step.sectionLabel} – Question ${indexInSection}/${totalInSection}`; // Mix of Arabic/English
-
-  elQuestionText.textContent = step.question || ""; // Arabic Question
-  elQuestionText.dir = "rtl";
-
-  renderReasoning(step);      
-  renderClinicalReasoning(step);
-
-  const isFirst = (engine.state.currentIndex === 0);
-  const isLast  = (engine.state.currentIndex >= engine.steps.length - 1);
-
-  elBtnPrev.disabled = isFirst;
-  elBtnNext.disabled = false;
-  
-  // English button labels
-  document.getElementById("btnPrev").textContent = "Previous";
-  document.getElementById("btnNext").textContent = isLast ? "Case Presentation" : "Next";
-}
-
-  // ---------- Button handlers ----------
-
-       elBtnNext.addEventListener("click", () => {
-    renderDDx(); 
-    
-    const isLast = (engine.state.currentIndex >= engine.steps.length - 1);
-    if (isLast) {
-      openCaseModal();
-    } else {
-      engine.nextStep();
-      renderCurrentStep();
-      renderClinicalReasoning(engine.getCurrentStep());
-    }
-  });
-
-  elBtnPrev.addEventListener("click", () => {
-    engine.prevStep();
-    renderCurrentStep();
-    renderClinicalReasoning(engine.getCurrentStep());
-  });
+  // --------------------------------------
 
   // ---------- Initial render ----------
 

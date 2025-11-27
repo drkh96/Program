@@ -115,23 +115,41 @@
         type: "numeric",
 
         getDxFromValue: function (value) {
+
           const n = parseInt(value);
           if (isNaN(n) || n < 0) return [];
+
           const dxList = [];
+
           if (n < 30) {
-            dxList.push({ add: ["Myocarditis", "Pericarditis", "Pneumothorax"], remove: ["IHD", "MI", "ACS", "AorticDissection", "PAD"] });
+            dxList.push({
+              add: ["Myocarditis", "Pericarditis", "Pneumothorax"],
+              remove: ["IHD", "MI", "ACS", "AorticDissection", "PAD"]
+            });
           }
+
           if (n >= 40 && n <= 65) {
-            dxList.push({ add: ["IHD", "StableAngina", "UnstableAngina", "MI", "ACS", "PAD"], remove: [] });
+            dxList.push({
+              add: ["IHD", "StableAngina", "UnstableAngina", "MI", "ACS", "PAD"],
+              remove: []
+            });
           }
+
           if (n > 65) {
-            dxList.push({ add: ["IHD", "MI", "HF", "AorticAneurysm", "AorticDissection", "ACS"], remove: [] });
+            dxList.push({
+              add: ["IHD", "MI", "HF", "AorticAneurysm", "AorticDissection", "ACS"],
+              remove: []
+            });
           }
+
           return dxList;
         },
 
         reasoningForNumeric: [
-          r("Age is a critical risk factor. Low age lowers probability of cardiac events; advanced age raises the risk significantly.", ["IHD", "MI", "AorticDissection"])
+          r(
+            "Age is a critical risk factor. Low age lowers probability of cardiac events; advanced age raises the risk significantly.",
+            ["IHD", "MI", "AorticDissection"]
+          )
         ]
       },
 
@@ -148,7 +166,10 @@
             dxAdd: addDx(["IHD", "MI", "ACS", "PAD"]),
             dxRemove: addDx([]),
             reasoning: [
-              r("Male sex is a classical risk factor for atherosclerotic ischemic heart disease.", ["IHD", "MI", "ACS"])
+              r(
+                "Male sex is a classical risk factor for atherosclerotic ischemic heart disease.",
+                ["IHD", "MI", "ACS"]
+              )
             ]
           },
           female: {
@@ -156,7 +177,10 @@
             dxAdd: addDx([]),
             dxRemove: addDx([]),
             reasoning: [
-              r("Female sex does not exclude cardiac pain, but pre-menopausal women have lower IHD risk.", ["IHD"])
+              r(
+                "Female sex does not exclude cardiac pain, but pre-menopausal women have lower IHD risk.",
+                ["IHD"]
+              )
             ]
           }
         }
@@ -683,13 +707,13 @@
               label: "سعال (Cough)",
               dxAdd: addDx(["Pneumonia", "HF"]),
               dxRemove: addDx([]),
-              reasoning: [ r("Cough with chest pain can be due to pneumonia or pulmonary congestion.", ["Pneumonia", "HF"]) ]
+              reasoning: [ r("Cough with chest pain can be due to pneumonia or pulmonary congestion in heart failure.", ["Pneumonia", "HF"]) ]
             },
             wheeze: {
               label: "أزيز (Wheeze)",
               dxAdd: addDx(["HF"]),
               dxRemove: addDx([]),
-              reasoning: [ r("Wheeze may occur in acute pulmonary congestion.", ["HF"]) ]
+              reasoning: [ r("Wheeze may occur in acute pulmonary congestion ('cardiac asthma').", ["HF"]) ]
             },
             exertDyspnea: {
               label: "ضيق تنفس جهدي (Exertional dyspnea)",
