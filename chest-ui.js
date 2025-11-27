@@ -1,6 +1,6 @@
 // ========================================
 // chest-ui.js
-// Connect ChestEngine with the 3-card UI (Arabic/RTL)
+// Connect ChestEngine with the 3-card UI (Arabic Questions / English UI)
 // ========================================
 
 "use strict";
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const elBtnPrev         = document.getElementById("btnPrev");
   const elBtnNext         = document.getElementById("btnNext");
-  // عناصر الـ case presentation modal
+  // Case presentation modal elements
   const elCaseModal    = document.getElementById("caseModal");
   const elCaseContent  = document.getElementById("caseModalContent");
   const elCaseClose    = document.getElementById("caseModalClose");
@@ -52,13 +52,13 @@ function renderDDx() {
   if (!groups.length) {
     const p = document.createElement("p");
     p.className = "dd-empty";
-    p.textContent = "لم يتم اقتراح تشخيص بعد. أجب على المزيد من الأسئلة لبناء التشخيص التفريقي.";
+    p.textContent = "No diagnosis suggested yet. Answer more questions to build the differential diagnosis.";
     elDDxContainer.appendChild(p);
     return;
   }
 
   groups.forEach((g) => {
-    // بطاقة خاصة لكل جهاز
+    // Group card
     const groupDiv = document.createElement("div");
     groupDiv.className = `dd-group-card dd-group-card--${g.id}`;
 
@@ -67,7 +67,6 @@ function renderDDx() {
     header.textContent = g.label;
     groupDiv.appendChild(header);
 
-    // جسم البطاقة اللي يحتوي الأمراض (مع scroll داخلي)
     const body = document.createElement("div");
     body.className = "dd-group-body";
 
@@ -80,31 +79,30 @@ function renderDDx() {
 
       const nameSpan = document.createElement("span");
       nameSpan.className = "dd-name";
-      nameSpan.textContent = item.label;
+      nameSpan.textContent = item.label; // English Label
 
       const scoreSpan = document.createElement("span");
       scoreSpan.className = "dd-score";
-      scoreSpan.textContent = `النقاط: ${item.score}`;
+      scoreSpan.textContent = `Score: ${item.score}`;
 
       dHeader.appendChild(nameSpan);
       dHeader.appendChild(scoreSpan);
       diseaseDiv.appendChild(dHeader);
       
-      // 💡 NEW: Display Wells Score if available
+      // Display Wells Score if available
       if (item.wells) {
           const wellsDiv = document.createElement("div");
           wellsDiv.className = "dd-wells-score";
-          wellsDiv.textContent = `Wells Score: ${item.wells.split(' (')[0]} - خطر ${item.wells.includes('High') ? 'مرتفع' : item.wells.includes('Moderate') ? 'متوسط' : 'منخفض'}`;
+          wellsDiv.textContent = item.wells; 
           diseaseDiv.appendChild(wellsDiv);
           
           if (item.wells.includes('High Risk')) {
-              scoreSpan.style.color = '#f87171'; // أحمر لتنبيه الخطر
+              scoreSpan.style.color = '#f87171';
           }
       }
 
-      // 💡 LOGIC FOR POSITIVE FEATURES (EXISTING)
+      // LOGIC FOR POSITIVE FEATURES
       if (item.features && item.features.length) {
-        // القائمة (مخفية بالبداية)
         const ul = document.createElement("ul");
         ul.className = "dd-features hidden";
 
@@ -114,30 +112,29 @@ function renderDDx() {
           ul.appendChild(li);
         });
 
-        // زر Show/Hide
         const toggleBtn = document.createElement("button");
         toggleBtn.className = "dd-toggle";
-        toggleBtn.textContent = "إظهار الميزات الإيجابية";
+        toggleBtn.textContent = "Show Positive Features";
 
         toggleBtn.addEventListener("click", () => {
           ul.classList.toggle("hidden");
           toggleBtn.textContent = ul.classList.contains("hidden")
-            ? "إظهار الميزات الإيجابية"
-            : "إخفاء الميزات الإيجابية";
+            ? "Show Positive Features"
+            : "Hide Positive Features";
         });
 
         diseaseDiv.appendChild(toggleBtn);
         diseaseDiv.appendChild(ul);
       }
       
-      // 💡 NEW LOGIC: Display Missing/Key findings
+      // LOGIC: Display Missing/Key findings
       if (item.missing && item.missing.length) {
         const missingDiv = document.createElement("div");
         missingDiv.className = "dd-missing-box";
         
         const missingHeader = document.createElement("div");
         missingHeader.className = "dd-missing-header";
-        missingHeader.textContent = "الخطوات الرئيسية التالية:";
+        missingHeader.textContent = "Key Next Steps:";
         missingDiv.appendChild(missingHeader);
 
         const missingUl = document.createElement("ul");
@@ -177,6 +174,7 @@ function renderDDx() {
 
         const t = engine.getStepType(step);
         
+        // Keep selected label (Arabic)
         if (t === "single" && step.options && step.options[val]) {
            answers[step.id] = step.options[val].label;
         } else if (t === "multi" && step.options) {
@@ -184,7 +182,7 @@ function renderDDx() {
               .map((key) => step.options[key])
               .filter(Boolean)
               .map((opt) => opt.label)
-              .join("، ");
+              .join("، "); // Use Arabic comma separator
         } else {
            answers[step.id] = val;
         }
@@ -206,29 +204,29 @@ function renderDDx() {
     const fh = getSectionNarrative("fh");
     const sh = getSectionNarrative("sh");
 
-    // 1) PATIENT DEMOGRAPHICS (Personal data)
+    // 1) PATIENT DEMOGRAPHICS 
     if (Object.keys(personal).length > 0) {
       let line = "";
-      if (personal.name && personal.name !== "المريض") line += `المريض **${personal.name}**`;
-      else line += `المريض`;
+      if (personal.name) line += `Patient **${personal.name}**`;
       
-      const age = personal.ageGroup || "عمر غير معلوم";
-      const sex = personal.sex ? personal.sex.toLowerCase().split(' ')[0] : "جنس غير معلوم";
+      const age = personal.ageGroup || "unknown age";
+      const sex = personal.sex || "unknown sex";
 
-      line += ` هو **${sex}** يبلغ من العمر **${age}** سنة ويشتكي من ألم صدري.`;
+      // Note: We use English structure for the case presentation output
+      line += ` is a **${age}** year old **${sex}** presenting with chest pain.`;
       
-      parts.push({ title: "البيانات الشخصية", lines: [line] });
+      parts.push({ title: "Patient Data", lines: [line] });
     }
 
     // 2) CHIEF COMPLAINT (CC)
     if (cc.mainSymptom || cc.ccDuration) {
-      let line = "الشكوى الرئيسية هي **" + (cc.mainSymptom || "ألم صدري") + "**";
+      let line = "The chief complaint is **" + (cc.mainSymptom || "Chest Pain") + "**";
       if (cc.ccDuration) {
-        line += "، وهي موجودة منذ **" + cc.ccDuration + "**.";
+        line += " that has been present for **" + cc.ccDuration + "**.";
       } else {
         line += ".";
       }
-      parts.push({ title: "الشكوى الرئيسية ومدة المرض", lines: [line] });
+      parts.push({ title: "Chief Complaint and Duration", lines: [line] });
     }
 
     // 3) HISTORY OF PRESENT ILLNESS (HPI)
@@ -236,70 +234,70 @@ function renderDDx() {
         let lines = [];
         
         // Onset and Site
-        let hpiLine1 = "بدأ الألم **" + (hpi.onset || "تدريجياً") + "**";
-        hpiLine1 += "، ويقع بشكل رئيسي في **" + (hpi.site || "خلف القص مركزياً") + "**.";
+        let hpiLine1 = "The pain started **" + (hpi.onset || "gradually") + "**";
+        hpiLine1 += " and is primarily **" + (hpi.site || "central retrosternal") + "**.";
         lines.push(hpiLine1);
 
         // Character and Radiation
-        let hpiLine2 = "وصف الألم هو **" + (hpi.character || "ضيق/ضغط") + "**";
+        let hpiLine2 = "The character of the pain is described as **" + (hpi.character || "tightness/pressure") + "**";
         if (hpi.radiation && !hpi.radiation.includes("لا يوجد")) {
-            hpiLine2 += "، مع إشعاع **" + hpi.radiation + "**.";
+            hpiLine2 += ", radiating **" + hpi.radiation + "**.";
         } else {
-            hpiLine2 += "، و**لا يوجد إشعاع محدد** له.";
+            hpiLine2 += " and has **no specific radiation**.";
         }
         lines.push(hpiLine2);
 
         // Modifying Factors
-        let hpiLine3 = "يزداد الألم سوءاً عادةً **مع " + (hpi.aggravating || "الجهد") + "**";
-        hpiLine3 += "، ويخف **بـ " + (hpi.relief || "لا شيء مهم") + "**.";
+        let hpiLine3 = "It is typically **worse with " + (hpi.aggravating || "exertion") + "**";
+        hpiLine3 += " and **relieved by " + (hpi.relief || "nothing significant") + "**.";
         lines.push(hpiLine3);
         
         // Severity and Course
-        let hpiLine4 = "كل نوبة تستمر **" + (hpi.episodeDuration || "5-20 دقيقة") + "**.";
+        let hpiLine4 = "Each episode lasts **" + (hpi.episodeDuration || "5-20 minutes") + "**.";
         if (hpi.severity) {
-            hpiLine4 += ` شدة الألم مقدرة بـ **${hpi.severity}/10**`;
+            hpiLine4 += ` The severity is rated as **${hpi.severity}/10**`;
         }
-        hpiLine4 += `، ومسار الألم العام هو **${hpi.course || "ثابت"}**.`
+        hpiLine4 += `, and the overall course is **${hpi.course || "constant"}**.`
         lines.push(hpiLine4);
 
         // Associated Symptoms
         if (hpi.associated) {
-             lines.push(`الأعراض المرافقة تشمل: **${hpi.associated}**.`);
+             lines.push(`Associated symptoms include: **${hpi.associated}**.`);
         }
         
-        parts.push({ title: "تاريخ المرض الحالي (HPI)", lines: lines });
+        parts.push({ title: "History of Present Illness (HPI)", lines: lines });
     }
     
     // 4) REVIEW OF SYSTEMS (ROS)
     if (Object.keys(ros).length > 0) {
         let lines = [];
-        if (ros.rosCVS) lines.push(`**القلبي الوعائي:** ${ros.rosCVS}`);
-        if (ros.rosResp) lines.push(`**التنفسي:** ${ros.rosResp}`);
-        if (ros.rosGIT) lines.push(`**الهضمي:** ${ros.rosGIT}`);
-        if (ros.rosCNS) lines.push(`**الجهاز العصبي:** ${ros.rosCNS}`);
-        if (ros.rosLM) lines.push(`**الحركي/الوعائي المحيطي:** ${ros.rosLM}`);
-        if (ros.rosHema) lines.push(`**الدموي:** ${ros.rosHema}`);
+        if (ros.rosCVS) lines.push(`**Cardiovascular:** ${ros.rosCVS}`);
+        if (ros.rosResp) lines.push(`**Respiratory:** ${ros.rosResp}`);
+        if (ros.rosGIT) lines.push(`**Gastrointestinal:** ${ros.rosGIT}`);
+        if (ros.rosCNS) lines.push(`**Nervous System:** ${ros.rosCNS}`);
+        if (ros.rosLM) lines.push(`**Locomotor/Peripheral:** ${ros.rosLM}`);
+        if (ros.rosHema) lines.push(`**Hematologic:** ${ros.rosHema}`);
         
         if (lines.length > 0) {
-             parts.push({ title: "مراجعة الأجهزة (ROS)", lines: lines });
+             parts.push({ title: "Review of Systems (ROS) - Pertinent Positives", lines: lines });
         }
     }
     
     // 5) PMH, PSH, DH, FH, SH (As lists)
     if (pmh.pmhChronic) {
-      parts.push({ title: "التاريخ المرضي السابق (PMH)", lines: [`تاريخ إيجابي لـ: **${pmh.pmhChronic}**`] });
+      parts.push({ title: "Past Medical History (PMH)", lines: [`Positive history of: **${pmh.pmhChronic}**`] });
     }
     if (psh.pshOps) {
-      parts.push({ title: "التاريخ الجراحي السابق (PSH)", lines: [`أُجريت له: **${psh.pshOps}**`] });
+      parts.push({ title: "Past Surgical History (PSH)", lines: [`History of: **${psh.pshOps}**`] });
     }
     if (dh.drugHistory) {
-      parts.push({ title: "تاريخ الأدوية (DH)", lines: [`يتناول حالياً: **${dh.drugHistory}**`] });
+      parts.push({ title: "Drug History (DH)", lines: [`Currently taking: **${dh.drugHistory}**`] });
     }
     if (fh.familyHistory) {
-      parts.push({ title: "التاريخ العائلي (FH)", lines: [`تاريخ عائلي ذو صلة بـ: **${fh.familyHistory}**`] });
+      parts.push({ title: "Family History (FH)", lines: [`Relevant history of: **${fh.familyHistory}**`] });
     }
     if (sh.socialHistory) {
-      parts.push({ title: "التاريخ الاجتماعي (SH)", lines: [`عوامل نمط الحياة تشمل: **${sh.socialHistory}**`] });
+      parts.push({ title: "Social History (SH)", lines: [`Lifestyle factors include: **${sh.socialHistory}**`] });
     }
 
     // 6) Probable diagnosis
@@ -315,32 +313,32 @@ function renderDDx() {
       const others = allDx.slice(1, 4).map((dx) => dx.label);
       const dxLines = [];
       dxLines.push(
-        `التشخيص الأكثر ترجيحاً: **${main.label}** (النقاط: ${main.score}).`
+        `Most likely diagnosis: **${main.label}** (Score: ${main.score}).`
       );
       if (others.length) {
         dxLines.push(
-          `تشخيصات أخرى في التشخيص التفريقي: **${others.join("، ")}**.`
+          `Other diagnoses in the differential: **${others.join(", ")}**.`
         );
       }
       
       if (main.wells) {
-          dxLines.push(`**Wells Score** للاشتباه بالانصمام الرئوي: ${main.wells.split(' (')[0]} (خطر ${main.wells.includes('High') ? 'مرتفع' : main.wells.includes('Moderate') ? 'متوسط' : 'منخفض'}).`);
+          dxLines.push(`**${main.wells}**.`);
       }
 
 
       parts.push({
-        title: "ملخص التشخيص التفريقي (DDx)",
+        title: "Differential Diagnosis (DDx) Summary",
         lines: dxLines
       });
     }
 
-    // تحويل إلى HTML + نص خام (لـ copy)
+    // Output generation (HTML and raw text)
     let html = "";
     let rawText = "";
 
     if (!parts.length) {
-      html = "<p>لا توجد إجابات كافية لبناء عرض الحالة بعد.</p>";
-      rawText = "لا توجد إجابات كافية لبناء عرض الحالة بعد.";
+      html = "<p>No sufficient answers yet to build a case presentation.</p>";
+      rawText = "No sufficient answers yet to build a case presentation.";
       return { html, text: rawText };
     }
 
@@ -351,14 +349,12 @@ function renderDDx() {
       rawText += `${p.title}:\n`;
 
       p.lines.forEach((ln) => {
-        // تحويل النص الغامق **...** إلى HTML
         const formattedLine = ln
           .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
           .replace(/^•\s*/, '');
           
         html += `<p class="case-section-line">${formattedLine}</p>`;
         
-        // للنص الخام (raw text)، نحذف علامات الـ Markdown ونضيف -
         rawText += `- ${ln.replace(/\*\*/g, '').replace(/^•\s*/, '')}\n`;
       });
       html += `</div>`;
@@ -382,7 +378,7 @@ function renderDDx() {
     if (!elCaseModal) return;
     elCaseModal.classList.add("hidden");
   }
-    // ===== CASE MODAL EVENTS =====
+    // ===== CASE MODAL EVENTS (Arabic) =====
   if (elCaseClose) {
     elCaseClose.addEventListener("click", closeCaseModal);
   }
@@ -401,7 +397,7 @@ function renderDDx() {
   if (elCaseCopy) {
     elCaseCopy.addEventListener("click", async () => {
       await navigator.clipboard.writeText(lastCaseText);
-      alert("تم نسخ عرض الحالة إلى الحافظة!");
+      alert("Case presentation copied to clipboard!");
     });
   }
   
@@ -412,11 +408,11 @@ function renderClinicalReasoning(step) {
   elReasonList.innerHTML = "";
 
   if (!reasons.length) {
-    elReasonQuestion.textContent = "اختر خياراً لعرض المنطق السريري.";
+    elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
     return;
   }
 
-  elReasonQuestion.textContent = "المنطق السريري:";
+  elReasonQuestion.textContent = "Clinical Reasoning:";
 
   reasons.forEach((r) => {
     const li = document.createElement("li");
@@ -424,11 +420,10 @@ function renderClinicalReasoning(step) {
 
     const text = document.createElement("span");
     text.className = "reason-text";
-    text.textContent = r.text;
+    text.textContent = r.text; // English Reasoning
 
     const dis = document.createElement("span");
     dis.className = "reason-diseases";
-    // يتم عرض الأسماء الإنجليزية هنا للحفاظ على المصطلحات الدقيقة
     dis.textContent = r.diseases
   .map(d => engine.pretty[d] || d)
   .join(", ");
@@ -452,7 +447,7 @@ function renderReasoning(step) {
     input.min = "0";
     input.max = "100"; 
     input.value = val !== undefined ? val : "";
-    input.placeholder = step.id === "severity" ? "0–10" : "العمر بالسنوات"; 
+    input.placeholder = step.id === "severity" ? "0–10" : "Age in years"; 
 
     input.addEventListener("input", () => {
       engine.setAnswer(step.id, input.value);
@@ -469,7 +464,7 @@ function renderReasoning(step) {
     const input = document.createElement("input");
     input.type = "text";
     input.value = val || "";
-    input.placeholder = "أدخل إجابتك هنا...";
+    input.placeholder = "Type your answer here...";
 
     input.addEventListener("input", () => {
       engine.setAnswer(step.id, input.value);
@@ -536,7 +531,7 @@ function renderCurrentStep() {
 
   // labels
   elSectionLabel.textContent = step.sectionLabel || "";
-  elStepCounter.textContent = `الخطوة ${prog.current} من ${prog.total}`;
+  elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
 
   const totalInSection = engine.steps.filter(
     (s) => s.sectionId === step.sectionId
@@ -547,7 +542,7 @@ function renderCurrentStep() {
       .findIndex((s) => s.id === step.id) + 1;
 
   elSectionStepCtr.textContent =
-    `${step.sectionLabel} – السؤال ${indexInSection}/${totalInSection}`;
+    `${step.sectionLabel} – Question ${indexInSection}/${totalInSection}`;
 
   elQuestionText.textContent = step.question || "";
   renderReasoning(step);      
@@ -558,7 +553,11 @@ function renderCurrentStep() {
 
   elBtnPrev.disabled = isFirst;
   elBtnNext.disabled = false;
-  elBtnNext.textContent = isLast ? "عرض الحالة" : "التالي";
+  elBtnNext.textContent = isLast ? "Case Presentation" : "Next";
+  
+  // Update Arabic button texts in footer
+  document.getElementById("btnPrev").textContent = "السابق";
+  document.getElementById("btnNext").textContent = isLast ? "عرض الحالة" : "التالي";
 }
 
   // ---------- Button handlers ----------
