@@ -653,3 +653,23 @@ input {
     padding: 10px 10px 10px;
   }
 }
+/* نص حقل الإدخال (name, age, CC...) */
+.ui-input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  padding: 8px 12px;
+  background: #020617;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.ui-input:focus {
+  border-color: var(--primary);
+}
+
+/* خلي رسالة الفحص تبين بلون أوضح */
+.validation-show {
+  opacity: 1;
+}
