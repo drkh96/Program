@@ -1,6 +1,6 @@
 // =========================================
 // chest-ui-options.js
-// Renders question options (Arabic only)
+// Renders question options (Arabic / English)
 // - Uses premium theme classes from style.css
 // - Smooth clinical click feedback
 // - Updates DDx + Reasoning on change
@@ -28,7 +28,7 @@ window.UIOptions = (function () {
   }
 
   // --------------------------------------------------
-  // Utility: animate click feedback (official clinical style)
+  // Utility: animate click feedback
   // --------------------------------------------------
   function animateClick(elem) {
     if (!elem) return;
@@ -45,15 +45,15 @@ window.UIOptions = (function () {
   }
 
   // --------------------------------------------------
-  // Render: Numeric input (we treat as free text visually)
+  // Render: Numeric input
   // --------------------------------------------------
-  function renderNumeric(step, val) {
+  function renderNumeric(step, val, lang) {
     elOptionsContainer.innerHTML = "";
 
     const input = document.createElement("input");
-    input.type = "text";             // يظهر كنص (مثل العمر النصّي)
+    input.type = "text";
     input.className = "ui-input";
-    input.dir = "ltr";               // بيانات مثل 55-year-old male
+    input.dir = "ltr";
     input.placeholder = step.placeholder || "Enter value";
 
     input.value = val ?? "";
@@ -68,15 +68,14 @@ window.UIOptions = (function () {
 
   // --------------------------------------------------
   // Render: Text input
-  // (used for: name, ageText, chief complaint, duration, etc.)
-// --------------------------------------------------
-  function renderText(step, val) {
+  // --------------------------------------------------
+  function renderText(step, val, lang) {
     elOptionsContainer.innerHTML = "";
 
     const input = document.createElement("input");
     input.type = "text";
     input.className = "ui-input";
-    input.dir = "ltr"; // نص إنجليزي أو mix (تقدر تغيره لاحقاً)
+    input.dir = lang === "en" ? "ltr" : "rtl";
     input.placeholder = step.placeholder || "Type answer...";
 
     input.value = val ?? "";
@@ -90,9 +89,9 @@ window.UIOptions = (function () {
   }
 
   // --------------------------------------------------
-  // Render: Single / Multi choice (Arabic RTL)
+  // Render: Single / Multi choice
   // --------------------------------------------------
-  function renderChoices(step, type, val) {
+  function renderChoices(step, type, val, lang) {
     elOptionsContainer.innerHTML = "";
     clearValidation();
 
@@ -104,26 +103,29 @@ window.UIOptions = (function () {
     Object.entries(step.options).forEach(([key, opt]) => {
       const row = document.createElement("label");
       row.className = "option-row";
-      row.setAttribute("dir", "rtl");
+      row.setAttribute("dir", lang === "en" ? "ltr" : "rtl");
 
       const input = document.createElement("input");
       input.type = type === "multi" ? "checkbox" : "radio";
       input.name = step.id;
       input.value = key;
 
-      // Pre-fill
       if (type === "single" && val === key) {
         input.checked = true;
       } else if (type === "multi" && Array.isArray(val) && val.includes(key)) {
         input.checked = true;
       }
 
-      // Text (Arabic label)
       const span = document.createElement("span");
       span.className = "option-label";
-      span.textContent = opt.label || key;
 
-      // Change handler (core logic)
+      const labelText =
+        lang === "en" && opt.labelEn
+          ? opt.labelEn
+          : opt.label || key;
+
+      span.textContent = labelText;
+
       input.addEventListener("change", () => {
         if (type === "single") {
           engine.setAnswer(step.id, key);
@@ -140,7 +142,6 @@ window.UIOptions = (function () {
 
         clearValidation();
 
-        // Update DDx + Reasoning
         if (window.UIDDx && typeof window.UIDDx.renderDDx === "function") {
           window.UIDDx.renderDDx();
         }
@@ -149,10 +150,7 @@ window.UIOptions = (function () {
         }
       });
 
-      // Row click animation (visual only)
-      row.addEventListener("click", (ev) => {
-        // نخلي الأنيميشن على الصف، والـ input يشتغل بشكل طبيعي
-        // (ما نمنع السلوك الافتراضي)
+      row.addEventListener("click", () => {
         animateClick(row);
       });
 
@@ -165,34 +163,29 @@ window.UIOptions = (function () {
   // --------------------------------------------------
   // Main render entry
   // --------------------------------------------------
-  function renderOptions(step) {
+  function renderOptions(step, lang) {
     if (!step) return;
-
     const t = engine.getStepType(step);
     const val = engine.state.answers[step.id];
 
     if (t === "numeric") {
-      renderNumeric(step, val);
+      renderNumeric(step, val, lang);
       return;
     }
 
     if (t === "text") {
-      renderText(step, val);
+      renderText(step, val, lang);
       return;
     }
 
     if (t === "single" || t === "multi") {
-      renderChoices(step, t, val);
+      renderChoices(step, t, val, lang);
       return;
     }
 
-    // Unknown type fallback
     elOptionsContainer.innerHTML = "<p>Unsupported question type.</p>";
   }
 
-  // --------------------------------------------------
-  // Public API
-  // --------------------------------------------------
   return {
     renderOptions
   };

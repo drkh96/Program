@@ -1,19 +1,20 @@
 // ========================================
 // chest-data-dx.js
 // Diagnoses & groups definitions
+// (labels EN; optional Arabic group label added)
 // ========================================
 
 "use strict";
 
 window.CHEST_DX_GROUPS = {
-  cardiac:  { id: "cardiac",  label: "Cardiac",            order: 1 },
-  aorta:    { id: "aorta",    label: "Aorta",              order: 2 },
-  pulmonary:{ id: "pulmonary",label: "Pulmonary",          order: 3 },
-  pleural:  { id: "pleural",  label: "Pleural / Lung",     order: 4 },
-  gi:       { id: "gi",       label: "Gastrointestinal",   order: 5 },
-  msk:      { id: "msk",      label: "Musculoskeletal",    order: 6 },
-  psych:    { id: "psych",    label: "Psychological",      order: 7 },
-  other:    { id: "other",    label: "Other / Systemic",   order: 99 }
+  cardiac:   { id: "cardiac",   label: "Cardiac",            labelAr: "قلبي",                order: 1 },
+  aorta:     { id: "aorta",     label: "Aorta",              labelAr: "أبهر",                order: 2 },
+  pulmonary: { id: "pulmonary", label: "Pulmonary",          labelAr: "رئوي",                order: 3 },
+  pleural:   { id: "pleural",   label: "Pleural / Lung",     labelAr: "جنبي / رئة",          order: 4 },
+  gi:        { id: "gi",        label: "Gastrointestinal",   labelAr: "هضمي",                order: 5 },
+  msk:       { id: "msk",       label: "Musculoskeletal",    labelAr: "عضلي هيكلي",          order: 6 },
+  psych:     { id: "psych",     label: "Psychological",      labelAr: "نفسي",                order: 7 },
+  other:     { id: "other",     label: "Other / Systemic",   labelAr: "أخرى / جهازية",       order: 99 }
 };
 
 window.CHEST_DIAGNOSES = [
@@ -94,7 +95,7 @@ window.CHEST_DIAGNOSES = [
     group: "cardiac",
     keyMissingFeatures: [
       "12-lead ECG / telemetry monitoring",
-      "Electrolytes, Thyroid function tests",
+      "Electrolytes, thyroid function tests",
       "Holter / event monitor if intermittent"
     ]
   },
@@ -152,7 +153,7 @@ window.CHEST_DIAGNOSES = [
     ]
   },
 
-  // Pleural / Lung surface
+  // Pleural / lung surface
   {
     id: "Pleuritis",
     label: "Pleuritic Chest Pain (Pleurisy / small effusion)",
@@ -205,7 +206,7 @@ window.CHEST_DIAGNOSES = [
     ]
   },
 
-  // Other / Systemic
+  // Other / systemic
   {
     id: "Cancer",
     label: "Underlying Malignancy",
@@ -218,7 +219,7 @@ window.CHEST_DIAGNOSES = [
   },
   {
     id: "Coagulopathy",
-    label: "Coagulopathy / Bleeding tendency",
+    label: "Coagulopathy / bleeding tendency",
     group: "other"
   },
   {

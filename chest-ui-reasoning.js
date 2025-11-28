@@ -17,14 +17,16 @@ window.UIReasoning = (function () {
 
   // Small fade animation
   function animateReason() {
-    elReasonList.classList.remove("fade-in");
-    void elReasonList.offsetWidth;
-    elReasonList.classList.add("fade-in");
-  }
+  if (!elReasonList) return;
+
+  elReasonList.classList.remove("fade-in");
+  void elReasonList.offsetWidth;
+  elReasonList.classList.add("fade-in");
+}
 
   // Render reasoning for a given step
   function render(step) {
-    if (!step || !engine) return;
+    if (!step || !engine || !elReasonQuestion || !elReasonList) return;
 
     const val = engine.state.answers[step.id];
     const reasons = engine.getReasoningFor(step, val) || [];

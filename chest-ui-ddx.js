@@ -49,7 +49,7 @@ window.UIDDx = (function () {
   // Main render
   // -------------------------------
   function renderDDx() {
-    if (!elDDxContainer) return;
+    if (!elDDxContainer || !engine) return;
 
     const groups = engine.getDDxGrouped();
     elDDxContainer.innerHTML = "";
