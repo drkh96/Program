@@ -1,48 +1,28 @@
 /* =========================================
    THEME VARIABLES
 ========================================= */
-
 :root {
-  /* Brand / Primary */
-  --primary: #1e88e5;
-  --primary-light: #64b5f6;
-  --primary-dark: #0d47a1;
-
-  /* Secondary / Accent */
-  --secondary: #26c6da;
-  --secondary-dark: #0097a7;
-
-  /* Backgrounds */
-  --bg-main: #020617;
-  --bg-grad-top: #1f2937;
+  --bg-grad-top: #020617;
   --bg-grad-mid: #020617;
   --bg-grad-bot: #000000;
-  --bg-card: #162238;
-  --bg-card-soft: #1e293b;
-  --bg-deep: #0f172a;
 
-  /* Text */
+  --bg-card: #020617;
+  --bg-deep: #020617;
+  --bg-ddx-header: #0f172a;
+
   --text-main: #e5e7eb;
-  --text-secondary: #94a3b8;
-  --text-muted: #6b7280;
-  --text-danger: #f97373;
+  --text-secondary: #9ca3af;
 
-  /* Lines & Borders */
-  --border-soft: rgba(148, 163, 184, 0.25);
-  --border-strong: rgba(148, 163, 184, 0.4);
+  --primary: #38bdf8;
+  --primary-light: #7dd3fc;
+  --secondary: #a5b4fc;
+  --accent: #f97316;
 
-  /* Shadows */
-  --shadow-card: 6px 6px 12px #151a24, -6px -6px 12px #27384c;
-  --shadow-card-soft: 3px 3px 6px #151a24, -3px -3px 6px #27384c;
-  --shadow-inset: inset 3px 3px 6px #000, inset -3px -3px 6px #1f2937;
+  --border-soft: rgba(148, 163, 184, 0.35);
+  --border-strong: rgba(148, 163, 184, 0.6);
 
-  /* DDx group colors */
-  --ddx-cardiac: #ef5350;
-  --ddx-aorta: #66bb6a;
-  --ddx-pulm: #42a5f5;
-  --ddx-gi: #ffa726;
-  --ddx-msk: #ab47bc;
-  --ddx-other: #b0bec5;
+  --shadow-card: 0 18px 40px rgba(0, 0, 0, 0.9);
+  --shadow-inset: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
 }
 
 /* =========================================
@@ -63,7 +43,7 @@ body {
 }
 
 html {
-  direction: ltr; /* English UI */
+  direction: ltr; /* English UI, السؤال نفسه RTL جوه .question-text */
 }
 
 body {
@@ -78,8 +58,14 @@ body {
   color: var(--text-main);
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
-  padding-top: 60px;
-  overflow: hidden;
+  padding-top: 60px;       /* مساحة للـ header الثابت */
+  overflow: hidden;        /* على الشاشات الكبيرة: ماكو scroll للصفحة، بس جوه الكروت */
+}
+
+/* إزالة outline الزايد */
+button,
+input {
+  font-family: inherit;
 }
 
 /* =========================================
@@ -126,7 +112,7 @@ body {
   grid-template-columns: repeat(3, 1fr); /* ثلاث كروت متساوية */
   grid-template-areas: "ddx reason history";
   gap: 16px;
-  height: calc(100vh - 80px);
+  height: calc(100dvh - 80px); /* تملأ الشاشة (iPad / desktop) */
 }
 
 /* Cards placement */
@@ -183,7 +169,7 @@ body {
 .card-body {
   padding-top: 4px;
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto; /* هنا السكّرول الداخلي */
 }
 
 /* Scrollbars inside cards */
@@ -241,197 +227,160 @@ body {
   direction: rtl;
 }
 
-/* صف واحد لكل خيار */
 .option-row {
   display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  gap: 8px;
-  border-radius: 12px;
-  padding: 8px 10px;
-  background: #020617;
-  box-shadow: 3px 3px 6px #000, -3px -3px 6px #1f2937;
-  cursor: pointer;
-  transition: transform 130ms cubic-bezier(0.19, 1, 0.22, 1),
-    box-shadow 130ms cubic-bezier(0.19, 1, 0.22, 1),
-    background 0.15s ease-in-out;
-}
-
-.option-row:hover {
-  background: #111827;
-  box-shadow: 4px 4px 8px #000, -4px -4px 8px #1f2937;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 .option-row input[type="radio"],
 .option-row input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--secondary);
-  cursor: pointer;
-  order: 2;
+  margin-top: 3px;
+  flex-shrink: 0;
 }
 
 .option-label {
-  flex: 1;
-  text-align: right;
   font-size: 0.9rem;
   color: var(--text-main);
 }
 
-/* input نصّي (name, age, CC...) */
-.ui-input {
+/* حقول إدخال نص */
+.option-row input[type="text"],
+.option-row input[type="number"] {
   width: 100%;
-  border-radius: 14px;
-  border: none;
-  padding: 8px 10px;
-  font-size: 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  padding: 6px 10px;
   background: #020617;
   color: var(--text-main);
-  box-shadow: var(--shadow-inset);
+  font-size: 0.9rem;
   outline: none;
 }
 
-.ui-input:focus {
-  box-shadow: var(--shadow-inset), 0 0 0 1px var(--secondary);
+.option-row input[type="text"]:focus,
+.option-row input[type="number"]:focus {
+  border-color: var(--primary);
 }
 
-/* رسالة الـ validation */
+/* رسالة الفالديشن */
 .validation-message {
-  margin-top: 4px;
-  font-size: 0.8rem;
-  color: var(--text-danger);
-  min-height: 1em;
-  opacity: 0;
-  transition: opacity 0.15s ease-in-out;
-}
-
-.validation-show {
-  opacity: 1;
-}
-
-/* =========================================
-   NAV BUTTONS (Prev / Next / Reset / Print)
-========================================= */
-
-.card-footer {
   margin-top: 8px;
+  font-size: 0.82rem;
+  color: #fca5a5;
 }
 
-.nav-buttons {
+/* أزرار التنقل */
+.controls-row {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .btn {
-  flex: 1;
-  padding: 8px 10px;
+  border: none;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: #020617;
-  color: var(--text-main);
-  font-size: 0.9rem;
+  padding: 7px 14px;
+  font-size: 0.86rem;
   cursor: pointer;
-  box-shadow: 4px 4px 8px #151a24, -4px -4px 8px #27384c;
-  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
 }
 
 .btn-primary {
-  background: var(--primary);
-  border-color: var(--primary-light);
-  color: #f9fafb;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #0b1120;
+  font-weight: 600;
 }
 
 .btn-secondary {
-  background: var(--bg-deep);
-  color: var(--primary-light);
+  background: #020617;
+  color: var(--text-main);
+  border: 1px solid var(--border-soft);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-soft);
 }
 
 .btn:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: default;
-  box-shadow: none;
-}
-
-.btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 6px 6px 12px #151a24, -6px -6px 12px #27384c;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-dark);
 }
 
 /* =========================================
-   DDX CARD (Detailed Medscape-style)
+   DDX CARD
 ========================================= */
 
-.ddx-body {
-  font-size: 0.9rem;
+#ddxContainer {
+  height: 100%;
 }
 
 .dd-empty {
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
 }
 
-/* Group card */
+/* مجموعة ديفرنشال */
 .dd-group-card {
   border-radius: 16px;
-  padding: 8px 10px 10px;
+  padding: 8px 10px;
+  background: #020617;
+  box-shadow: var(--shadow-inset);
   margin-bottom: 8px;
-  background: var(--bg-card-soft);
-  box-shadow: var(--shadow-card-soft);
 }
 
-/* Colored borders by system */
-.dd-group-card--cardiac {
-  border-left: 5px solid var(--ddx-cardiac);
+/* ألوان المجموعات */
+.dd-group-card--cardiac .dd-group-header {
+  color: #f97373;
 }
-.dd-group-card--aorta {
-  border-left: 5px solid var(--ddx-aorta);
+.dd-group-card--pulmonary .dd-group-header {
+  color: #7dd3fc;
 }
-.dd-group-card--pulmonary {
-  border-left: 5px solid var(--ddx-pulm);
+.dd-group-card--aorta .dd-group-header {
+  color: #fbbf24;
 }
-.dd-group-card--gi {
-  border-left: 5px solid var(--ddx-gi);
+.dd-group-card--gi .dd-group-header {
+  color: #f97316;
 }
-.dd-group-card--msk {
-  border-left: 5px solid var(--ddx-msk);
+.dd-group-card--msk .dd-group-header {
+  color: #86efac;
 }
-.dd-group-card--other {
-  border-left: 5px solid var(--ddx-other);
+.dd-group-card--psych .dd-group-header {
+  color: #c4b5fd;
+}
+.dd-group-card--other .dd-group-header {
+  color: #e5e7eb;
 }
 
 .dd-group-header {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   margin-bottom: 4px;
-  display: flex;
-  justify-content: space-between;
-  color: var(--primary-light);
 }
 
-.dd-group-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* Disease item */
+/* تشخيص واحد داخل المجموعة */
 .dd-item {
-  padding: 6px 6px;
   border-radius: 12px;
+  padding: 6px 8px;
   background: #020617;
-  box-shadow: var(--shadow-inset);
+  border: 1px solid rgba(31, 41, 55, 0.8);
+  margin-top: 4px;
 }
 
 .dd-item-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 4px;
+  gap: 6px;
 }
 
 .dd-name {
@@ -441,17 +390,18 @@ body {
 }
 
 .dd-score {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-secondary);
 }
 
-/* Clinical score text */
+/* نص إضافي في DDX (مثلاً clinicalScore) */
 .dd-clinical-text {
   font-size: 0.8rem;
-  color: var(--text-main);
+  color: var(--text-secondary);
+  margin-top: 4px;
 }
 
-/* Features / Missing lists */
+/* قوائم features / missing */
 .dd-features-list,
 .dd-missing-list {
   margin-left: 1.1rem;
@@ -464,7 +414,7 @@ body {
   margin-bottom: 2px;
 }
 
-/* Collapsible sections */
+/* الأقسام القابلة للطي */
 .dd-section {
   margin-top: 4px;
 }
@@ -538,7 +488,7 @@ body {
 }
 
 /* =========================================
-   CASE PRESENTATION MODAL (Story Mode)
+   CASE PRESENTATION MODAL
 ========================================= */
 
 .case-modal {
@@ -585,8 +535,8 @@ body {
   margin-bottom: 6px;
 }
 
-.case-modal-header h2 {
-  font-size: 1rem;
+.case-modal-title {
+  font-size: 0.95rem;
   color: var(--primary-light);
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -668,7 +618,8 @@ body {
    RESPONSIVE
 ========================================= */
 
-@media (max-width: 960px) {
+/* موبايل وتابلت صغيرة: الكروت تصير تحت بعض، والصفحة تسوي scroll */
+@media (max-width: 768px) {
   .app-layout {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -680,7 +631,7 @@ body {
   }
 
   body {
-    overflow: auto;
+    overflow: auto; /* على الموبايل خليه يسكّرول كل الصفحة */
   }
 }
 
