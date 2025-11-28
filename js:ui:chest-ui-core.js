@@ -4,7 +4,7 @@
 // - step rendering
 // - navigation (Prev / Next / Reset / Print)
 // - validation
-// - optional state persistence
+// - language toggle (Arabic / English)
 // ========================================
 
 "use strict";
@@ -14,6 +14,19 @@
   if (!engine) {
     console.error("ChestEngine is not available.");
     return;
+  }
+
+  // ---------- لغة الواجهة ----------
+  const LANG_STORAGE_KEY = "chest_lang";
+  try {
+    const savedLang = window.localStorage.getItem(LANG_STORAGE_KEY);
+    if (savedLang === "en" || savedLang === "ar") {
+      window.APP_LANG = savedLang;
+    } else {
+      window.APP_LANG = "ar";
+    }
+  } catch (e) {
+    window.APP_LANG = "ar";
   }
 
   // ---------- DOM elements ----------
@@ -28,9 +41,17 @@
   const elBtnNext  = document.getElementById("btnNext");
   const elBtnReset = document.getElementById("btnReset");
   const elBtnPrint = document.getElementById("btnPrint");
+  const elBtnLang  = document.getElementById("btnToggleLang");
 
   // Safety check
-  if (!elQuestionText || !elOptionsContainer || !elSectionLabel || !elStepCounter || !elBtnPrev || !elBtnNext) {
+  if (
+    !elQuestionText ||
+    !elOptionsContainer ||
+    !elSectionLabel ||
+    !elStepCounter ||
+    !elBtnPrev ||
+    !elBtnNext
+  ) {
     console.error("UI Core: some required DOM elements are missing.");
     return;
   }
@@ -41,7 +62,6 @@
   function animateFade(elem) {
     if (!elem) return;
     elem.classList.remove("fade-in");
-    // Force reflow
     void elem.offsetWidth;
     elem.classList.add("fade-in");
   }
@@ -94,11 +114,27 @@
   }
 
   // -----------------------------------
+  // زر اللغة: تحديث النص
+  // -----------------------------------
+  function updateLangButton() {
+    if (!elBtnLang) return;
+    const lang = window.APP_LANG === "en" ? "en" : "ar";
+    if (lang === "en") {
+      elBtnLang.textContent = "التبديل إلى عربي";
+    } else {
+      elBtnLang.textContent = "Switch to English";
+    }
+  }
+
+  // -----------------------------------
   // Render current step on the UI
   // -----------------------------------
   function renderCurrentStep() {
     const step = engine.getCurrentStep();
     if (!step) return;
+
+    const lang = window.APP_LANG === "en" ? "en" : "ar";
+    const isEnglish = lang === "en";
 
     // Clear validation when changing step
     if (elValidation) {
@@ -110,20 +146,28 @@
     const prog = engine.getProgressInfo();
     elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
 
-    // Section label + per-section progress
+    // Section label + per-section progress (تظل إنجليزيّة مثل ما هي)
     elSectionLabel.textContent = step.sectionLabel || "";
 
-    const stepsInSection = engine.steps.filter((s) => s.sectionId === step.sectionId);
-    const indexInSection = stepsInSection.findIndex((s) => s.id === step.id) + 1;
+    const stepsInSection = engine.steps.filter(
+      (s) => s.sectionId === step.sectionId
+    );
+    const indexInSection =
+      stepsInSection.findIndex((s) => s.id === step.id) + 1;
     elSectionStepCtr.textContent = `${step.sectionLabel || ""} — Question ${indexInSection}/${stepsInSection.length}`;
 
-    // Question text (Arabic, RTL)
-    elQuestionText.textContent = step.question || "";
-    elQuestionText.setAttribute("dir", "rtl");
+    // Question text: عربي / إنجليزي حسب اللغة
+    const qText =
+      isEnglish && step.questionEn
+        ? step.questionEn
+        : step.question || "";
 
-    // Render options via UIOptions module
+    elQuestionText.textContent = qText;
+    elQuestionText.setAttribute(isEnglish ? "dir" : "dir", isEnglish ? "ltr" : "rtl");
+
+    // Render options via UIOptions module (مع اللغة)
     if (window.UIOptions && typeof window.UIOptions.renderOptions === "function") {
-      window.UIOptions.renderOptions(step);
+      window.UIOptions.renderOptions(step, lang);
     } else {
       elOptionsContainer.innerHTML = "<p>Options module not loaded.</p>";
     }
@@ -188,7 +232,6 @@
 
     saveStateIfPossible();
 
-    // Clear reasoning + ddx if modules exist
     if (window.UIReasoning && typeof window.UIReasoning.clear === "function") {
       window.UIReasoning.clear();
     }
@@ -203,7 +246,6 @@
     if (window.UICaseModal && typeof window.UICaseModal.printCase === "function") {
       window.UICaseModal.printCase();
     } else {
-      // fallback: normal print
       window.print();
     }
   }
@@ -223,7 +265,6 @@
     }
 
     if (!loaded && typeof engine.init === "function") {
-      // First time: clean state
       engine.init();
     }
   }
@@ -232,17 +273,20 @@
   // Wire events
   // -----------------------------------
   function wireEvents() {
-    if (elBtnNext) {
-      elBtnNext.addEventListener("click", handleNext);
-    }
-    if (elBtnPrev) {
-      elBtnPrev.addEventListener("click", handlePrev);
-    }
-    if (elBtnReset) {
-      elBtnReset.addEventListener("click", handleReset);
-    }
-    if (elBtnPrint) {
-      elBtnPrint.addEventListener("click", handlePrint);
+    if (elBtnNext) elBtnNext.addEventListener("click", handleNext);
+    if (elBtnPrev) elBtnPrev.addEventListener("click", handlePrev);
+    if (elBtnReset) elBtnReset.addEventListener("click", handleReset);
+    if (elBtnPrint) elBtnPrint.addEventListener("click", handlePrint);
+
+    if (elBtnLang) {
+      elBtnLang.addEventListener("click", () => {
+        window.APP_LANG = window.APP_LANG === "en" ? "ar" : "en";
+        try {
+          window.localStorage.setItem(LANG_STORAGE_KEY, window.APP_LANG);
+        } catch (e) {}
+        updateLangButton();
+        renderCurrentStep();
+      });
     }
   }
 
@@ -250,6 +294,7 @@
   // Entry point
   // -----------------------------------
   function initUI() {
+    updateLangButton();
     initEngineState();
     wireEvents();
     renderCurrentStep();
