@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Chest Pain History Trainer</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- CSS: داخل مجلد css -->
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
@@ -101,28 +103,32 @@
     </div>
   </div>
 
-  <!-- DATA FILES -->
-<script src="chest-data-dx.js"></script>
-<script src="chest-data-personal.js"></script>
-<script src="chest-data-hpi.js"></script>
-<script src="chest-data-ros.js"></script>
-<script src="chest-data-background.js"></script>
-<script src="chest-data-main.js"></script>
+  <!-- ===========================
+       SCRIPTS
+  ============================ -->
 
-<!-- ENGINE -->
-<script src="engine/chest-engine-config.js"></script>
-<script src="engine/chest-engine-state.js"></script>
-<script src="engine/chest-engine-scoring.js"></script>
-<script src="engine/chest-engine-recompute.js"></script>
-<script src="engine/chest-engine-output.js"></script>
-<script src="engine/chest-engine-core.js"></script>
+  <!-- DATA FILES: داخل js/data -->
+  <script src="js/data/chest-data-dx.js"></script>
+  <script src="js/data/chest-data-personal.js"></script>
+  <script src="js/data/chest-data-hpi.js"></script>
+  <script src="js/data/chest-data-ros.js"></script>
+  <script src="js/data/chest-data-background.js"></script>
+  <script src="js/data/chest-data-main.js"></script>
 
-<!-- UI -->
-<script src="chest-ui-core.js"></script>
-<script src="chest-ui-ddx.js"></script>
-<script src="chest-ui-reasoning.js"></script>
-<script src="chest-ui-options.js"></script>
-<script src="chest-ui-case-modal.js"></script>
+  <!-- ENGINE: داخل js/engine -->
+  <script src="js/engine/chest-engine-config.js"></script>
+  <script src="js/engine/chest-engine-state.js"></script>
+  <script src="js/engine/chest-engine-scoring.js"></script>
+  <script src="js/engine/chest-engine-recompute.js"></script>
+  <script src="js/engine/chest-engine-output.js"></script>
+  <script src="js/engine/chest-engine-core.js"></script>
+
+  <!-- UI: داخل js/ui -->
+  <script src="js/ui/chest-ui-core.js"></script>
+  <script src="js/ui/chest-ui-ddx.js"></script>
+  <script src="js/ui/chest-ui-reasoning.js"></script>
+  <script src="js/ui/chest-ui-options.js"></script>
+  <script src="js/ui/chest-ui-case-modal.js"></script>
 
 </body>
 </html>
