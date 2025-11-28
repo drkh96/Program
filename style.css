@@ -1,4 +1,51 @@
 /* =========================================
+   THEME VARIABLES
+========================================= */
+
+:root {
+  /* Brand / Primary */
+  --primary: #1e88e5;
+  --primary-light: #64b5f6;
+  --primary-dark: #0d47a1;
+
+  /* Secondary / Accent */
+  --secondary: #26c6da;
+  --secondary-dark: #0097a7;
+
+  /* Backgrounds */
+  --bg-main: #020617;
+  --bg-grad-top: #1f2937;
+  --bg-grad-mid: #020617;
+  --bg-grad-bot: #000000;
+  --bg-card: #162238;
+  --bg-card-soft: #1e293b;
+  --bg-deep: #0f172a;
+
+  /* Text */
+  --text-main: #e5e7eb;
+  --text-secondary: #94a3b8;
+  --text-muted: #6b7280;
+  --text-danger: #f97373;
+
+  /* Lines & Borders */
+  --border-soft: rgba(148, 163, 184, 0.25);
+  --border-strong: rgba(148, 163, 184, 0.4);
+
+  /* Shadows */
+  --shadow-card: 6px 6px 12px #151a24, -6px -6px 12px #27384c;
+  --shadow-card-soft: 3px 3px 6px #151a24, -3px -3px 6px #27384c;
+  --shadow-inset: inset 3px 3px 6px #000, inset -3px -3px 6px #1f2937;
+
+  /* DDx group colors */
+  --ddx-cardiac: #ef5350;
+  --ddx-aorta: #66bb6a;
+  --ddx-pulm: #42a5f5;
+  --ddx-gi: #ffa726;
+  --ddx-msk: #ab47bc;
+  --ddx-other: #b0bec5;
+}
+
+/* =========================================
    RESET & BASE
 ========================================= */
 
@@ -15,19 +62,23 @@ body {
   height: 100%;
 }
 
+html {
+  direction: ltr; /* English UI */
+}
+
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
-  color: #e5e7eb;
+  background: radial-gradient(
+    circle at top,
+    var(--bg-grad-top) 0,
+    var(--bg-grad-mid) 55%,
+    var(--bg-grad-bot) 100%
+  );
+  color: var(--text-main);
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
-  padding-top: 60px; /* مساحة للـ header الـ sticky */
-}
-
-/* Direction */
-html {
-  direction: ltr; /* LTR for English UI */
+  padding-top: 60px;
   overflow: hidden;
 }
 
@@ -36,110 +87,46 @@ html {
 ========================================= */
 
 .app-header {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  inset: 0 0 auto 0;
   z-index: 20;
   padding: 14px 24px;
   text-align: left;
-  background: #1e293b;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.98),
+    rgba(15, 23, 42, 0.92)
+  );
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
 }
 
 .app-header h1 {
   font-size: 1.5rem;
-  letter-spacing: 0.03em;
-  color: #f9fafb;
+  letter-spacing: 0.08em;
+  color: var(--primary-light);
+  text-transform: uppercase;
 }
 
-.app-header-main {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.app-header-subtitle {
+.app-subtitle {
+  margin-top: 4px;
   font-size: 0.9rem;
-  color: #cbd5f5;
-  margin-top: 2px;
-}
-
-.app-header-disclaimer {
-  margin-top: 6px;
-  font-size: 0.8rem;
-  color: #fbbf24;
-  max-width: 720px;
+  color: var(--text-secondary);
 }
 
 /* =========================================
-   MAIN 3-CARD LAYOUT & NAVIGATION BAR
+   MAIN 3-CARD LAYOUT
 ========================================= */
 
 .app-layout {
   max-width: 1200px;
-  margin: 10px auto 16px;
-  padding: 0 16px 12px;
+  margin: 80px auto 0;
+  padding: 0 16px 16px;
   display: grid;
-  /* الترتيب: DDX | REASON | HISTORY. والـ NAV في صف جديد في الأسفل */
-  grid-template-columns: 1.05fr 1.2fr 1.05fr;
-  grid-template-areas:
-    "ddx reason history"
-    "nav nav nav";
+  grid-template-columns: repeat(3, 1fr); /* ثلاث كروت متساوية */
+  grid-template-areas: "ddx reason history";
   gap: 16px;
-  height: calc(100vh - 64px);
-}
-
-/* Navigation Card (Bottom Row) */
-.nav-bar {
-  grid-area: nav;
-  padding: 10px 16px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  overflow-x: auto;
-  background: #1e293b;
-  border-radius: 22px;
-  box-shadow: 6px 6px 12px #151a24, -6px -6px 12px #27384c;
-  gap: 8px;
-}
-
-/* Small scrollbar styling */
-.nav-bar::-webkit-scrollbar {
-  height: 6px;
-}
-.nav-bar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.nav-bar::-webkit-scrollbar-thumb {
-  background: #4b5563;
-  border-radius: 999px;
-}
-
-/* Nav buttons */
-.nav-button {
-  border: none;
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  white-space: nowrap;
-  background: #0f172a;
-  color: #e5e7eb;
-  box-shadow: 3px 3px 6px #020617, -3px -3px 6px #1f2937;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-}
-
-.nav-button:hover {
-  background: #1e293b;
-  transform: translateY(-1px);
-}
-
-.nav-button--active {
-  background: #0ea5e9;
-  color: #0b1120;
-  font-weight: 600;
-  box-shadow: inset 2px 2px 4px rgba(15, 23, 42, 0.9),
-    inset -2px -2px 4px rgba(148, 163, 184, 0.7);
+  height: calc(100vh - 80px);
 }
 
 /* Cards placement */
@@ -154,40 +141,47 @@ html {
 }
 
 /* =========================================
-   CARD BASE STYLE - NEUMORPHIC GROUP
+   CARD BASE (Neumorphic / Premium)
 ========================================= */
 
 .card {
   position: relative;
   border-radius: 22px;
-  padding: 14px 16px 14px;
-  /* الخلفية النيومورفية */
-  background: #1e293b;
-  border: none;
-  box-shadow: 6px 6px 12px #151a24, -6px -6px 12px #27384c;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  padding: 14px 16px;
+  background: radial-gradient(
+      circle at top left,
+      rgba(148, 163, 184, 0.08),
+      transparent 45%
+    ),
+    var(--bg-card);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.85);
 }
 
 .card-header {
   padding-bottom: 4px;
   margin-bottom: 4px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
-.card-header h2,
-.card-header .history-title {
-  font-size: 1rem;
-  letter-spacing: 0.05em;
+/* عنوان الكارت الرئيسي */
+.card-title {
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #e5e7eb;
+  color: var(--primary-light);
+  font-weight: 700;
 }
 
+/* جسم الكارت */
 .card-body {
-  padding-top: 2px;
+  padding-top: 4px;
   flex: 1;
   overflow-y: auto;
 }
@@ -205,255 +199,234 @@ html {
 }
 
 /* =========================================
-   HISTORY CARD
+   QUESTION / HISTORY CARD
 ========================================= */
 
-.history-header {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.history-title {
-  font-size: 1rem;
+.section-label {
+  font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #e5e7eb;
+  color: var(--secondary);
 }
 
-.history-subtitle {
-  font-size: 0.82rem;
-  color: #9ca3af;
+.section-step-counter {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
 }
 
-.history-body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* step counters */
-.question-meta {
-  font-size: 0.78rem;
-  color: #9ca3af;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.question-text {
+.step-counter {
   margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+/* سؤال (عربي / RTL) */
+.question-text {
+  margin-top: 6px;
   border-radius: 12px;
   padding: 10px 12px;
-  background: #0f172a;
-  box-shadow: inset 3px 3px 6px #020617, inset -3px -3px 6px #1f2937;
-  font-size: 0.95rem;
-  color: #e5e7eb;
+  background: var(--bg-deep);
+  box-shadow: var(--shadow-inset);
+  font-size: 0.98rem;
+  color: var(--text-main);
+  direction: rtl;
+  text-align: right;
 }
 
-/* Next/Prev footer */
-.nav-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.nav-footer button {
-  flex: 1;
-  border-radius: 999px;
-  border: none;
-  padding: 6px 10px;
-  font-size: 0.9rem;
-  background: #020617;
-  color: #e5e7eb;
-  box-shadow: 3px 3px 6px #000, -3px -3px 6px #1f2937;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-}
-
-.nav-footer button:hover {
-  background: #0f172a;
-  transform: translateY(-1px);
-}
-
-/* =========================================
-   OPTIONS (RADIO / CHECKBOX / NUMERIC)
-========================================= */
-
+/* خيارات السؤال (عربي، RTL) */
 .options-container {
-  margin-top: 4px;
+  margin-top: 6px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  direction: rtl;
 }
 
-/* كل خيار في "row" */
+/* صف واحد لكل خيار */
 .option-row {
   display: flex;
-  flex-direction: row-reverse; /* العنصر النصي في اليمين */
+  flex-direction: row-reverse;
   align-items: center;
   gap: 8px;
-  border-radius: 999px;
-  padding: 6px 10px;
+  border-radius: 12px;
+  padding: 8px 10px;
   background: #020617;
   box-shadow: 3px 3px 6px #000, -3px -3px 6px #1f2937;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  transition: transform 130ms cubic-bezier(0.19, 1, 0.22, 1),
+    box-shadow 130ms cubic-bezier(0.19, 1, 0.22, 1),
+    background 0.15s ease-in-out;
 }
 
 .option-row:hover {
-  background: #1e293b;
-  box-shadow: 6px 6px 12px #151a24, -6px -6px 12px #27384c;
-  transform: translateY(0);
+  background: #111827;
+  box-shadow: 4px 4px 8px #000, -4px -4px 8px #1f2937;
 }
 
 .option-row input[type="radio"],
 .option-row input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  accent-color: #38bdf8;
+  accent-color: var(--secondary);
   cursor: pointer;
-  order: 2; /* وضع Checkbox/Radio في اليسار */
+  order: 2;
 }
 
 .option-label {
-  font-size: 0.9rem;
-  color: #e5e7eb;
-  flex-grow: 1;
+  flex: 1;
   text-align: right;
+  font-size: 0.9rem;
+  color: var(--text-main);
 }
 
-/* numeric / text inputs (Neumorphic Concave) */
-.options-container input[type="number"],
-.options-container input[type="text"] {
+/* input نصّي (name, age, CC...) */
+.ui-input {
   width: 100%;
   border-radius: 14px;
   border: none;
-  padding: 7px 10px;
+  padding: 8px 10px;
   font-size: 0.9rem;
   background: #020617;
-  color: #e5e7eb;
-  box-shadow: inset 3px 3px 6px #000, inset -3px -3px 6px #1f2937;
+  color: var(--text-main);
+  box-shadow: var(--shadow-inset);
   outline: none;
 }
 
-.options-container input[type="number"]:focus,
-.options-container input[type="text"]:focus {
-  box-shadow: inset 3px 3px 6px #000, inset -3px -3px 6px #1f2937,
-    0 0 0 1px #38bdf8;
+.ui-input:focus {
+  box-shadow: var(--shadow-inset), 0 0 0 1px var(--secondary);
+}
+
+/* رسالة الـ validation */
+.validation-message {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: var(--text-danger);
+  min-height: 1em;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.validation-show {
+  opacity: 1;
 }
 
 /* =========================================
-   DIFFERENTIAL DIAGNOSIS CARD
+   NAV BUTTONS (Prev / Next / Reset / Print)
+========================================= */
+
+.card-footer {
+  margin-top: 8px;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #020617;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 4px 4px 8px #151a24, -4px -4px 8px #27384c;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary-light);
+  color: #f9fafb;
+}
+
+.btn-secondary {
+  background: var(--bg-deep);
+  color: var(--primary-light);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 6px 6px 12px #151a24, -6px -6px 12px #27384c;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+/* =========================================
+   DDX CARD (Detailed Medscape-style)
 ========================================= */
 
 .ddx-body {
   font-size: 0.9rem;
 }
 
-/* رسالة فارغة */
 .dd-empty {
   font-size: 0.86rem;
-  color: #9ca3af;
-  text-align: left;
+  color: var(--text-secondary);
 }
 
-/* بطاقة جهاز واحد (Group Card) */
+/* Group card */
 .dd-group-card {
   border-radius: 16px;
   padding: 8px 10px 10px;
-  margin-bottom: 6px;
-  background: #1e293b;
-  border: none;
-  box-shadow: 3px 3px 6px #151a24, -3px -3px 6px #27384c; /* Reduced convex for groups */
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 8px;
+  background: var(--bg-card-soft);
+  box-shadow: var(--shadow-card-soft);
 }
 
-/* 💡 RE-APPLYING BORDER COLORS FOR VISUAL DISTINCTION */
-
+/* Colored borders by system */
 .dd-group-card--cardiac {
-  border-left: 5px solid #ef4444;
-} /* Red */
-.dd-group-card--cardiac .dd-group-header {
-  color: #fca5a5;
+  border-left: 5px solid var(--ddx-cardiac);
 }
-
 .dd-group-card--aorta {
-  border-left: 5px solid #22c55e;
-} /* Green */
-.dd-group-card--aorta .dd-group-header {
-  color: #86efac;
+  border-left: 5px solid var(--ddx-aorta);
 }
-
 .dd-group-card--pulmonary {
-  border-left: 5px solid #3b82f6;
-} /* Blue */
-.dd-group-card--pulmonary .dd-group-header {
-  color: #93c5fd;
+  border-left: 5px solid var(--ddx-pulm);
 }
-
 .dd-group-card--gi {
-  border-left: 5px solid #f97316;
-} /* Orange */
-.dd-group-card--gi .dd-group-header {
-  color: #fed7aa;
+  border-left: 5px solid var(--ddx-gi);
 }
-
 .dd-group-card--msk {
-  border-left: 5px solid #a855f7;
-} /* Purple */
-.dd-group-card--msk .dd-group-header {
-  color: #e9d5ff;
+  border-left: 5px solid var(--ddx-msk);
 }
-
 .dd-group-card--other {
-  border-left: 5px solid #e5e7eb;
-} /* Gray */
-.dd-group-card--other .dd-group-header {
-  color: #e5e7eb;
+  border-left: 5px solid var(--ddx-other);
 }
 
-/* Group Header (System Name + badges) */
 .dd-group-header {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 4px;
   display: flex;
-  align-items: baseline;
   justify-content: space-between;
+  color: var(--primary-light);
 }
 
-/* Badges inside header */
-.dd-group-header-badges {
-  display: flex;
-  gap: 4px;
-  font-size: 0.7rem;
-}
-
-.dd-badge {
-  border-radius: 999px;
-  padding: 1px 6px;
-  background: rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-  border: 1px solid rgba(148, 163, 184, 0.5);
-}
-
-/* مرض واحد داخل مجموعة (Item) */
-.dd-item {
+.dd-group-body {
   display: flex;
   flex-direction: column;
-  padding: 6px 6px 6px 6px;
-  border-radius: 12px;
-  background: #020617;
-  box-shadow: inset 2px 2px 4px #000, inset -2px -2px 4px #1f2937;
-  margin-bottom: 4px;
+  gap: 4px;
 }
 
-/* العنوان + القيمة */
+/* Disease item */
+.dd-item {
+  padding: 6px 6px;
+  border-radius: 12px;
+  background: #020617;
+  box-shadow: var(--shadow-inset);
+}
+
 .dd-item-header {
   display: flex;
   justify-content: space-between;
@@ -461,177 +434,121 @@ html {
   gap: 4px;
 }
 
-/* اسم المرض */
-.dd-item-name {
+.dd-name {
   font-size: 0.86rem;
   font-weight: 600;
-  color: #f9fafb;
+  color: var(--text-main);
 }
 
-/* value & badge */
-.dd-item-score {
+.dd-score {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-secondary);
 }
 
-/* level badges for disease */
-.dd-item-risk {
-  font-size: 0.7rem;
-  border-radius: 999px;
-  padding: 1px 6px;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  background: #020617;
-  margin-left: 4px;
+/* Clinical score text */
+.dd-clinical-text {
+  font-size: 0.8rem;
+  color: var(--text-main);
 }
 
-.dd-item-risk--high {
-  border-color: #ef4444;
-  color: #fecaca;
-}
-.dd-item-risk--medium {
-  border-color: #f97316;
-  color: #fed7aa;
-}
-.dd-item-risk--low {
-  border-color: #22c55e;
-  color: #bbf7d0;
-}
-
-/* Wells & HEART badges */
-.dd-scores-row {
-  margin-top: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.dd-score-pill {
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: #0f172a;
-  font-size: 0.7rem;
-  color: #e5e7eb;
-}
-
-/* =================================================================================
-   NEW SECTION: Explicit "Missing Clinical Data" list in DDX card
-================================================================================= */
-
-.dd-missing-block {
-  margin-top: 6px;
-  border-radius: 12px;
-  padding: 6px 8px;
-  background: #020617;
-  box-shadow: inset 2px 2px 4px #000, inset -2px -2px 4px #1f2937;
-}
-
-.dd-missing-title {
-  font-size: 0.76rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 2px;
-  color: #e5e7eb;
-}
-
+/* Features / Missing lists */
+.dd-features-list,
 .dd-missing-list {
-  font-size: 0.76rem;
-  color: #e5e7eb;
-  list-style: none;
-  padding-left: 1em;
-  text-indent: -1em;
+  margin-left: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--text-main);
 }
 
-.dd-missing-list li::before {
-  content: "•";
-  color: #facc15;
-  font-weight: bold;
-  display: inline-block;
-  width: 1em;
-  margin-right: 0.1em;
-  margin-left: 0;
+.dd-features-list li,
+.dd-missing-list li {
+  margin-bottom: 2px;
+}
+
+/* Collapsible sections */
+.dd-section {
+  margin-top: 4px;
+}
+
+.dd-section-header {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 4px 8px;
+  text-align: left;
+  font-size: 0.78rem;
+  background: #0f172a;
+  color: var(--secondary);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dd-section-header::after {
+  content: "▾";
+  font-size: 0.7rem;
+  opacity: 0.8;
+  color: var(--primary-light);
+}
+
+.dd-section-body {
+  margin-top: 4px;
+  border-left: 2px solid rgba(148, 163, 184, 0.35);
+  padding-left: 6px;
 }
 
 /* =========================================
    CLINICAL REASONING CARD
 ========================================= */
 
-.reason-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.9rem;
-}
-
-/* النص أعلى قائمة الأسباب */
-.reason-question {
+.reason-title {
   border-radius: 12px;
   padding: 8px 10px;
-  background: #020617;
-  box-shadow: inset 3px 3px 6px #000, inset -3px -3px 6px #1f2937;
-  min-height: 40px;
-  color: #e5e7eb;
+  background: var(--bg-deep);
+  box-shadow: var(--shadow-inset);
+  font-size: 0.9rem;
+  color: var(--primary-light);
 }
 
-/* قائمة الأسباب */
 .reason-list {
   list-style: none;
-  margin-top: 4px;
+  margin-top: 6px;
   padding-left: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-/* عنصر واحد في الـ reasoning */
 .reason-item {
   border-radius: 12px;
   padding: 6px 8px;
   background: #020617;
-  box-shadow: inset 3px 3px 6px #000, inset -3px -3px 6px #1f2937;
+  box-shadow: var(--shadow-inset);
 }
 
-.reason-item-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px;
-}
-
-.reason-item-main {
+.reason-text {
   font-size: 0.86rem;
-  font-weight: 600;
-  color: #f9fafb;
+  color: var(--text-main);
 }
 
-.reason-item-diseases {
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-.reason-item-body {
+.reason-diseases {
   margin-top: 2px;
-  font-size: 0.8rem;
-  color: #e5e7eb;
-}
-
-/* "type" badge */
-.reason-type-badge {
-  font-size: 0.7rem;
-  border-radius: 999px;
-  padding: 1px 6px;
-  background: #0f172a;
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  color: #e5e7eb;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
 }
 
 /* =========================================
-   CASE PRESENTATION MODAL
+   CASE PRESENTATION MODAL (Story Mode)
 ========================================= */
 
 .case-modal {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.85);
+  background: radial-gradient(
+    circle at top,
+    rgba(15, 23, 42, 0.96),
+    rgba(2, 6, 23, 0.92)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -646,79 +563,105 @@ html {
   width: min(640px, 95vw);
   max-height: 80vh;
   border-radius: 24px;
-  background: #0f172a;
+  background: radial-gradient(
+      circle at top left,
+      rgba(148, 163, 184, 0.12),
+      transparent 45%
+    ),
+    var(--bg-deep);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
   padding: 14px 14px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
 }
 
 .case-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+  border-bottom: 1px solid var(--border-strong);
   padding-bottom: 6px;
   margin-bottom: 6px;
 }
 
 .case-modal-header h2 {
   font-size: 1rem;
-  color: #e5e7eb;
+  color: var(--primary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
-/* Close button (X) */
 .case-modal-close {
   border: none;
   background: none;
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-size: 1.4rem;
   cursor: pointer;
 }
 
 .case-modal-close:hover {
-  color: #e5e7eb;
+  color: var(--text-main);
 }
 
-/* متن العرض */
-.case-modal-body {
+.case-modal-content {
   flex: 1;
   overflow-y: auto;
-  padding: 6px 4px 4px;
+  padding: 4px 2px 4px;
 }
 
-/* نص الـ case */
-.case-modal-body p {
+/* Case sections */
+.case-section {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.25);
+}
+
+.case-section-title {
   font-size: 0.9rem;
-  color: #e5e7eb;
-  margin-bottom: 6px;
+  font-weight: 600;
+  color: var(--secondary);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-/* Footer buttons (Copy, Close) */
+.case-section-line {
+  font-size: 0.86rem;
+  color: var(--text-main);
+}
+
 .case-modal-footer {
-  border-top: 1px solid rgba(148, 163, 184, 0.4);
+  border-top: 1px solid var(--border-strong);
   padding-top: 6px;
   margin-top: 6px;
   display: flex;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 8px;
 }
 
-.case-modal-footer button {
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: none;
-  background: #1e293b;
-  color: #f9fafb;
+.case-modal-footer .btn {
+  flex: 0 0 auto;
   font-size: 0.85rem;
-  cursor: pointer;
-  box-shadow: 4px 4px 8px #151a24, -4px -4px 8px #27384c; /* Neumorphic */
-  transition: all 0.2s ease-in-out;
 }
 
-.case-modal-footer button:hover {
-  transform: translateY(-1px);
-  box-shadow: 6px 6px 12px #151a24, -6px -6px 12px #27384c;
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+.fade-in {
+  animation: fadeInStep 0.18s ease-out;
+}
+
+@keyframes fadeInStep {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* =========================================
@@ -731,17 +674,13 @@ html {
     grid-template-areas:
       "history"
       "ddx"
-      "reason"
-      "nav";
+      "reason";
     height: auto;
+    margin-top: 76px;
   }
 
   body {
-    padding-top: 56px;
-  }
-
-  .card {
-    min-height: auto;
+    overflow: auto;
   }
 }
 
@@ -762,14 +701,4 @@ html {
     border-radius: 18px;
     padding: 10px 10px 10px;
   }
-
-  .nav-bar {
-    border-radius: 18px;
-  }
-}
-.validation-message {
-  margin-top: 4px;
-  font-size: 0.8rem;
-  color: #f97373;      /* أحمر ناعم */
-  min-height: 1em;
 }

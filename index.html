@@ -1,126 +1,129 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chest Pain History Trainer (Educational Only)</title>
-  <meta
-    name="description"
-    content="Interactive chest pain history taking and differential diagnosis tool for medical education. Not for clinical use."
-  />
+  <title>Chest Pain History Trainer</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
+  <!-- ===========================
+       HEADER
+  ============================ -->
   <header class="app-header">
-    <div class="app-header-main">
-      <h1>Chest Pain History Trainer</h1>
-      <p class="app-header-subtitle">
-        Interactive chest pain history taking and differential diagnosis &mdash; educational use only
-      </p>
-    </div>
-
-    <p class="app-header-disclaimer" role="note">
-      This tool is for medical education only and must not be used for real patient care, diagnosis, or treatment decisions.
-    </p>
+    <h1>Chest Pain History Trainer</h1>
+    <p class="app-subtitle">Educational use only – not for real patients</p>
   </header>
 
-  <main class="app-layout" aria-label="Chest pain history trainer">
+  <!-- ===========================
+       MAIN 3-CARD LAYOUT
+  ============================ -->
+  <main class="app-layout">
 
-    <!-- Differential Diagnosis Card -->
-    <section class="card card-ddx" aria-labelledby="ddxHeading">
+    <!-- ========== CARD 1: DDx ========== -->
+    <section class="card card-ddx">
       <header class="card-header">
-        <h2 id="ddxHeading">Current Differential Diagnosis</h2>
+        <h2 class="card-title">Differential Diagnosis</h2>
       </header>
-      <div class="card-body ddx-body" id="ddxContainer">
-        <p class="dd-empty">
-          No diagnosis suggested yet. Start answering questions to build the differential diagnosis.
-        </p>
+      <div id="ddxContainer" class="card-body ddx-body">
+        <p class="dd-empty">Start answering questions to build the DDx.</p>
       </div>
     </section>
 
-    <!-- Clinical Reasoning Card -->
-    <section class="card card-reason" aria-labelledby="reasonHeading">
+    <!-- ========== CARD 2: Clinical Reasoning ========== -->
+    <section class="card card-reason">
       <header class="card-header">
-        <h2 id="reasonHeading">Clinical Reasoning</h2>
+        <h2 class="card-title">Clinical Reasoning</h2>
       </header>
-      <div class="card-body reason-body">
-        <div class="reason-question" id="reasonQuestion">
+
+      <div class="card-body">
+        <div id="reasonQuestion" class="reason-title">
           Select an option to see clinical reasoning.
         </div>
-        <ul class="reason-list" id="reasonList" aria-live="polite"></ul>
+        <ul id="reasonList" class="reason-list"></ul>
       </div>
     </section>
 
-    <!-- History Taking Card -->
-    <section class="card card-history" aria-labelledby="historyHeading">
-      <header class="card-header history-header">
-        <div class="history-title" id="historyHeading">History Taking</div>
-        <div class="history-subtitle" id="sectionLabel">Personal Data</div>
+    <!-- ========== CARD 3: Questions (Arabic ONLY for Q & options) ========== -->
+    <section class="card card-history">
+      <header class="card-header card-header--question">
+        <span id="sectionLabel" class="section-label">Section</span>
+        <span id="sectionStepCounter" class="section-step-counter"></span>
       </header>
 
-      <div class="card-body history-body">
-        <div class="question-meta">
-          <span id="stepCounter" class="meta-main"></span>
-          <span id="sectionStepCounter" class="meta-sub"></span>
-        </div>
+      <div class="card-body">
 
-        <div class="question-text" id="questionText">
-          Question will appear here…
-        </div>
+        <div id="stepCounter" class="step-counter"></div>
 
-        <!-- Validation message for required questions -->
-        <div id="validationMessage" class="validation-message"></div>
+        <!-- ⬅⬅⬅ THIS PART IS RTL BECAUSE Q IS ARABIC -->
+        <div id="questionText" class="question-text" dir="rtl"></div>
 
-        <div id="optionsContainer" class="options-container" aria-live="polite"></div>
+        <!-- validation english -->
+        <div id="validationMessage" class="validation-message" dir="ltr"></div>
+
+        <!-- options also RTL because Arabic -->
+        <div id="optionsContainer" class="options-container" dir="rtl"></div>
+
       </div>
 
-      <footer class="card-footer nav-footer">
-        <button id="btnPrev" type="button">Previous</button>
-        <button id="btnNext" type="button">Next</button>
-        <button id="btnReset" type="button" class="btn-secondary">Reset Case</button>
-        <button id="btnPrint" type="button" class="btn-secondary">Print / Save as PDF</button>
+      <footer class="card-footer">
+        <div class="nav-buttons">
+          <button id="btnPrev" class="btn btn-secondary">Previous</button>
+          <button id="btnNext" class="btn btn-primary">Next</button>
+          <button id="btnReset" class="btn btn-secondary">Reset</button>
+          <button id="btnPrint" class="btn btn-secondary">Print</button>
+        </div>
       </footer>
     </section>
-
-    <!-- Navigation bar (sections) -->
- <nav class="nav-bar" id="navBar" aria-label="History sections navigation">
-      <!-- Navigation buttons will be generated by JavaScript -->
-    </nav>
 
   </main>
 
-  <!-- Case Presentation Modal -->
-  <div id="caseModal" class="case-modal hidden" role="dialog" aria-modal="true" aria-labelledby="caseModalTitle">
+  <!-- ===========================
+       CASE MODAL
+  ============================ -->
+  <div id="caseModal" class="case-modal hidden">
+    <div class="case-modal-backdrop"></div>
+
     <div class="case-modal-dialog">
       <header class="case-modal-header">
-        <h2 id="caseModalTitle">Case Presentation (Narrative Summary)</h2>
-        <button
-          id="caseModalClose"
-          type="button"
-          class="case-modal-close"
-          aria-label="Close case presentation"
-        >&times;</button>
+        <h2>Case Presentation</h2>
+        <button id="caseModalClose" class="case-modal-close">&times;</button>
       </header>
 
-      <div class="case-modal-body" dir="ltr">
-        <div id="caseModalContent"></div>
-      </div>
+      <div id="caseModalContent" class="case-modal-content"></div>
 
       <footer class="case-modal-footer">
-        <button id="caseModalCopy" type="button">Copy Text</button>
-        <button id="caseModalClose2" type="button">Close</button>
+        <button id="caseModalCopy" class="btn btn-secondary">Copy</button>
+        <button id="caseModalClose2" class="btn btn-primary">Close</button>
       </footer>
     </div>
   </div>
-<script src="chest-data-dx.js"></script>
-<script src="chest-data-personal.js"></script>
-<script src="chest-data-hpi.js"></script>
-<script src="chest-data-ros.js"></script>
-<script src="chest-data-background.js"></script>
-<script src="chest-data-main.js"></script>
 
-<script src="chest-engine.js"></script>
-<script src="chest-ui.js"></script>
+  <!-- DATA FILES -->
+  <script src="chest-data-dx.js"></script>
+  <script src="chest-data-personal.js"></script>
+  <script src="chest-data-hpi.js"></script>
+  <script src="chest-data-ros.js"></script>
+  <script src="chest-data-background.js"></script>
+  <script src="chest-data-main.js"></script>
+
+  <!-- ENGINE -->
+  <script src="engine/chest-engine-config.js"></script>
+  <script src="engine/chest-engine-state.js"></script>
+  <script src="engine/chest-engine-scoring.js"></script>
+  <script src="engine/chest-engine-recompute.js"></script>
+  <script src="engine/chest-engine-output.js"></script>
+  <script src="engine/chest-engine-core.js"></script>
+
+  <!-- UI -->
+  <script src="chest-ui-core.js"></script>
+  <script src="chest-ui-ddx.js"></script>
+  <script src="chest-ui-reasoning.js"></script>
+  <script src="chest-ui-options.js"></script>
+  <script src="chest-ui-navigation.js"></script>
+  <script src="chest-ui-case-modal.js"></script>
+
 </body>
 </html>
