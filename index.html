@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title> ￼ focus history ￼</title>
+  <title>Focus History – Trainer</title>
 
-  <!-- CSS: داخل مجلد css -->
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -14,15 +14,10 @@
   <!-- ===========================
        HEADER
   ============================ -->
-<header class="app-header">
-  <h1> focus history ￼</h1>
-  <p class="app-subtitle">.</p>
-
-  <!-- زر تغيير اللغة -->
-  <button id="btnToggleLang" class="btn btn-outline">
-    التبديل إلى English
-  </button>
-</header>
+  <header class="app-header">
+    <h1>Focus History Trainer</h1>
+    <p class="app-subtitle">Educational use only – not for real patients</p>
+  </header>
 
   <!-- ===========================
        MAIN 3-CARD LAYOUT
@@ -53,7 +48,7 @@
       </div>
     </section>
 
-    <!-- ========== CARD 3: Questions (Arabic ONLY for Q & options) ========== -->
+    <!-- ========== CARD 3: Questions (Arabic Q & options) ========== -->
     <section class="card card-history">
       <header class="card-header card-header--question">
         <span id="sectionLabel" class="section-label">Section</span>
@@ -64,21 +59,21 @@
 
         <div id="stepCounter" class="step-counter"></div>
 
-        <!-- ⬅⬅⬅ THIS PART IS RTL BECAUSE Q IS ARABIC -->
+        <!-- السؤال بالعربي (RTL) -->
         <div id="questionText" class="question-text" dir="rtl"></div>
 
-        <!-- validation english -->
+        <!-- validation بالإنجليزي -->
         <div id="validationMessage" class="validation-message" dir="ltr"></div>
 
-        <!-- options also RTL because Arabic -->
+        <!-- الخيارات بالعربي (RTL) -->
         <div id="optionsContainer" class="options-container" dir="rtl"></div>
 
       </div>
 
       <footer class="card-footer">
-      <div class="controls-row">
-          <button id="btnPrev" class="btn btn-secondary">Previous</button>
-          <button id="btnNext" class="btn btn-primary">Next</button>
+        <div class="controls-row">
+          <button id="btnPrev"  class="btn btn-secondary">Previous</button>
+          <button id="btnNext"  class="btn btn-primary">Next</button>
           <button id="btnReset" class="btn btn-secondary">Reset</button>
           <button id="btnPrint" class="btn btn-secondary">Print</button>
         </div>
@@ -102,7 +97,7 @@
       <div id="caseModalContent" class="case-modal-content"></div>
 
       <footer class="case-modal-footer">
-        <button id="caseModalCopy" class="btn btn-secondary">Copy</button>
+        <button id="caseModalCopy"  class="btn btn-secondary">Copy</button>
         <button id="caseModalClose2" class="btn btn-primary">Close</button>
       </footer>
     </div>
@@ -111,30 +106,28 @@
   <!-- ===========================
        SCRIPTS
   ============================ -->
+<script src="chest-ids.js"></script>
+<script src="chest-data-dx.js"></script>
+<script src="chest-data-entry.js"></script>
+<script src="chest-data-personal.js"></script>
+<script src="chest-data-hpi.js"></script>
+<script src="chest-data-ros.js"></script>
+<script src="chest-data-background.js"></script>
+<script src="chest-data-peds.js"></script>
+<script src="chest-data-main.js"></script>
 
-    <!-- DATA FILES: داخل js/data -->
-  <script src="js/data/chest-ids.js"></script>
-  <script src="js/data/chest-data-dx.js"></script>
-  <script src="js/data/chest-data-personal.js"></script>
-  <script src="js/data/chest-data-hpi.js"></script>
-  <script src="js/data/chest-data-ros.js"></script>
-  <script src="js/data/chest-data-background.js"></script>
-  <script src="js/data/chest-data-main.js"></script>
+<script src="chest-engine-config.js"></script>
+<script src="chest-engine-state.js"></script>
+<script src="chest-engine-scoring.js"></script>
+<script src="chest-engine-recompute.js"></script>
+<script src="chest-engine-output.js"></script>
+<script src="chest-engine-core.js"></script>
 
-  <!-- ENGINE: داخل js/engine -->
-  <script src="js/engine/chest-engine-config.js"></script>
-  <script src="js/engine/chest-engine-state.js"></script>
-  <script src="js/engine/chest-engine-scoring.js"></script>
-  <script src="js/engine/chest-engine-recompute.js"></script>
-  <script src="js/engine/chest-engine-output.js"></script>
-  <script src="js/engine/chest-engine-core.js"></script>
-
-  <!-- UI: داخل js/ui -->
-  <script src="js/ui/chest-ui-core.js"></script>
-  <script src="js/ui/chest-ui-ddx.js"></script>
-  <script src="js/ui/chest-ui-reasoning.js"></script>
-  <script src="js/ui/chest-ui-options.js"></script>
-  <script src="js/ui/chest-ui-case-modal.js"></script>
+<script src="chest-ui-core.js"></script>
+<script src="chest-ui-ddx.js"></script>
+<script src="chest-ui-reasoning.js"></script>
+<script src="chest-ui-options.js"></script>
+<script src="chest-ui-case-modal.js"></script>
 
 </body>
 </html>

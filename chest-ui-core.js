@@ -4,7 +4,7 @@
 // - step rendering
 // - navigation (Prev / Next / Reset / Print)
 // - validation
-// - language toggle (Arabic / English)
+// - optional state persistence
 // ========================================
 
 "use strict";
@@ -14,19 +14,6 @@
   if (!engine) {
     console.error("ChestEngine is not available.");
     return;
-  }
-
-  // ---------- لغة الواجهة ----------
-  const LANG_STORAGE_KEY = "chest_lang";
-  try {
-    const savedLang = window.localStorage.getItem(LANG_STORAGE_KEY);
-    if (savedLang === "en" || savedLang === "ar") {
-      window.APP_LANG = savedLang;
-    } else {
-      window.APP_LANG = "ar";
-    }
-  } catch (e) {
-    window.APP_LANG = "ar";
   }
 
   // ---------- DOM elements ----------
@@ -41,13 +28,13 @@
   const elBtnNext  = document.getElementById("btnNext");
   const elBtnReset = document.getElementById("btnReset");
   const elBtnPrint = document.getElementById("btnPrint");
-  const elBtnLang  = document.getElementById("btnToggleLang");
 
   // Safety check
   if (
     !elQuestionText ||
     !elOptionsContainer ||
     !elSectionLabel ||
+    !elSectionStepCtr ||
     !elStepCounter ||
     !elBtnPrev ||
     !elBtnNext
@@ -62,6 +49,7 @@
   function animateFade(elem) {
     if (!elem) return;
     elem.classList.remove("fade-in");
+    // Force reflow
     void elem.offsetWidth;
     elem.classList.add("fade-in");
   }
@@ -69,22 +57,6 @@
   // -----------------------------------
   // Validation for required steps
   // -----------------------------------
-    // -----------------------------------
-  // Small click animation helper
-  // تستعملها UIOptions لما تضغط على الخيار
-  // -----------------------------------
-  function animateClick(elem) {
-    if (!elem) return;
-    elem.classList.remove("clicked");
-    // force reflow حتى تعيد الأنيميشن من جديد
-    void elem.offsetWidth;
-    elem.classList.add("clicked");
-
-    // اختياري: نشيل الكلاس بعد شوية حتى ما يبقى ملتصق
-    setTimeout(() => {
-      elem.classList.remove("clicked");
-    }, 180);
-  }
   function validateStep(step) {
     if (!step || !step.required) {
       if (elValidation) {
@@ -103,7 +75,8 @@
 
     if (empty) {
       if (elValidation) {
-        elValidation.textContent = "Please answer this question before continuing.";
+        elValidation.textContent =
+          "Please answer this question before continuing.";
         elValidation.classList.add("validation-show");
       }
       return false;
@@ -130,27 +103,11 @@
   }
 
   // -----------------------------------
-  // زر اللغة: تحديث النص
-  // -----------------------------------
-  function updateLangButton() {
-    if (!elBtnLang) return;
-    const lang = window.APP_LANG === "en" ? "en" : "ar";
-    if (lang === "en") {
-      elBtnLang.textContent = "التبديل إلى عربي";
-    } else {
-      elBtnLang.textContent = "Switch to English";
-    }
-  }
-
-  // -----------------------------------
   // Render current step on the UI
   // -----------------------------------
   function renderCurrentStep() {
     const step = engine.getCurrentStep();
     if (!step) return;
-
-    const lang = window.APP_LANG === "en" ? "en" : "ar";
-    const isEnglish = lang === "en";
 
     // Clear validation when changing step
     if (elValidation) {
@@ -162,28 +119,22 @@
     const prog = engine.getProgressInfo();
     elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
 
-    // Section label + per-section progress (تظل إنجليزيّة مثل ما هي)
+    // Section label + per-section progress
     elSectionLabel.textContent = step.sectionLabel || "";
 
     const stepsInSection = engine.steps.filter(
       (s) => s.sectionId === step.sectionId
     );
-    const indexInSection =
-      stepsInSection.findIndex((s) => s.id === step.id) + 1;
+    const indexInSection = stepsInSection.findIndex((s) => s.id === step.id) + 1;
     elSectionStepCtr.textContent = `${step.sectionLabel || ""} — Question ${indexInSection}/${stepsInSection.length}`;
 
-    // Question text: عربي / إنجليزي حسب اللغة
-    const qText =
-      isEnglish && step.questionEn
-        ? step.questionEn
-        : step.question || "";
+    // Question text (Arabic, RTL)
+    elQuestionText.textContent = step.question || "";
+    elQuestionText.setAttribute("dir", "rtl");
 
-    elQuestionText.textContent = qText;
-    elQuestionText.setAttribute(isEnglish ? "dir" : "dir", isEnglish ? "ltr" : "rtl");
-
-    // Render options via UIOptions module (مع اللغة)
+    // Render options via UIOptions module
     if (window.UIOptions && typeof window.UIOptions.renderOptions === "function") {
-      window.UIOptions.renderOptions(step, lang);
+      window.UIOptions.renderOptions(step);
     } else {
       elOptionsContainer.innerHTML = "<p>Options module not loaded.</p>";
     }
@@ -248,6 +199,7 @@
 
     saveStateIfPossible();
 
+    // Clear reasoning + ddx if modules exist
     if (window.UIReasoning && typeof window.UIReasoning.clear === "function") {
       window.UIReasoning.clear();
     }
@@ -262,6 +214,7 @@
     if (window.UICaseModal && typeof window.UICaseModal.printCase === "function") {
       window.UICaseModal.printCase();
     } else {
+      // fallback: normal print
       window.print();
     }
   }
@@ -281,6 +234,7 @@
     }
 
     if (!loaded && typeof engine.init === "function") {
+      // First time: clean state
       engine.init();
     }
   }
@@ -289,20 +243,17 @@
   // Wire events
   // -----------------------------------
   function wireEvents() {
-    if (elBtnNext) elBtnNext.addEventListener("click", handleNext);
-    if (elBtnPrev) elBtnPrev.addEventListener("click", handlePrev);
-    if (elBtnReset) elBtnReset.addEventListener("click", handleReset);
-    if (elBtnPrint) elBtnPrint.addEventListener("click", handlePrint);
-
-    if (elBtnLang) {
-      elBtnLang.addEventListener("click", () => {
-        window.APP_LANG = window.APP_LANG === "en" ? "ar" : "en";
-        try {
-          window.localStorage.setItem(LANG_STORAGE_KEY, window.APP_LANG);
-        } catch (e) {}
-        updateLangButton();
-        renderCurrentStep();
-      });
+    if (elBtnNext) {
+      elBtnNext.addEventListener("click", handleNext);
+    }
+    if (elBtnPrev) {
+      elBtnPrev.addEventListener("click", handlePrev);
+    }
+    if (elBtnReset) {
+      elBtnReset.addEventListener("click", handleReset);
+    }
+    if (elBtnPrint) {
+      elBtnPrint.addEventListener("click", handlePrint);
     }
   }
 
@@ -310,11 +261,14 @@
   // Entry point
   // -----------------------------------
   function initUI() {
-    updateLangButton();
     initEngineState();
     wireEvents();
     renderCurrentStep();
   }
 
-  document.addEventListener("DOMContentLoaded", initUI);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initUI);
+  } else {
+    initUI();
+  }
 })();

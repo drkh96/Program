@@ -6,13 +6,6 @@
 
 "use strict";
 
-function dxB(ids) {
-  return ids || [];
-}
-function rB(text, diseases) {
-  return { text, diseases: diseases || [] };
-}
-
 window.CHEST_SECTIONS_BACKGROUND = [
   {
     id: "pmh",
