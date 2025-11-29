@@ -69,6 +69,22 @@
   // -----------------------------------
   // Validation for required steps
   // -----------------------------------
+    // -----------------------------------
+  // Small click animation helper
+  // تستعملها UIOptions لما تضغط على الخيار
+  // -----------------------------------
+  function animateClick(elem) {
+    if (!elem) return;
+    elem.classList.remove("clicked");
+    // force reflow حتى تعيد الأنيميشن من جديد
+    void elem.offsetWidth;
+    elem.classList.add("clicked");
+
+    // اختياري: نشيل الكلاس بعد شوية حتى ما يبقى ملتصق
+    setTimeout(() => {
+      elem.classList.remove("clicked");
+    }, 180);
+  }
   function validateStep(step) {
     if (!step || !step.required) {
       if (elValidation) {
@@ -300,9 +316,5 @@
     renderCurrentStep();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initUI);
-  } else {
-    initUI();
-  }
+  document.addEventListener("DOMContentLoaded", initUI);
 })();

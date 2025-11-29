@@ -673,3 +673,7 @@ input {
 .validation-show {
   opacity: 1;
 }
+.ui-option-row.clicked {
+  transform: scale(0.98);
+  transition: transform 0.12s ease-out, background 0.12s ease-out;
+}
