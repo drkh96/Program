@@ -26,52 +26,56 @@ window.UIReasoning = (function () {
 
   // Render reasoning for a given step
   function render(step) {
-    if (!step || !engine || !elReasonQuestion || !elReasonList) return;
+  if (!step || !engine || !elReasonQuestion || !elReasonList) return;
 
-    const val = engine.state.answers[step.id];
-    const reasons = engine.getReasoningFor(step, val) || [];
+  const val = engine.state.answers[step.id];
+  const reasons = engine.getReasoningFor(step, val) || [];
 
-    elReasonList.innerHTML = "";
+  elReasonList.innerHTML = "";
 
-    if (!reasons.length) {
-      elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
-      return;
-    }
+  if (!reasons.length) {
+    elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
+    return;
+  }
 
-    elReasonQuestion.textContent = "Clinical reasoning for this choice:";
+  // عنوان رئيسي ثابت
+  elReasonQuestion.textContent = "Clinical Reasoning Summary:";
+  elReasonQuestion.classList.add("reason-card-header");
 
-    reasons.forEach((r) => {
-      const li = document.createElement("li");
-      li.className = "reason-item";
+  // بطاقة رئيسية كبيرة
+  
+  const mainCard = document.createElement("div");
+  mainCard.className = "reason-card fade-royal";
 
-      const text = document.createElement("div");
-      text.className = "reason-text";
-      text.textContent = r.text; // النص من الداتا (تقدر تخليه إنجليزي لاحقاً)
+  reasons.forEach((r) => {
+    const item = document.createElement("div");
+    item.className = "reason-item-royal";
 
-      const dis = document.createElement("div");
-      dis.className = "reason-diseases";
+    const txt = document.createElement("div");
+    txt.className = "reason-text";
+    txt.textContent = r.text;
 
-      const diseaseNames = (r.diseases || []).map((d) => {
-        if (engine.pretty && engine.pretty[d]) return engine.pretty[d];
-        return d;
-      });
+    const dis = document.createElement("div");
+    dis.className = "reason-disease";
 
-      if (diseaseNames.length) {
-        dis.textContent = "Supports / affects: " + diseaseNames.join(", ");
-      } else {
-        dis.textContent = "";
-      }
-
-      li.appendChild(text);
-      if (dis.textContent.trim()) {
-        li.appendChild(dis);
-      }
-
-      elReasonList.appendChild(li);
+    const names = (r.diseases || []).map((d) => {
+      if (engine.pretty && engine.pretty[d]) return engine.pretty[d];
+      return d;
     });
 
-    animateReason();
-  }
+    if (names.length) {
+      dis.textContent = "Supports: " + names.join(", ");
+    }
+
+    item.appendChild(txt);
+    if (names.length) item.appendChild(dis);
+
+    mainCard.appendChild(item);
+  });
+
+  elReasonList.appendChild(mainCard);
+  animateReason();
+}
 
   function clear() {
     elReasonQuestion.textContent = "Select an option to see clinical reasoning.";

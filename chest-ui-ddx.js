@@ -1,9 +1,6 @@
 // =========================================
-// chest-ui-ddx.js
-// Detailed DDx panel (Medscape-style)
-// - Colored groups (cardiac, aortic, etc.)
-// - Collapsible sections (features, tests, scores)
-// - Uses classes styled in style.css theme
+// chest-ui-ddx.js  (ROYAL EDITION)
+// FOCUS HISTORY – Premium DDx Interface
 // =========================================
 
 "use strict";
@@ -17,11 +14,11 @@ window.UIDDx = (function () {
   }
 
   // -------------------------------
-  // Utility: create collapsible block
+  // Utility: create collapsible block (Royal)
   // -------------------------------
   function createCollapseSection(title, contentElem) {
     const wrapper = document.createElement("div");
-    wrapper.className = "dd-section";
+    wrapper.className = "dd-section fade-royal";
 
     const header = document.createElement("button");
     header.type = "button";
@@ -32,12 +29,12 @@ window.UIDDx = (function () {
     body.className = "dd-section-body";
     body.appendChild(contentElem);
 
-    // default collapsed
     body.style.display = "none";
 
+    // Smooth expand
     header.addEventListener("click", () => {
-      const isHidden = body.style.display === "none";
-      body.style.display = isHidden ? "block" : "none";
+      const isClosed = body.style.display === "none";
+      body.style.display = isClosed ? "block" : "none";
     });
 
     wrapper.appendChild(header);
@@ -46,7 +43,7 @@ window.UIDDx = (function () {
   }
 
   // -------------------------------
-  // Main render
+  // Main render (Royal Edition)
   // -------------------------------
   function renderDDx() {
     if (!elDDxContainer || !engine) return;
@@ -56,7 +53,7 @@ window.UIDDx = (function () {
 
     if (!groups || !groups.length) {
       const p = document.createElement("p");
-      p.className = "dd-empty";
+      p.className = "dd-empty fade-royal";
       p.textContent =
         "No diagnosis suggested yet. Start by answering the questions.";
       elDDxContainer.appendChild(p);
@@ -64,24 +61,27 @@ window.UIDDx = (function () {
     }
 
     groups.forEach((group) => {
+      // ---------- DEVICE CARD (Royal) ----------
       const groupCard = document.createElement("div");
-      groupCard.className = `dd-group-card dd-group-card--${group.id}`;
+      groupCard.className = "device-card fade-royal";
+      groupCard.style.maxHeight = "300px";
+      groupCard.style.overflowY = "auto";
 
-      // Group header
+      // ---------- HEADER ----------
       const gHeader = document.createElement("div");
-      gHeader.className = "dd-group-header";
+      gHeader.className = "device-card-header";
       gHeader.textContent = group.label || "Group";
       groupCard.appendChild(gHeader);
 
-      // Group body
+      // ---------- BODY ----------
       const gBody = document.createElement("div");
       gBody.className = "dd-group-body";
 
       group.items.forEach((item) => {
         const diseaseBox = document.createElement("div");
-        diseaseBox.className = "dd-item";
+        diseaseBox.className = "dd-item fade-royal";
 
-        // Top line: Name + Score
+        // HEADER: NAME + SCORE
         const header = document.createElement("div");
         header.className = "dd-item-header";
 
@@ -97,7 +97,7 @@ window.UIDDx = (function () {
         header.appendChild(scoreSpan);
         diseaseBox.appendChild(header);
 
-        // Clinical score (if present) → collapsible
+        // CLINICAL SCORE (if present)
         if (item.clinicalScore) {
           const p = document.createElement("p");
           p.className = "dd-clinical-text";
@@ -106,7 +106,7 @@ window.UIDDx = (function () {
           diseaseBox.appendChild(sec);
         }
 
-        // Positive features → collapsible
+        // POSITIVE FEATURES
         if (item.features && item.features.length) {
           const ul = document.createElement("ul");
           ul.className = "dd-features-list";
@@ -121,7 +121,7 @@ window.UIDDx = (function () {
           diseaseBox.appendChild(sec);
         }
 
-        // Missing key tests → collapsible
+        // MISSING TESTS
         if (item.missing && item.missing.length) {
           const ul = document.createElement("ul");
           ul.className = "dd-missing-list";

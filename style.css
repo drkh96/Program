@@ -682,3 +682,266 @@ body.lang-en * {
     direction: ltr !important;
     text-align: left !important;
 }
+
+/* ============================================
+   FOCUS HISTORY: ROYAL UI DESIGN SYSTEM
+   ============================================ */
+
+/* 🎨 1) Royal Color Palette */
+:root {
+  --royal-primary: #0ea5e9;        /* الأزرق الطبي الفخم */
+  --royal-primary-light: #7dd3fc;
+  --royal-secondary: #a5b4fc;      /* البنفسجي الملكي */
+  --royal-accent: #f97316;         /* البرتقالي التحذيري */
+  --royal-bg-1: #020617;           /* خلفية فوق */
+  --royal-bg-2: #000000;           /* خلفية تحت */
+  --royal-card: #0f172a;           /* خلفية الكروت */
+  --royal-soft-text: #9ca3af;
+  --royal-strong-text: #e5e7eb;
+}
+
+/* ============================================
+   2) Royal Typography
+   ============================================ */
+body {
+  font-family: "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* عنوان الكارت */
+.card-title {
+  color: var(--royal-primary) !important;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+/* السؤال */
+.question-text {
+  background: #0f172a;
+  color: var(--royal-secondary) !important;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18);
+}
+
+/* ============================================
+   3) Royal Cards
+   ============================================ */
+.card {
+  background: var(--royal-card);
+  border-radius: 24px !important;
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.75) !important;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* ============================================
+   4) Royal Options
+   ============================================ */
+.option-row {
+  background: #0a1120;
+  padding: 10px;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.25);
+  transition: 120ms cubic-bezier(0.19,1,0.22,1);
+}
+
+.option-row:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 12px rgba(56,189,248,0.35);
+}
+
+/* ============================================
+   5) Royal Buttons + رفع أزرار التنقل
+   ============================================ */
+
+.controls-row {
+  margin-bottom: 10px !important;  /* رفع الأزرار */
+}
+
+.btn {
+  border-radius: 999px !important;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  transition: 120ms cubic-bezier(0.19,1,0.22,1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--royal-primary), #0284c7);
+  color: #0b1120;
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(56,189,248,0.4);
+}
+
+.btn-secondary:hover {
+  transform: scale(1.04);
+}
+
+/* ============================================
+   6) Royal DDx Device Cards (NEW FEATURE)
+   ============================================ */
+
+.device-card {
+  background: #0f172a;
+  border-radius: 20px;
+  padding: 14px 16px;
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,0.28);
+  margin-bottom: 12px;
+  overflow-y: auto;
+  max-height: 260px;
+  transition: 180ms ease;
+}
+
+.device-card-header {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--royal-primary-light);
+  margin-bottom: 8px;
+  letter-spacing: 0.11em;
+}
+
+.device-card-body {
+  font-size: 0.88rem;
+  color: var(--royal-strong-text);
+  line-height: 1.5;
+  padding-right: 4px;
+}
+
+/* حركة رائعة للمحتوى عند فتح الديفايز */
+.device-card-body:hover {
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   7) Royal Animations
+   ============================================ */
+@keyframes royalFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-royal {
+  animation: royalFade 0.22s ease-out;
+}
+.controls-row {
+  margin-bottom: 16px !important;
+  padding-bottom: 6px;
+}
+
+/* ============================================
+   ROYAL REASONING CARD
+   ============================================ */
+
+.reason-card {
+  background: var(--royal-card);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.20);
+  margin-bottom: 14px;
+  animation: royalFade 0.25s ease-out;
+}
+
+.reason-card-header {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--royal-primary-light);
+  letter-spacing: 0.11em;
+  margin-bottom: 10px;
+}
+
+.reason-item-royal {
+  background: #0a1120;
+  padding: 12px;
+  border-radius: 16px;
+  margin-bottom: 10px;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.25);
+  transition: 130ms cubic-bezier(0.19,1,0.22,1);
+}
+
+.reason-item-royal:hover {
+  transform: scale(1.015);
+  box-shadow: 0 0 10px rgba(56,189,248,0.35);
+}
+
+.reason-text {
+  color: var(--royal-strong-text);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.reason-disease {
+  margin-top: 6px;
+  font-size: 0.83rem;
+  color: var(--royal-secondary);
+  letter-spacing: 0.04em;
+}
+
+/* رفع أزرار التنقل وتثبيتها داخل الكارت */
+.controls-row {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(12px);
+
+  padding: 12px 10px 14px;
+  margin-top: 8px !important;
+  margin-bottom: 0 !important;
+
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  z-index: 50;
+  border-radius: 0 0 20px 20px;
+}
+
+.btn {
+  border-radius: 999px !important;
+  padding: 12px 20px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  transition: 150ms cubic-bezier(0.19,1,0.22,1);
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--royal-primary), #0284c7);
+  color: #0b1120;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(56,189,248,0.45);
+}
+
+.btn-secondary {
+  background: #0f172a;
+  color: var(--royal-strong-text);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.btn-secondary:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 8px rgba(165,180,252,0.35);
+}
+
+.card-history .card-body {
+  padding-bottom: 80px !important; /* مساحة كافية للأزرار */
+}

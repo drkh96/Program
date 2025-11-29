@@ -28,6 +28,13 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "Cardiovascular symptoms (select all that apply):",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           palpitations: {
             label: "خفقان",
@@ -76,6 +83,13 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "Respiratory symptoms (select all that apply):",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           chronicCough: {
             label: "كحّة مزمنة",
@@ -136,6 +150,13 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "Gastrointestinal symptoms (select all that apply):",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           heartburn: {
             label: "حُرقة خلف القص / ارتجاع حمضي",
@@ -184,6 +205,13 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "Neurological symptoms (select all that apply):",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           focalDeficit: {
             label: "ضعف أو خدر في أحد الأطراف / أعراض بؤرية",
@@ -220,6 +248,13 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "Limb / musculoskeletal symptoms (select all that apply):",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           unilateralSwelling: {
             label: "تورّم أحادي مؤلم في الساق",
@@ -268,6 +303,13 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "General / hematologic symptoms (select all that apply):",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           weightLoss: {
             label: "نقص وزن غير مفسّر",

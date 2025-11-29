@@ -30,49 +30,49 @@ window.CHEST_SECTIONS_HPI = [
           sudden1min: {
             label: "بداية فجائية خلال أقل من دقيقة، ألم شديد جداً",
             labelEn: "Sudden onset within less than 1 minute, very severe pain",
-            dxAdd: dx(["MI", "PEMajor", "Dissection"]),
-            dxRemove: dx(["GERD", "Musculoskeletal"]),
+            dxAdd: ["MI", "PEMajor", "Dissection"],
+            dxRemove: ["GERD", "Musculoskeletal"],
             reasoning: [
-              r(
-                "Very abrupt onset of severe chest pain strongly suggests acute MI, pulmonary embolism or aortic dissection.",
-                ["MI", "PEMajor", "Dissection"]
-              )
+              {
+                text: "Very abrupt onset of severe chest pain strongly suggests acute MI, pulmonary embolism or aortic dissection.",
+                diseases: ["MI", "PEMajor", "Dissection"]
+              }
             ]
           },
           sudden10min: {
             label: "بداية سريعة خلال 10 دقائق",
             labelEn: "Rapid onset over about 10 minutes",
-            dxAdd: dx(["MI", "UnstableAngina", "PEMajor"]),
-            dxRemove: dx(["GERD"]),
+            dxAdd: ["MI", "UnstableAngina", "PEMajor"],
+            dxRemove: ["GERD"],
             reasoning: [
-              r(
-                "Onset over several minutes still supports an acute vascular cause such as ACS or PE rather than a chronic process.",
-                ["MI", "UnstableAngina", "PEMajor"]
-              )
+              {
+                text: "Onset over several minutes still supports an acute vascular cause such as ACS or PE rather than a chronic process.",
+                diseases: ["MI", "UnstableAngina", "PEMajor"]
+              }
             ]
           },
           gradualHours: {
             label: "بداية تدريجية على مدى ساعات",
             labelEn: "Gradual onset over several hours",
-            dxAdd: dx(["Pericarditis", "Pneumonia", "Musculoskeletal"]),
-            dxRemove: dx(["MI", "Dissection"]),
+            dxAdd: ["Pericarditis", "Pneumonia", "Musculoskeletal"],
+            dxRemove: ["MI", "Dissection"],
             reasoning: [
-              r(
-                "Gradual onset over hours is more compatible with inflammatory causes such as pericarditis or pneumonia or chest wall pain.",
-                ["Pericarditis", "Pneumonia", "Musculoskeletal"]
-              )
+              {
+                text: "Gradual onset over hours is more compatible with inflammatory causes such as pericarditis or pneumonia or chest wall pain.",
+                diseases: ["Pericarditis", "Pneumonia", "Musculoskeletal"]
+              }
             ]
           },
           gradualDays: {
             label: "بداية تدريجية على مدى أيام",
             labelEn: "Gradual onset over days",
-            dxAdd: dx(["Pneumonia", "GERD", "Musculoskeletal"]),
-            dxRemove: dx(["MI", "PEMajor", "Dissection"]),
+            dxAdd: ["Pneumonia", "GERD", "Musculoskeletal"],
+            dxRemove: ["MI", "PEMajor", "Dissection"],
             reasoning: [
-              r(
-                "Symptoms evolving over days decrease the likelihood of acute vascular catastrophes and favor inflammatory, musculoskeletal or GI causes.",
-                ["Pneumonia", "GERD", "Musculoskeletal"]
-              )
+              {
+                text: "Symptoms evolving over days decrease the likelihood of acute vascular catastrophes and favor inflammatory, musculoskeletal or GI causes.",
+                diseases: ["Pneumonia", "GERD", "Musculoskeletal"]
+              }
             ]
           }
         }
@@ -98,49 +98,49 @@ window.CHEST_SECTIONS_HPI = [
           retrosternal: {
             label: "خلف القص (Retrosternal)",
             labelEn: "Retrosternal (behind the sternum)",
-            dxAdd: dx(["IHD", "MI", "ACS", "GERD"]),
-            dxRemove: dx(["Musculoskeletal"]),
+            dxAdd: ["IHD", "MI", "ACS", "GERD"],
+            dxRemove: ["Musculoskeletal"],
             reasoning: [
-              r(
-                "Retrosternal pain is the classic location for ischemic cardiac pain, but can also occur with reflux disease.",
-                ["IHD", "MI", "ACS", "GERD"]
-              )
+              {
+                text: "Retrosternal pain is the classic location for ischemic cardiac pain, but can also occur with reflux disease.",
+                diseases: ["IHD", "MI", "ACS", "GERD"]
+              }
             ]
           },
           leftChest: {
             label: "النصف الأيسر من الصدر",
             labelEn: "Left side of the chest",
-            dxAdd: dx(["IHD", "MI", "Musculoskeletal"]),
-            dxRemove: dx([]),
+            dxAdd: ["IHD", "MI", "Musculoskeletal"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Left-sided chest pain may be cardiac or musculoskeletal depending on other features.",
-                ["IHD", "Musculoskeletal"]
-              )
+              {
+                text: "Left-sided chest pain may be cardiac or musculoskeletal depending on other features.",
+                diseases: ["IHD", "Musculoskeletal"]
+              }
             ]
           },
           pleuriticSide: {
             label: "موضع جانبي يزداد مع التنفس",
             labelEn: "Lateral chest pain worse with breathing",
-            dxAdd: dx(["Pleuritis", "Pneumonia", "PEMajor"]),
-            dxRemove: dx(["IHD", "MI"]),
+            dxAdd: ["Pleuritis", "Pneumonia", "PEMajor"],
+            dxRemove: ["IHD", "MI"],
             reasoning: [
-              r(
-                "Lateral pleuritic pain is more suggestive of pleural or pulmonary disease than ischemic heart disease.",
-                ["Pleuritis", "Pneumonia", "PEMajor"]
-              )
+              {
+                text: "Lateral pleuritic pain is more suggestive of pleural or pulmonary disease than ischemic heart disease.",
+                diseases: ["Pleuritis", "Pneumonia", "PEMajor"]
+              }
             ]
           },
           pointTender: {
             label: "موضع صغير يمكن الإشارة إليه بإصبع واحد",
             labelEn: "Small, well-localised point tenderness",
-            dxAdd: dx(["Musculoskeletal"]),
-            dxRemove: dx(["MI", "PEMajor"]),
+            dxAdd: ["Musculoskeletal"],
+            dxRemove: ["MI", "PEMajor"],
             reasoning: [
-              r(
-                "Very localised, fingertip pain is typical of chest wall / musculoskeletal causes rather than MI or PE.",
-                ["Musculoskeletal"]
-              )
+              {
+                text: "Very localised, fingertip pain is typical of chest wall / musculoskeletal causes rather than MI or PE.",
+                diseases: ["Musculoskeletal"]
+              }
             ]
           }
         }
@@ -166,49 +166,49 @@ window.CHEST_SECTIONS_HPI = [
           pressure: {
             label: "ضاغط / ثقل / انقباض",
             labelEn: "Pressure / heaviness / tightness",
-            dxAdd: dx(["IHD", "MI", "ACS"]),
-            dxRemove: dx(["Musculoskeletal"]),
+            dxAdd: ["IHD", "MI", "ACS"],
+            dxRemove: ["Musculoskeletal"],
             reasoning: [
-              r(
-                "Pressure-like or constricting chest pain is the typical description of ischemic cardiac pain.",
-                ["IHD", "MI", "ACS"]
-              )
+              {
+                text: "Pressure-like or constricting chest pain is the typical description of ischemic cardiac pain.",
+                diseases: ["IHD", "MI", "ACS"]
+              }
             ]
           },
           sharpPleuritic: {
             label: "طاعن يزداد مع التنفس (Pleuritic sharp pain)",
             labelEn: "Sharp, pleuritic pain worse on inspiration",
-            dxAdd: dx(["Pleuritis", "Pneumonia", "PEMajor"]),
-            dxRemove: dx(["IHD"]),
+            dxAdd: ["Pleuritis", "Pneumonia", "PEMajor"],
+            dxRemove: ["IHD"],
             reasoning: [
-              r(
-                "Sharp inspiratory pain usually indicates pleural, pulmonary or PE-related pathology rather than classic ischemic pain.",
-                ["Pleuritis", "Pneumonia", "PEMajor"]
-              )
+              {
+                text: "Sharp inspiratory pain usually indicates pleural, pulmonary or PE-related pathology rather than classic ischemic pain.",
+                diseases: ["Pleuritis", "Pneumonia", "PEMajor"]
+              }
             ]
           },
           burning: {
             label: "حرقة خلف القص خاصة بعد الأكل",
             labelEn: "Burning retrosternal pain especially after meals",
-            dxAdd: dx(["GERD", "PepticUlcer"]),
-            dxRemove: dx(["MI"]),
+            dxAdd: ["GERD", "PepticUlcer"],
+            dxRemove: ["MI"],
             reasoning: [
-              r(
-                "Burning post-prandial retrosternal pain strongly suggests GERD or peptic ulcer rather than MI.",
-                ["GERD", "PepticUlcer"]
-              )
+              {
+                text: "Burning post-prandial retrosternal pain strongly suggests GERD or peptic ulcer rather than MI.",
+                diseases: ["GERD", "PepticUlcer"]
+              }
             ]
           },
           tearingBack: {
             label: "ألم حارق/ماحق ينتشر إلى الظهر (Tearing to back)",
             labelEn: "Severe tearing pain radiating to the back",
-            dxAdd: dx(["Dissection"]),
-            dxRemove: dx([]),
+            dxAdd: ["Dissection"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Sudden tearing chest pain radiating to the back is a classic red flag for aortic dissection.",
-                ["Dissection"]
-              )
+              {
+                text: "Sudden tearing chest pain radiating to the back is a classic red flag for aortic dissection.",
+                diseases: ["Dissection"]
+              }
             ]
           }
         }
@@ -234,37 +234,37 @@ window.CHEST_SECTIONS_HPI = [
           leftArmJaw: {
             label: "الذراع الأيسر / الفك السفلي / الرقبة",
             labelEn: "Left arm, jaw or neck",
-            dxAdd: dx(["MI", "IHD", "ACS"]),
-            dxRemove: dx([]),
+            dxAdd: ["MI", "IHD", "ACS"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Radiation to the left arm or jaw is classical for ischemic cardiac pain.",
-                ["MI", "IHD", "ACS"]
-              )
+              {
+                text: "Radiation to the left arm or jaw is classical for ischemic cardiac pain.",
+                diseases: ["MI", "IHD", "ACS"]
+              }
             ]
           },
           backBetweenScapulae: {
             label: "إلى الظهر بين لوحي الكتف",
             labelEn: "To the back between the scapulae",
-            dxAdd: dx(["Dissection", "PEMajor"]),
-            dxRemove: dx([]),
+            dxAdd: ["Dissection", "PEMajor"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Radiation to the interscapular back, especially with sudden onset, raises suspicion of aortic dissection or PE.",
-                ["Dissection", "PEMajor"]
-              )
+              {
+                text: "Radiation to the interscapular back, especially with sudden onset, raises suspicion of aortic dissection or PE.",
+                diseases: ["Dissection", "PEMajor"]
+              }
             ]
           },
           none: {
             label: "لا يوجد انتشار واضح",
             labelEn: "No clear radiation",
-            dxAdd: dx([]),
-            dxRemove: dx([]),
+            dxAdd: [],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Absence of radiation does not exclude MI, but is less typical for classic infarction.",
-                ["MI"]
-              )
+              {
+                text: "Absence of radiation does not exclude MI, but is less typical for classic infarction.",
+                diseases: ["MI"]
+              }
             ]
           }
         }
@@ -290,73 +290,73 @@ window.CHEST_SECTIONS_HPI = [
           exertion: {
             label: "الجهد / صعود الدرج / المشي السريع",
             labelEn: "Physical exertion (stairs, fast walking)",
-            dxAdd: dx(["IHD", "StableAngina", "ACS"]),
-            dxRemove: dx(["Pleuritis"]),
+            dxAdd: ["IHD", "StableAngina", "ACS"],
+            dxRemove: ["Pleuritis"],
             reasoning: [
-              r(
-                "Pain provoked by exertion and relieved by rest is typical of angina due to coronary artery disease.",
-                ["IHD", "StableAngina", "ACS"]
-              )
+              {
+                text: "Pain provoked by exertion and relieved by rest is typical of angina due to coronary artery disease.",
+                diseases: ["IHD", "StableAngina", "ACS"]
+              }
             ]
           },
           emotionalStress: {
             label: "الانفعال النفسي / التوتر",
             labelEn: "Emotional stress or anxiety",
-            dxAdd: dx(["IHD", "Anxiety"]),
-            dxRemove: dx([]),
+            dxAdd: ["IHD", "Anxiety"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Emotional stress may trigger both angina and panic attacks; interpretation depends on the full story.",
-                ["IHD", "Anxiety"]
-              )
+              {
+                text: "Emotional stress may trigger both angina and panic attacks; interpretation depends on the full story.",
+                diseases: ["IHD", "Anxiety"]
+              }
             ]
           },
           deepInspiration: {
             label: "الشهيق العميق أو الكحة",
             labelEn: "Deep inspiration or coughing",
-            dxAdd: dx(["Pleuritis", "Pneumonia", "PEMajor"]),
-            dxRemove: dx(["StableAngina"]),
+            dxAdd: ["Pleuritis", "Pneumonia", "PEMajor"],
+            dxRemove: ["StableAngina"],
             reasoning: [
-              r(
-                "Pleuritic pain worsened by deep breathing suggests pleural or pulmonary pathology rather than stable angina.",
-                ["Pleuritis", "Pneumonia", "PEMajor"]
-              )
+              {
+                text: "Pleuritic pain worsened by deep breathing suggests pleural or pulmonary pathology rather than stable angina.",
+                diseases: ["Pleuritis", "Pneumonia", "PEMajor"]
+              }
             ]
           },
           movementPalpation: {
             label: "حركة الجذع أو الضغط على جدار الصدر",
             labelEn: "Trunk movement or palpation of the chest wall",
-            dxAdd: dx(["Musculoskeletal"]),
-            dxRemove: dx(["MI", "PEMajor"]),
+            dxAdd: ["Musculoskeletal"],
+            dxRemove: ["MI", "PEMajor"],
             reasoning: [
-              r(
-                "Pain that increases with movement or local palpation is typical of musculoskeletal chest wall pain.",
-                ["Musculoskeletal"]
-              )
+              {
+                text: "Pain that increases with movement or local palpation is typical of musculoskeletal chest wall pain.",
+                diseases: ["Musculoskeletal"]
+              }
             ]
           },
           postMeal: {
             label: "بعد الأكل أو عند الانحناء للأمام",
             labelEn: "After meals or bending forward",
-            dxAdd: dx(["GERD", "PepticUlcer"]),
-            dxRemove: dx(["IHD"]),
+            dxAdd: ["GERD", "PepticUlcer"],
+            dxRemove: ["IHD"],
             reasoning: [
-              r(
-                "Pain linked to meals or bending forwards strongly suggests esophageal or gastric causes.",
-                ["GERD", "PepticUlcer"]
-              )
+              {
+                text: "Pain linked to meals or bending forwards strongly suggests esophageal or gastric causes.",
+                diseases: ["GERD", "PepticUlcer"]
+              }
             ]
           },
           none: {
             label: "لا توجد علاقة واضحة",
             labelEn: "No clear relationship",
-            dxAdd: dx([]),
-            dxRemove: dx([]),
+            dxAdd: [],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Lack of a clear aggravating factor does not rule out disease but makes classic patterns less obvious.",
-                ["IHD"]
-              )
+              {
+                text: "Lack of a clear aggravating factor does not rule out disease but makes classic patterns less obvious.",
+                diseases: ["IHD"]
+              }
             ]
           }
         }
@@ -382,61 +382,61 @@ window.CHEST_SECTIONS_HPI = [
           rest: {
             label: "الراحة بعد الجهد",
             labelEn: "Rest after exertion",
-            dxAdd: dx(["StableAngina"]),
-            dxRemove: dx(["MI"]),
+            dxAdd: ["StableAngina"],
+            dxRemove: ["MI"],
             reasoning: [
-              r(
-                "Pain that reliably settles within minutes of rest is typical for stable angina rather than MI.",
-                ["StableAngina"]
-              )
+              {
+                text: "Pain that reliably settles within minutes of rest is typical for stable angina rather than MI.",
+                diseases: ["StableAngina"]
+              }
             ]
           },
           gtn: {
             label: "أقراص النترات تحت اللسان (GTN)",
             labelEn: "Sublingual GTN tablets",
-            dxAdd: dx(["IHD", "StableAngina"]),
-            dxRemove: dx([]),
+            dxAdd: ["IHD", "StableAngina"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Rapid response to GTN supports ischemic cardiac pain, although it is not 100% specific.",
-                ["IHD", "StableAngina"]
-              )
+              {
+                text: "Rapid response to GTN supports ischemic cardiac pain, although it is not 100% specific.",
+                diseases: ["IHD", "StableAngina"]
+              }
             ]
           },
           leaningForward: {
             label: "الجلوس والانحناء للأمام",
             labelEn: "Sitting up and leaning forward",
-            dxAdd: dx(["Pericarditis"]),
-            dxRemove: dx([]),
+            dxAdd: ["Pericarditis"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Improvement of pain when leaning forward is a classic feature of pericarditis.",
-                ["Pericarditis"]
-              )
+              {
+                text: "Improvement of pain when leaning forward is a classic feature of pericarditis.",
+                diseases: ["Pericarditis"]
+              }
             ]
           },
           antacids: {
             label: "مضادات الحموضة / PPI",
             labelEn: "Antacids / PPIs",
-            dxAdd: dx(["GERD", "PepticUlcer"]),
-            dxRemove: dx(["MI"]),
+            dxAdd: ["GERD", "PepticUlcer"],
+            dxRemove: ["MI"],
             reasoning: [
-              r(
-                "Symptom relief with antacids suggests an upper GI cause rather than MI.",
-                ["GERD", "PepticUlcer"]
-              )
+              {
+                text: "Symptom relief with antacids suggests an upper GI cause rather than MI.",
+                diseases: ["GERD", "PepticUlcer"]
+              }
             ]
           },
           nothing: {
             label: "لا شيء يخفف الألم بشكل واضح",
             labelEn: "Nothing clearly relieves the pain",
-            dxAdd: dx(["MI", "PEMajor", "Dissection"]),
-            dxRemove: dx([]),
+            dxAdd: ["MI", "PEMajor", "Dissection"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Persistent, unrelieved severe chest pain is worrisome for MI, PE or aortic dissection.",
-                ["MI", "PEMajor", "Dissection"]
-              )
+              {
+                text: "Persistent, unrelieved severe chest pain is worrisome for MI, PE or aortic dissection.",
+                diseases: ["MI", "PEMajor", "Dissection"]
+              }
             ]
           }
         }
@@ -462,49 +462,49 @@ window.CHEST_SECTIONS_HPI = [
           seconds: {
             label: "ثوانٍ إلى أقل من دقيقة",
             labelEn: "Seconds to less than 1 minute",
-            dxAdd: dx(["Musculoskeletal", "Anxiety"]),
-            dxRemove: dx(["StableAngina", "MI"]),
+            dxAdd: ["Musculoskeletal", "Anxiety"],
+            dxRemove: ["StableAngina", "MI"],
             reasoning: [
-              r(
-                "Very brief pains lasting only seconds are rarely ischemic and more likely musculoskeletal or anxiety-related.",
-                ["Musculoskeletal", "Anxiety"]
-              )
+              {
+                text: "Very brief pains lasting only seconds are rarely ischemic and more likely musculoskeletal or anxiety-related.",
+                diseases: ["Musculoskeletal", "Anxiety"]
+              }
             ]
           },
           fiveTo20: {
             label: "5–20 دقيقة (نموذجي لنوبة الذبحة)",
             labelEn: "5–20 minutes (typical for angina attack)",
-            dxAdd: dx(["StableAngina", "IHD"]),
-            dxRemove: dx([]),
+            dxAdd: ["StableAngina", "IHD"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Episodes lasting 5–20 minutes are typical for stable angina.",
-                ["StableAngina", "IHD"]
-              )
+              {
+                text: "Episodes lasting 5–20 minutes are typical for stable angina.",
+                diseases: ["StableAngina", "IHD"]
+              }
             ]
           },
           more20: {
             label: "> 20 دقيقة دون تحسن",
             labelEn: "> 20 minutes without improvement",
-            dxAdd: dx(["MI", "UnstableAngina", "Pericarditis"]),
-            dxRemove: dx([]),
+            dxAdd: ["MI", "UnstableAngina", "Pericarditis"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Pain lasting more than 20 minutes without improvement is concerning for MI or unstable angina.",
-                ["MI", "UnstableAngina", "Pericarditis"]
-              )
+              {
+                text: "Pain lasting more than 20 minutes without improvement is concerning for MI or unstable angina.",
+                diseases: ["MI", "UnstableAngina", "Pericarditis"]
+              }
             ]
           },
           hoursDays: {
             label: "لساعات أو أيام",
             labelEn: "For many hours or days",
-            dxAdd: dx(["Pericarditis", "Pneumonia", "Musculoskeletal", "GERD"]),
-            dxRemove: dx(["MI", "UnstableAngina"]),
+            dxAdd: ["Pericarditis", "Pneumonia", "Musculoskeletal", "GERD"],
+            dxRemove: ["MI", "UnstableAngina"],
             reasoning: [
-              r(
-                "Very prolonged pain over hours or days is more in keeping with inflammatory, musculoskeletal or GI causes.",
-                ["Pericarditis", "Pneumonia", "Musculoskeletal", "GERD"]
-              )
+              {
+                text: "Very prolonged pain over hours or days is more in keeping with inflammatory, musculoskeletal or GI causes.",
+                diseases: ["Pericarditis", "Pneumonia", "Musculoskeletal", "GERD"]
+              }
             ]
           }
         }
@@ -530,49 +530,49 @@ window.CHEST_SECTIONS_HPI = [
           intermittent: {
             label: "يأتي على شكل نوبات متكررة مع فترات خالية",
             labelEn: "Comes in intermittent attacks with pain-free intervals",
-            dxAdd: dx(["StableAngina", "GERD", "Musculoskeletal"]),
-            dxRemove: dx([]),
+            dxAdd: ["StableAngina", "GERD", "Musculoskeletal"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Intermittent recurrent attacks with pain-free intervals fit stable angina, GERD or chest wall pain.",
-                ["StableAngina", "GERD", "Musculoskeletal"]
-              )
+              {
+                text: "Intermittent recurrent attacks with pain-free intervals fit stable angina, GERD or chest wall pain.",
+                diseases: ["StableAngina", "GERD", "Musculoskeletal"]
+              }
             ]
           },
           progressive: {
             label: "ألم يزداد تدريجياً في الشدة أو التكرار",
             labelEn: "Pain gradually increasing in severity or frequency",
-            dxAdd: dx(["UnstableAngina", "MI", "PEMajor"]),
-            dxRemove: dx([]),
+            dxAdd: ["UnstableAngina", "MI", "PEMajor"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Progressive worsening is a red flag for unstable angina, evolving MI or PE.",
-                ["UnstableAngina", "MI", "PEMajor"]
-              )
+              {
+                text: "Progressive worsening is a red flag for unstable angina, evolving MI or PE.",
+                diseases: ["UnstableAngina", "MI", "PEMajor"]
+              }
             ]
           },
           constant: {
             label: "ألم ثابت الشدة تقريباً",
             labelEn: "Pain of roughly constant intensity",
-            dxAdd: dx(["Pericarditis", "Pneumonia", "Musculoskeletal"]),
-            dxRemove: dx([]),
+            dxAdd: ["Pericarditis", "Pneumonia", "Musculoskeletal"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Constant chest pain can be seen in pericarditis, pneumonia or chest wall pain.",
-                ["Pericarditis", "Pneumonia", "Musculoskeletal"]
-              )
+              {
+                text: "Constant chest pain can be seen in pericarditis, pneumonia or chest wall pain.",
+                diseases: ["Pericarditis", "Pneumonia", "Musculoskeletal"]
+              }
             ]
           },
           improving: {
             label: "يتحسن تدريجياً منذ الذروة",
             labelEn: "Gradually improving since the peak",
-            dxAdd: dx([]),
-            dxRemove: dx([]),
+            dxAdd: [],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Gradual improvement suggests that an acute process is resolving, but is not specific for any single diagnosis.",
-                []
-              )
+              {
+                text: "Gradual improvement suggests that an acute process is resolving, but is not specific for any single diagnosis.",
+                diseases: []
+              }
             ]
           }
         }
@@ -598,85 +598,85 @@ window.CHEST_SECTIONS_HPI = [
           dyspnea: {
             label: "ضيق في التنفس",
             labelEn: "Shortness of breath",
-            dxAdd: dx(["MI", "HF", "PEMajor", "Pneumonia"]),
-            dxRemove: dx([]),
+            dxAdd: ["MI", "HF", "PEMajor", "Pneumonia"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Dyspnea with chest pain raises the possibility of MI, heart failure, PE or pneumonia.",
-                ["MI", "HF", "PEMajor", "Pneumonia"]
-              )
+              {
+                text: "Dyspnea with chest pain raises the possibility of MI, heart failure, PE or pneumonia.",
+                diseases: ["MI", "HF", "PEMajor", "Pneumonia"]
+              }
             ]
           },
           diaphoresis: {
             label: "تعرّق شديد",
             labelEn: "Profuse sweating",
-            dxAdd: dx(["MI", "ACS"]),
-            dxRemove: dx([]),
+            dxAdd: ["MI", "ACS"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Marked diaphoresis with chest pain is a classic presentation of acute MI.",
-                ["MI", "ACS"]
-              )
+              {
+                text: "Marked diaphoresis with chest pain is a classic presentation of acute MI.",
+                diseases: ["MI", "ACS"]
+              }
             ]
           },
           nausea: {
             label: "غثيان / تقيؤ",
             labelEn: "Nausea / vomiting",
-            dxAdd: dx(["MI", "GERD"]),
-            dxRemove: dx([]),
+            dxAdd: ["MI", "GERD"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Nausea or vomiting may accompany MI or upper GI pathology such as GERD.",
-                ["MI", "GERD"]
-              )
+              {
+                text: "Nausea or vomiting may accompany MI or upper GI pathology such as GERD.",
+                diseases: ["MI", "GERD"]
+              }
             ]
           },
           syncope: {
             label: "إغماء أو شبه إغماء",
             labelEn: "Syncope or near-syncope",
-            dxAdd: dx(["Arrhythmia", "PEMajor", "Dissection"]),
-            dxRemove: dx([]),
+            dxAdd: ["Arrhythmia", "PEMajor", "Dissection"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Syncope with chest pain is alarming for arrhythmia, massive PE or aortic dissection.",
-                ["Arrhythmia", "PEMajor", "Dissection"]
-              )
+              {
+                text: "Syncope with chest pain is alarming for arrhythmia, massive PE or aortic dissection.",
+                diseases: ["Arrhythmia", "PEMajor", "Dissection"]
+              }
             ]
           },
           hemoptysis: {
             label: "سعال مصحوب بدم",
             labelEn: "Coughing up blood (hemoptysis)",
-            dxAdd: dx(["PEMajor", "Pneumonia"]),
-            dxRemove: dx([]),
+            dxAdd: ["PEMajor", "Pneumonia"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Hemoptysis with chest pain suggests PE or advanced pneumonia.",
-                ["PEMajor", "Pneumonia"]
-              )
+              {
+                text: "Hemoptysis with chest pain suggests PE or advanced pneumonia.",
+                diseases: ["PEMajor", "Pneumonia"]
+              }
             ]
           },
           anxietyFeatures: {
             label: "تسارع نفس، شعور بالموت، رجفة (نوبة هلع)",
             labelEn: "Rapid breathing, fear of dying, tremor (panic-like)",
-            dxAdd: dx(["Anxiety"]),
-            dxRemove: dx([]),
+            dxAdd: ["Anxiety"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Typical panic-attack features may explain chest pain but organic causes must be excluded first.",
-                ["Anxiety"]
-              )
+              {
+                text: "Typical panic-attack features may explain chest pain but organic causes must be excluded first.",
+                diseases: ["Anxiety"]
+              }
             ]
           },
           none: {
             label: "لا توجد أعراض مصاحبة مهمة",
             labelEn: "No significant associated symptoms",
-            dxAdd: dx([]),
-            dxRemove: dx(["PEMajor", "HF", "Pneumonia"]),
+            dxAdd: [],
+            dxRemove: ["PEMajor", "HF", "Pneumonia"],
             reasoning: [
-              r(
-                "Absence of major associated symptoms slightly reduces the likelihood of PE, overt HF or clear pneumonia.",
-                ["PEMajor", "HF", "Pneumonia"]
-              )
+              {
+                text: "Absence of major associated symptoms slightly reduces the likelihood of PE, overt HF or clear pneumonia.",
+                diseases: ["PEMajor", "HF", "Pneumonia"]
+              }
             ]
           }
         }
@@ -702,49 +702,49 @@ window.CHEST_SECTIONS_HPI = [
           tearingBack: {
             label: "ألم تمزّقي مفاجئ ممتد إلى الظهر",
             labelEn: "Sudden tearing pain radiating to the back",
-            dxAdd: dx(["Dissection"]),
-            dxRemove: dx([]),
+            dxAdd: ["Dissection"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Sudden tearing chest-to-back pain is a classic emergency sign of aortic dissection.",
-                ["Dissection"]
-              )
+              {
+                text: "Sudden tearing chest-to-back pain is a classic emergency sign of aortic dissection.",
+                diseases: ["Dissection"]
+              }
             ]
           },
           suddenSevereDyspnea: {
             label: "ضيق نفس حاد مفاجئ مع ألم صدري",
             labelEn: "Sudden severe dyspnea with chest pain",
-            dxAdd: dx(["PEMajor", "HF"]),
-            dxRemove: dx([]),
+            dxAdd: ["PEMajor", "HF"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Abrupt severe dyspnea with chest pain strongly suggests PE or acute pulmonary edema.",
-                ["PEMajor", "HF"]
-              )
+              {
+                text: "Abrupt severe dyspnea with chest pain strongly suggests PE or acute pulmonary edema.",
+                diseases: ["PEMajor", "HF"]
+              }
             ]
           },
           hypotensionShock: {
             label: "علامات هبوط ضغط / صدمة (دوخة شديدة، برودة أطراف)",
             labelEn: "Signs of hypotension or shock (marked dizziness, cold extremities)",
-            dxAdd: dx(["MI", "PEMajor", "Dissection"]),
-            dxRemove: dx([]),
+            dxAdd: ["MI", "PEMajor", "Dissection"],
+            dxRemove: [],
             reasoning: [
-              r(
-                "Shock features with chest pain are life-threatening and may indicate large MI, massive PE or aortic dissection.",
-                ["MI", "PEMajor", "Dissection"]
-              )
+              {
+                text: "Shock features with chest pain are life-threatening and may indicate large MI, massive PE or aortic dissection.",
+                diseases: ["MI", "PEMajor", "Dissection"]
+              }
             ]
           },
           none: {
             label: "لا توجد علامات خطورة واضحة",
             labelEn: "No obvious red-flag signs",
-            dxAdd: dx([]),
-            dxRemove: dx(["Dissection", "PEMajor"]),
+            dxAdd: [],
+            dxRemove: ["Dissection", "PEMajor"],
             reasoning: [
-              r(
-                "Absence of classic red-flag signs reduces—but does not eliminate—the probability of dissection or massive PE.",
-                ["Dissection", "PEMajor"]
-              )
+              {
+                text: "Absence of classic red-flag signs reduces—but does not eliminate—the probability of dissection or massive PE.",
+                diseases: ["Dissection", "PEMajor"]
+              }
             ]
           }
         }

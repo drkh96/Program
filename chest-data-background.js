@@ -21,6 +21,13 @@ window.CHEST_SECTIONS_BACKGROUND = [
         questionEn: "Does the patient have any chronic medical conditions? (select all that apply)",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           dm: {
             label: "داء السكري",
@@ -115,6 +122,13 @@ window.CHEST_SECTIONS_BACKGROUND = [
           "Has the patient had major surgery recently or prolonged immobilization?",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           recentMajorSurgery: {
             label: "جراحة كبرى خلال آخر 4 أسابيع",
@@ -171,6 +185,13 @@ window.CHEST_SECTIONS_BACKGROUND = [
         questionEn: "Which medications does the patient take regularly?",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           aspirin: {
             label: "أسبرين / مضادات صفائح",
@@ -251,6 +272,13 @@ window.CHEST_SECTIONS_BACKGROUND = [
         questionEn: "Is there any relevant family history?",
         type: "single",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           prematureIHD: {
             label: "إصابة قلبية (IHD/MI) في عمر مبكر ضمن العائلة",
@@ -307,6 +335,13 @@ window.CHEST_SECTIONS_BACKGROUND = [
         questionEn: "What are the patient's habits and lifestyle? (select all that apply)",
         type: "multi",
         required: false,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           smoker: {
             label: "مدخّن حالي",
