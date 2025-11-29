@@ -17,6 +17,11 @@ window.CHEST_SECTIONS_PEDS = [
         question: "Is this a pediatric case?",
         type: "single",
         required: true,
+        // 👇 يظهر فقط إذا القسم PEDS
+        visibleWhen: {
+          stepId: "department",
+          equals: "peds"
+        },
         options: {
           yes: { label: "Yes, child patient" },
           no:  { label: "No, adult patient" }
@@ -29,12 +34,17 @@ window.CHEST_SECTIONS_PEDS = [
         question: "Who is giving the history?",
         type: "single",
         required: false,
+        // 👇 يظهر فقط إذا القسم PEDS
+        visibleWhen: {
+          stepId: "department",
+          equals: "peds"
+        },
         options: {
-          mother:       { label: "Mother" },
-          father:       { label: "Father" },
-          bothParents:  { label: "Both parents" },
-          caregiver:    { label: "Caregiver / relative" },
-          patientSelf:  { label: "Older child (self)" }
+          mother:      { label: "Mother" },
+          father:      { label: "Father" },
+          bothParents: { label: "Both parents" },
+          caregiver:   { label: "Caregiver / relative" },
+          patientSelf: { label: "Older child (self)" }
         }
       },
       {
@@ -44,6 +54,11 @@ window.CHEST_SECTIONS_PEDS = [
         question: "Birth history:",
         type: "multi",
         required: false,
+        // 👇 يظهر فقط إذا القسم PEDS
+        visibleWhen: {
+          stepId: "department",
+          equals: "peds"
+        },
         options: {
           term:              { label: "Term delivery" },
           preterm:           { label: "Preterm delivery" },
@@ -60,6 +75,11 @@ window.CHEST_SECTIONS_PEDS = [
         question: "Feeding history:",
         type: "multi",
         required: false,
+        // 👇 يظهر فقط إذا القسم PEDS
+        visibleWhen: {
+          stepId: "department",
+          equals: "peds"
+        },
         options: {
           exclusiveBF:  { label: "Exclusive breast feeding (first 6 months)" },
           mixedFeeding: { label: "Mixed feeding" },
@@ -74,6 +94,11 @@ window.CHEST_SECTIONS_PEDS = [
         question: "Vaccination status:",
         type: "single",
         required: false,
+        // 👇 يظهر فقط إذا القسم PEDS
+        visibleWhen: {
+          stepId: "department",
+          equals: "peds"
+        },
         options: {
           complete:   { label: "Complete for age" },
           incomplete: { label: "Incomplete" },
@@ -87,6 +112,11 @@ window.CHEST_SECTIONS_PEDS = [
         question: "Developmental history:",
         type: "multi",
         required: false,
+        // 👇 يظهر فقط إذا القسم PEDS
+        visibleWhen: {
+          stepId: "department",
+          equals: "peds"
+        },
         options: {
           normal:      { label: "Normal milestones for age" },
           motorDelay:  { label: "Motor delay" },
@@ -102,12 +132,17 @@ window.CHEST_SECTIONS_PEDS = [
         question: "Exposure and environment:",
         type: "multi",
         required: false,
+        // 👇 يظهر فقط إذا القسم PEDS
+        visibleWhen: {
+          stepId: "department",
+          equals: "peds"
+        },
         options: {
-          daycare:       { label: "Attends daycare / school" },
-          sickContacts:  { label: "Contact with sick persons" },
-          pets:          { label: "Pets at home" },
-          smokingHouse:  { label: "Smoking exposure in house" },
-          recentTravel:  { label: "Recent travel" }
+          daycare:      { label: "Attends daycare / school" },
+          sickContacts: { label: "Contact with sick persons" },
+          pets:         { label: "Pets at home" },
+          smokingHouse: { label: "Smoking exposure in house" },
+          recentTravel: { label: "Recent travel" }
         }
       }
     ]

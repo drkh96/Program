@@ -19,6 +19,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "How did the pain start?",
         type: "single",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           sudden1min: {
             label: "بداية فجائية خلال أقل من دقيقة، ألم شديد جداً",
@@ -80,6 +87,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "Where is the pain mainly located?",
         type: "single",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           retrosternal: {
             label: "خلف القص (Retrosternal)",
@@ -141,6 +155,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "What is the character of the pain?",
         type: "single",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           pressure: {
             label: "ضاغط / ثقل / انقباض",
@@ -202,6 +223,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "Does the pain radiate anywhere?",
         type: "single",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           leftArmJaw: {
             label: "الذراع الأيسر / الفك السفلي / الرقبة",
@@ -251,6 +279,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "What makes the pain worse?",
         type: "single",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           exertion: {
             label: "الجهد / صعود الدرج / المشي السريع",
@@ -336,6 +371,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "What relieves the pain?",
         type: "single",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           rest: {
             label: "الراحة بعد الجهد",
@@ -409,6 +451,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "How long does each episode of pain last?",
         type: "single",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           seconds: {
             label: "ثوانٍ إلى أقل من دقيقة",
@@ -470,6 +519,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "How has the pain evolved over time?",
         type: "single",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           intermittent: {
             label: "يأتي على شكل نوبات متكررة مع فترات خالية",
@@ -531,6 +587,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "Are there any associated symptoms? (pick all that apply)",
         type: "multi",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           dyspnea: {
             label: "ضيق في التنفس",
@@ -628,6 +691,13 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "Red flags: are any of the following present?",
         type: "multi",
         required: true,
+        visibleWhen: {
+          all: [
+            { stepId: "department",  equals: "internal" },
+            { stepId: "system",      equals: "cvs" },
+            { stepId: "mainSymptom", equals: "chestPain" }
+          ]
+        },
         options: {
           tearingBack: {
             label: "ألم تمزّقي مفاجئ ممتد إلى الظهر",

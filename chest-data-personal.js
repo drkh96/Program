@@ -77,7 +77,7 @@ window.CHEST_SECTIONS_PERSONAL = [
     ]
   },
 
-  {
+    {
     id: "cc",
     label: "الشكوى الرئيسية",
     labelEn: "Chief Complaint",
@@ -89,11 +89,40 @@ window.CHEST_SECTIONS_PERSONAL = [
         sectionLabelEn: "Chief Complaint",
         question: "ما هي الشكوى الرئيسية؟",
         questionEn: "What is the main presenting complaint?",
-        type: "text",
+        type: "single",
         required: true,
-        placeholder: "مثال: ألم في الصدر عند الجهد",
-        placeholderEn: "e.g. chest pain on exertion"
-        // Used by the engine to infer type of presentation (chest pain / dyspnea / syncope…)
+        visibleWhen: {
+          all: [
+            { stepId: "department", equals: "internal" },
+            { stepId: "system",     equals: "cvs" }
+          ]
+        },
+        options: {
+          chestPain: {
+            label:   "ألم في الصدر (Chest pain)",
+            labelEn: "Chest pain",
+            dxAdd: dx(["IHD", "MI", "ACS", "PEMajor", "Pericarditis", "Musculoskeletal", "GERD"]),
+            dxRemove: dx([]),
+            reasoning: [
+              r(
+                "Chest pain as the chief complaint significantly increases the likelihood of ischemic heart disease, acute coronary syndromes, pulmonary embolism, pericarditis, musculoskeletal chest wall pain, and sometimes reflux disease.",
+                ["IHD", "MI", "ACS", "PEMajor", "Pericarditis", "Musculoskeletal", "GERD"]
+              )
+            ]
+          },
+          palpitations: {
+            label:   "خفقان (Palpitations)",
+            labelEn: "Palpitations",
+            dxAdd: dx(["Arrhythmia", "Anxiety"]),
+            dxRemove: dx([]),
+            reasoning: [
+              r(
+                "Palpitations as the main complaint point towards clinically significant arrhythmias, but can also be seen in anxiety and panic attacks.",
+                ["Arrhythmia", "Anxiety"]
+              )
+            ]
+          }
+        }
       },
       {
         id: "ccDuration",
@@ -106,7 +135,7 @@ window.CHEST_SECTIONS_PERSONAL = [
         required: true,
         placeholder: "مثال: منذ 3 ساعات / منذ يومين",
         placeholderEn: "e.g. for 3 hours / for 2 days"
-        // Used by the engine to categorize acute vs chronic
+        // Used by the engine to categorize acute vs chronic (يمكن تطويرها لاحقاً)
       }
     ]
   }

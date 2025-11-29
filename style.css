@@ -677,3 +677,8 @@ input {
   transform: scale(0.98);
   transition: transform 0.12s ease-out, background 0.12s ease-out;
 }
+
+body.lang-en * {
+    direction: ltr !important;
+    text-align: left !important;
+}

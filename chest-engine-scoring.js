@@ -428,8 +428,19 @@
       }
     }
 
-    // ----- Chief complaint: mainSymptom -----
-    const mainSym = normaliseText(ans[IDS.mainSymptom] || "");
+        // ----- Chief complaint: mainSymptom -----
+    let rawMain = ans[IDS.mainSymptom];
+
+    // لو الخطوة صارت single-choice (مثل chestPain / palpitations)
+    // نستبدل القيمة بالـ label العربي حتى تظل الهيوريستك السابقة شغّالة
+    if (rawMain) {
+      const step = getStepById(IDS.mainSymptom);
+      if (step && step.options && step.options[rawMain] && step.options[rawMain].label) {
+        rawMain = step.options[rawMain].label;
+      }
+    }
+
+    const mainSym = normaliseText(rawMain || "");
 
     if (mainSym) {
       if (mainSym.includes("ألم") && mainSym.includes("صدر")) {

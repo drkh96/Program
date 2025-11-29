@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Focus History – Trainer</title>
+  <title>Focus History</title>
 
-  <!-- CSS -->
+  <!-- CSS (ضع style.css بنفس الفولدر) -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -15,8 +15,10 @@
        HEADER
   ============================ -->
   <header class="app-header">
-    <h1>Focus History Trainer</h1>
-    <p class="app-subtitle">Educational use only – not for real patients</p>
+    <h1>FOCUS HISTORY</h1>
+    <p class="app-subtitle">.</p> <!-- نفس النقطة اللي بالصورة -->
+
+    <button class="lang-toggle">التبديل إلى English</button>
   </header>
 
   <!-- ===========================
@@ -27,7 +29,7 @@
     <!-- ========== CARD 1: DDx ========== -->
     <section class="card card-ddx">
       <header class="card-header">
-        <h2 class="card-title">Differential Diagnosis</h2>
+        <h2 class="card-title">DIFFERENTIAL DIAGNOSIS</h2>
       </header>
       <div id="ddxContainer" class="card-body ddx-body">
         <p class="dd-empty">Start answering questions to build the DDx.</p>
@@ -37,7 +39,7 @@
     <!-- ========== CARD 2: Clinical Reasoning ========== -->
     <section class="card card-reason">
       <header class="card-header">
-        <h2 class="card-title">Clinical Reasoning</h2>
+        <h2 class="card-title">CLINICAL REASONING</h2>
       </header>
 
       <div class="card-body">
@@ -48,7 +50,7 @@
       </div>
     </section>
 
-    <!-- ========== CARD 3: Questions (Arabic Q & options) ========== -->
+    <!-- ========== CARD 3: Questions ========== -->
     <section class="card card-history">
       <header class="card-header card-header--question">
         <span id="sectionLabel" class="section-label">Section</span>
@@ -59,13 +61,13 @@
 
         <div id="stepCounter" class="step-counter"></div>
 
-        <!-- السؤال بالعربي (RTL) -->
+        <!-- السؤال بالعربي -->
         <div id="questionText" class="question-text" dir="rtl"></div>
 
-        <!-- validation بالإنجليزي -->
+        <!-- validation -->
         <div id="validationMessage" class="validation-message" dir="ltr"></div>
 
-        <!-- الخيارات بالعربي (RTL) -->
+        <!-- الخيارات -->
         <div id="optionsContainer" class="options-container" dir="rtl"></div>
 
       </div>
@@ -104,30 +106,35 @@
   </div>
 
   <!-- ===========================
-       SCRIPTS
+       SCRIPTS  (بدون مجلدات)
   ============================ -->
-<script src="chest-ids.js"></script>
-<script src="chest-data-dx.js"></script>
-<script src="chest-data-entry.js"></script>
-<script src="chest-data-personal.js"></script>
-<script src="chest-data-hpi.js"></script>
-<script src="chest-data-ros.js"></script>
-<script src="chest-data-background.js"></script>
-<script src="chest-data-peds.js"></script>
-<script src="chest-data-main.js"></script>
 
-<script src="chest-engine-config.js"></script>
-<script src="chest-engine-state.js"></script>
-<script src="chest-engine-scoring.js"></script>
-<script src="chest-engine-recompute.js"></script>
-<script src="chest-engine-output.js"></script>
-<script src="chest-engine-core.js"></script>
+    <!-- DATA -->
+  <script src="chest-ids.js"></script>
+  <script src="main-data.js"></script>
+  <script src="chest-data-personal.js"></script>
+  <script src="chest-data-hpi.js"></script>
+  <script src="chest-data-ros.js"></script>
+  <script src="chest-data-background.js"></script>
+  <script src="chest-data-peds.js"></script>
+  <script src="chest-data-resp.js"></script>
+  <script src="chest-data-surgery.js"></script>
+  <script src="chest-data-obgyn.js"></script>
+  <script src="chest-data-main.js"></script>
 
-<script src="chest-ui-core.js"></script>
-<script src="chest-ui-ddx.js"></script>
-<script src="chest-ui-reasoning.js"></script>
-<script src="chest-ui-options.js"></script>
-<script src="chest-ui-case-modal.js"></script>
+  <!-- ENGINE -->
+  <script src="chest-engine-config.js"></script>
+  <script src="chest-engine-state.js"></script>
+  <script src="chest-engine-scoring.js"></script>
+  <script src="chest-engine-recompute.js"></script>
+  <script src="chest-engine-output.js"></script>
+  <script src="chest-engine-core.js"></script>
 
+  <!-- UI -->
+  <script src="chest-ui-core.js"></script>
+  <script src="chest-ui-ddx.js"></script>
+  <script src="chest-ui-reasoning.js"></script>
+  <script src="chest-ui-options.js"></script>
+  <script src="chest-ui-case-modal.js"></script>
 </body>
 </html>

@@ -129,12 +129,13 @@
     elSectionStepCtr.textContent = `${step.sectionLabel || ""} — Question ${indexInSection}/${stepsInSection.length}`;
 
     // Question text (Arabic, RTL)
-    elQuestionText.textContent = step.question || "";
+    elQuestionText.textContent = (appLang === "en" ? step.questionEn : step.question) || "";
+elQuestionText.setAttribute("dir", appLang === "en" ? "ltr" : "rtl");
     elQuestionText.setAttribute("dir", "rtl");
 
     // Render options via UIOptions module
     if (window.UIOptions && typeof window.UIOptions.renderOptions === "function") {
-      window.UIOptions.renderOptions(step);
+      window.UIOptions.renderOptions(step, appLang);
     } else {
       elOptionsContainer.innerHTML = "<p>Options module not loaded.</p>";
     }
@@ -272,3 +273,26 @@
     initUI();
   }
 })();
+// ========================
+// Language Toggle
+// ========================
+let appLang = "ar";  // default Arabic
+
+function setLanguage(lang) {
+  appLang = lang;
+  document.documentElement.setAttribute("lang", lang);
+
+  // أعد رسم الخطوة الحالية بالإنكليزي
+  const step = engine.getCurrentStep();
+  renderCurrentStep(step);
+}
+
+document.querySelector(".lang-toggle").addEventListener("click", () => {
+  if (appLang === "ar") {
+    setLanguage("en");
+    document.querySelector(".lang-toggle").textContent = "التبديل إلى العربية";
+  } else {
+    setLanguage("ar");
+    document.querySelector(".lang-toggle").textContent = "Switch to English";
+  }
+});
