@@ -37,11 +37,11 @@ window.UIReasoning = (function () {
     elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
     return;
   }
-
-  // عنوان رئيسي ثابت
-  elReasonQuestion.textContent = "Clinical Reasoning Summary:";
-  elReasonQuestion.classList.add("reason-card-header");
-
+// نجيب أول سبب ونحوّله إلى عنوان
+if (reasons.length > 0) {
+  elReasonQuestion.textContent = reasons[0].text;   // عنوان سريري
+  elReasonQuestion.className = "reason-headline";
+}
   // بطاقة رئيسية كبيرة
   
   const mainCard = document.createElement("div");
@@ -55,17 +55,16 @@ window.UIReasoning = (function () {
     txt.className = "reason-text";
     txt.textContent = r.text;
 
-    const dis = document.createElement("div");
-    dis.className = "reason-disease";
+    // بطاقة الأمراض (Tags)
+const dis = document.createElement("div");
+dis.className = "reason-disease-tags";
 
-    const names = (r.diseases || []).map((d) => {
-      if (engine.pretty && engine.pretty[d]) return engine.pretty[d];
-      return d;
-    });
-
-    if (names.length) {
-      dis.textContent = "Supports: " + names.join(", ");
-    }
+names.forEach((nm) => {
+  const tag = document.createElement("span");
+  tag.className = "disease-tag";
+  tag.textContent = nm;
+  dis.appendChild(tag);
+});
 
     item.appendChild(txt);
     if (names.length) item.appendChild(dis);

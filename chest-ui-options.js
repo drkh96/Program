@@ -102,7 +102,15 @@ window.UIOptions = (function () {
 
     Object.entries(step.options).forEach(([key, opt]) => {
       const row = document.createElement("label");
-      row.className = "option-row";
+      row.className = "option-row radio-option";
+      // حذف التحديد من بقية الأزرار
+document.querySelectorAll(".radio-option").forEach(r => r.classList.remove("selected"));
+
+// إضافة التحديد للزر الحالي
+row.addEventListener("click", () => {
+  document.querySelectorAll(".radio-option").forEach(r => r.classList.remove("selected"));
+  row.classList.add("selected");
+});
       row.setAttribute("dir", lang === "en" ? "ltr" : "rtl");
 
       const input = document.createElement("input");

@@ -11,6 +11,8 @@
 
 (function () {
   const engine = window.ChestEngine;
+  window._uiRender = renderCurrentStep;
+window._uiEngine = engine;
   if (!engine) {
     console.error("ChestEngine is not available.");
     return;
@@ -117,7 +119,7 @@
 
     // Global progress
     const prog = engine.getProgressInfo();
-    elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
+    elStepCounter.textContent = "";
 
     // Section label + per-section progress
     elSectionLabel.textContent = step.sectionLabel || "";
@@ -274,7 +276,7 @@ elQuestionText.setAttribute("dir", appLang === "en" ? "ltr" : "rtl");
   }
 })();
 // ========================
-// Language Toggle
+// Language Toggle (fixed)
 // ========================
 let appLang = "ar";  // default Arabic
 
@@ -282,17 +284,20 @@ function setLanguage(lang) {
   appLang = lang;
   document.documentElement.setAttribute("lang", lang);
 
-  // أعد رسم الخطوة الحالية بالإنكليزي
-  const step = engine.getCurrentStep();
-  renderCurrentStep(step);
+  // إعادة رسم السؤال الحالي
+  if (window._uiRender && typeof window._uiRender === "function") {
+    window._uiRender();
+  }
 }
 
 document.querySelector(".lang-toggle").addEventListener("click", () => {
+  const btn = document.querySelector(".lang-toggle");
+
   if (appLang === "ar") {
     setLanguage("en");
-    document.querySelector(".lang-toggle").textContent = "التبديل إلى العربية";
+    btn.textContent = "العربية";
   } else {
     setLanguage("ar");
-    document.querySelector(".lang-toggle").textContent = "Switch to English";
+    btn.textContent = "English";
   }
 });

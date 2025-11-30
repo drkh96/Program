@@ -63,7 +63,7 @@ window.UIDDx = (function () {
     groups.forEach((group) => {
       // ---------- DEVICE CARD (Royal) ----------
       const groupCard = document.createElement("div");
-      groupCard.className = "device-card fade-royal";
+groupCard.className = `device-card fade-royal ${group.id}`;
       groupCard.style.maxHeight = "300px";
       groupCard.style.overflowY = "auto";
 
@@ -85,12 +85,12 @@ window.UIDDx = (function () {
         const header = document.createElement("div");
         header.className = "dd-item-header";
 
-        const nameSpan = document.createElement("span");
-        nameSpan.className = "dd-name";
+        const nameSpan = document.createElement("div");
+nameSpan.className = "dd-disease-name";
         nameSpan.textContent = item.label;
 
-        const scoreSpan = document.createElement("span");
-        scoreSpan.className = "dd-score";
+        const scoreSpan = document.createElement("div");
+scoreSpan.className = "dd-disease-score";
         scoreSpan.textContent = `Score: ${item.score}`;
 
         header.appendChild(nameSpan);
@@ -107,42 +107,36 @@ window.UIDDx = (function () {
         }
 
         // POSITIVE FEATURES
-        if (item.features && item.features.length) {
-          const ul = document.createElement("ul");
-          ul.className = "dd-features-list";
+        // Positive Features (short, colored, bullet tags)
+if (item.features && item.features.length) {
+  const wrap = document.createElement("div");
+  wrap.className = "pos-features-box";
 
-          item.features.forEach((f) => {
-            const li = document.createElement("li");
-            li.textContent = f;
-            ul.appendChild(li);
-          });
+  item.features.forEach((f) => {
+    // حول الجملة الطويلة إلى كلمة مختصرة
+    const short = f
+      .replace(/.*male.*/i, "Male")
+      .replace(/.*female.*/i, "Female")
+      .replace(/.*hypertension.*/i, "Hypertensive")
+      .replace(/.*sudden.*/i, "Sudden onset")
+      .replace(/.*abrupt.*/i, "Abrupt pain")
+      .replace(/.*retrosternal.*/i, "Retrosternal pain")
+      .replace(/.*central chest.*/i, "Central chest pain")
+      .replace(/.*radiation.*/i, "Radiation")
+      .replace(/.*severe.*/i, "Severe pain")
+      .replace(/.*smoker.*/i, "Smoker")
+      .trim();
 
-          const sec = createCollapseSection("Positive Features", ul);
-          diseaseBox.appendChild(sec);
-        }
+    const tag = document.createElement("span");
+    tag.className = "pos-feature-tag";
+    tag.textContent = short;
 
-        // MISSING TESTS
-        if (item.missing && item.missing.length) {
-          const ul = document.createElement("ul");
-          ul.className = "dd-missing-list";
+    wrap.appendChild(tag);
+  });
 
-          item.missing.forEach((m) => {
-            const li = document.createElement("li");
-            li.textContent = m;
-            ul.appendChild(li);
-          });
-
-          const sec = createCollapseSection("Missing Key Tests", ul);
-          diseaseBox.appendChild(sec);
-        }
-
-        gBody.appendChild(diseaseBox);
-      });
-
-      groupCard.appendChild(gBody);
-      elDDxContainer.appendChild(groupCard);
-    });
-  }
+  const title = createCollapseSection("Positive Features", wrap);
+  diseaseBox.appendChild(title);
+}
 
   // -------------------------------
   // Public API

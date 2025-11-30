@@ -18,12 +18,10 @@ window.CHEST_SECTIONS_MAIN = [
         question: "اختر القسم الرئيسي للحالة:",
         type: "single",
         required: true,
-        options: {
-          internal: { label: "باطنية (Internal Medicine)" },
-          surgery:  { label: "جراحة (Surgery)" },
-          peds:     { label: "أطفال (Pediatrics)" },
-          obgyn:    { label: "نسائية / توليد (Ob/Gyn)" }
-        }
+        internal: { label: "Internal Medicine" },
+surgery:  { label: "Surgery" },
+peds:     { label: "Pediatrics" },
+obgyn:    { label: "Ob/Gyn" }
       },
 
       // 2) اختيار الجهاز – للبــاطنية فقط
@@ -36,8 +34,8 @@ window.CHEST_SECTIONS_MAIN = [
         required: true,
         visibleWhen: { stepId: "department", equals: "internal" },
         options: {
-          cvs:  { label: "جهاز القلب والأوعية (CVS)" },
-          resp: { label: "الجهاز التنفسي (Respiratory)" }
+          cvs:  { label: "cardiovascular system￼" },
+          resp: { label: "Respiratory" }
           // باقي الأجهزة نضيفها مستقبلاً
         }
       }
