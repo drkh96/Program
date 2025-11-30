@@ -1,7 +1,8 @@
 // ========================================
-// chest-engine-recompute.js
-// Recompute all diagnosis scores using
-// step responses + scoring helpers.
+// chest-engine-recompute.js (FINAL FIXED)
+// Recompute diagnosis scores + attach features
+// + attach HEART & PE scores
+// + final packing for DDx UI
 // ========================================
 
 "use strict";
@@ -9,54 +10,46 @@
 (function (global) {
   const Engine = global.ChestEngine;
   if (!Engine) {
-    console.error("ChestEngine is not available. Make sure chest-engine-state.js and chest-engine-scoring.js are loaded.");
+    console.error("ChestEngine missing. Load state + scoring first.");
     return;
   }
 
   const STEPS     = Engine.steps || [];
   const DIAGNOSES = Engine.diagnoses || [];
   const state     = Engine.state;
-  const scoring   = Engine.scoring || {};
 
+  const scoring = Engine.scoring || {};
   const applyTextHeuristics       = scoring.applyTextHeuristics;
   const calculateHeartLikeScore   = scoring.calculateHeartLikeScore;
   const calculatePEHeuristicScore = scoring.calculatePEHeuristicScore;
 
-  if (!applyTextHeuristics || !calculateHeartLikeScore || !calculatePEHeuristicScore) {
-    console.warn("Scoring helpers are missing on Engine.scoring.");
-  }
-
-  // -----------------------------
-  // Internal helpers: dxScores
-  // -----------------------------
+  // ---------------------------------------
+  // Helpers
+  // ---------------------------------------
   function resetDxScores() {
-    const scores = {};
-    (DIAGNOSES || []).forEach((dx) => {
-      scores[dx.id] = 0;
+    state.dxScores = {};
+    DIAGNOSES.forEach((dx) => {
+      state.dxScores[dx.id] = 0;
     });
-    state.dxScores = scores;
   }
 
   function ensureDx(id) {
-    if (!state.dxScores) state.dxScores = {};
-    if (!(id in state.dxScores)) {
-      state.dxScores[id] = 0;
-    }
+    if (!state.dxScores[id]) state.dxScores[id] = 0;
   }
 
   function bumpDx(id, delta) {
-    if (!id || !delta) return;
+    if (!id || typeof delta !== "number") return;
     ensureDx(id);
     state.dxScores[id] += delta;
   }
 
-  // -----------------------------
-  // Recompute all diagnosis scores
-  // -----------------------------
+  // ---------------------------------------
+  // Main recompute function
+  // ---------------------------------------
   function recomputeDxScores() {
     resetDxScores();
 
-    // featureMap: dxId -> Set of clinical feature texts
+    // dxId → Set(features)
     const featureMap = {};
 
     function addFeature(dxId, text) {
@@ -65,9 +58,12 @@
       featureMap[dxId].add(text);
     }
 
-    // Traverse all steps and apply dxAdd/dxRemove or numeric logic
+    // ---------------------------------------
+    // STEP → scoring
+    // ---------------------------------------
     STEPS.forEach((step) => {
       const value = state.answers[step.id];
+
       if (
         value === undefined ||
         value === null ||
@@ -79,90 +75,114 @@
 
       const type = Engine.getStepType(step);
 
-      // Numeric with getDxFromValue
+      // Numeric
       if (type === "numeric" && typeof step.getDxFromValue === "function") {
         const res = step.getDxFromValue(value);
+
         if (Array.isArray(res)) {
-          // Two possible shapes:
-          // 1) ["MI","ACS",...]
-          // 2) [{add: [...], remove: [...]}, ...]
-          if (res.length && typeof res[0] === "string") {
-            res.forEach((id) => bumpDx(id, 2));
+          if (typeof res[0] === "string") {
+            // e.g. ["MI","ACS"]
+            res.forEach((dxId) => bumpDx(dxId, 2));
           } else {
+            // e.g. [{add:[...], remove:[...]}, ...]
             res.forEach((obj) => {
-              if (!obj) return;
-              (obj.add || []).forEach((id) => bumpDx(id, 2));
-              (obj.remove || []).forEach((id) => bumpDx(id, -2));
+              (obj.add || []).forEach((dxId) => bumpDx(dxId, 2));
+              (obj.remove || []).forEach((dxId) => bumpDx(dxId, -2));
             });
           }
         }
 
-        // Reasoning for numeric steps
         if (Array.isArray(step.reasoningForNumeric)) {
           step.reasoningForNumeric.forEach((r) => {
             (r.diseases || []).forEach((dxId) => addFeature(dxId, r.text));
           });
         }
+
         return;
       }
 
-      // Text steps don't directly affect dxScores in this engine
-      if (type === "text") {
-        return;
-      }
+      // Text → no scoring
+      if (type === "text") return;
 
-      // Single / multi options
       if (!step.options) return;
 
+      // Single / multi select
       const handleOption = (optKey) => {
         const opt = step.options[optKey];
         if (!opt) return;
 
-        // Basic add/remove lists
-        const dxAdd    = Array.isArray(opt.dxAdd) ? opt.dxAdd : [];
-        const dxRemove = Array.isArray(opt.dxRemove) ? opt.dxRemove : [];
+        (opt.dxAdd || []).forEach((dxId) => bumpDx(dxId, 2));
+        (opt.dxRemove || []).forEach((dxId) => bumpDx(dxId, -2));
 
-        dxAdd.forEach((id) => bumpDx(id, 2));
-        dxRemove.forEach((id) => bumpDx(id, -2));
-
-        // Reasoning attached to option -> positive features
         if (Array.isArray(opt.reasoning)) {
           opt.reasoning.forEach((r) => {
-            (r.diseases || []).forEach((dxId) => addFeature(dxId, r.text));
+            (r.diseases || []).forEach((dxId) =>
+              addFeature(dxId, r.text)
+            );
           });
         }
       };
 
       if (type === "single") {
         handleOption(value);
-      } else if (type === "multi" && Array.isArray(value)) {
+      } else if (type === "multi") {
         value.forEach((v) => handleOption(v));
       }
     });
 
-    // Text-based heuristics (ageText, mainSymptom, ccDuration)
-    if (typeof applyTextHeuristics === "function") {
+    // ---------------------------------------
+    // Apply heuristics (age, CC, duration)
+    // ---------------------------------------
+    if (applyTextHeuristics) {
       applyTextHeuristics(addFeature, bumpDx);
     }
 
-    // HEART-style and PE scoring
+    // Reset scores
     state.heartScore = null;
-    state.peScore    = null;
+    state.peScore = null;
 
-    if (typeof calculateHeartLikeScore === "function") {
+    // HEART-style
+    if (calculateHeartLikeScore) {
       calculateHeartLikeScore(addFeature, bumpDx);
     }
-    if (typeof calculatePEHeuristicScore === "function") {
+
+    // PE heuristic
+    if (calculatePEHeuristicScore) {
       calculatePEHeuristicScore(addFeature, bumpDx);
     }
 
-    // Store feature map on state for UI / DDx panel
+    // ---------------------------------------
+    // FINAL PACKING FOR UI (DDx panel)
+    // ---------------------------------------
+    state.diagnosisList = DIAGNOSES.map((dx) => {
+      return {
+        id: dx.id,
+        label: dx.label,
+        group: dx.group,
+        score: state.dxScores[dx.id] || 0,
+        features: featureMap[dx.id]
+          ? Array.from(featureMap[dx.id])
+          : [],
+        clinicalScore:
+          dx.id === "IHD" ||
+          dx.id === "MI" ||
+          dx.id === "ACS"
+            ? state.heartScore
+            : dx.id === "PEMajor"
+            ? state.peScore
+            : null
+      };
+    });
+
+    // Highest score first
+    state.diagnosisList.sort((a, b) => b.score - a.score);
+
+    // Save feature map
     state.featureMap = featureMap;
   }
 
-  // Expose on Engine
-  Engine._resetDxScores     = resetDxScores;
-  Engine._bumpDx            = bumpDx;
-  Engine.recomputeDxScores  = recomputeDxScores;
-
+  // Expose
+  Engine._resetDxScores = resetDxScores;
+  Engine._bumpDx = bumpDx;
+  Engine.recomputeDxScores = recomputeDxScores;
 })(window);

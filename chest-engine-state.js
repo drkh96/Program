@@ -1,7 +1,7 @@
 // ========================================
-// chest-engine-state.js
+// chest-engine-state.js  (FIXED & CLEAN VERSION)
 // Core state, navigation & persistence
-// (no scoring / DDx logic here)
+// Supports visible-step filtering
 // ========================================
 
 "use strict";
@@ -21,23 +21,22 @@
 
   const STORAGE_KEY = "chestHistoryState_v2";
 
-  // -----------------------------
-  // State object
-  // -----------------------------
+  // ==============================
+  // MAIN STATE
+  // ==============================
   const state = {
     currentIndex: 0,
-    answers: {},      // stepId -> value (string | string[] | number)
+    answers: {},
 
-    // هذي الحقول راح تستخدم لاحقاً في ملفات scoring
-    dxScores: {},     // dxId -> score (filled by scoring module)
-    heartScore: null, // {score, category}
-    peScore: null,    // {score, category}
-    featureMap: {}    // dxId -> Set of feature strings
+    dxScores: {},
+    heartScore: null,
+    peScore: null,
+    featureMap: {}
   };
 
-  // -----------------------------
-  // Helpers
-  // -----------------------------
+  // ==============================
+  // STEP HELPERS
+  // ==============================
   function getStepType(step) {
     if (!step) return "single";
     if (step.type === "numeric") return "numeric";
@@ -47,23 +46,34 @@
   }
 
   function getStepById(id) {
-  const step = STEPS.find((s) => s.id === id);
-  if (!step) {
-    console.warn("ChestEngine: step not found:", id);
+    const step = STEPS.find((s) => s.id === id);
+    if (!step) {
+      console.warn("ChestEngine: step not found:", id);
+    }
+    return step;
   }
-  return step;
-}
+
+  // Return ALL visible steps depending on user selection
+  function getVisibleSteps() {
+    if (typeof isStepVisible !== "function") return STEPS;
+    return STEPS.filter((s) => isStepVisible(s));
+  }
 
   function getCurrentStep() {
+    const visible = getVisibleSteps();
+    if (!visible.length) return null;
+
     if (state.currentIndex < 0) state.currentIndex = 0;
-    if (state.currentIndex >= STEPS.length) {
-      state.currentIndex = STEPS.length - 1;
+    if (state.currentIndex >= visible.length) {
+      state.currentIndex = visible.length - 1;
     }
-    return STEPS[state.currentIndex];
+
+    return visible[state.currentIndex];
   }
 
   function nextStep() {
-    if (state.currentIndex < STEPS.length - 1) {
+    const visible = getVisibleSteps();
+    if (state.currentIndex < visible.length - 1) {
       state.currentIndex += 1;
     }
   }
@@ -75,23 +85,34 @@
   }
 
   function goToStep(idx) {
-    if (idx < 0 || idx >= STEPS.length) return;
+    const visible = getVisibleSteps();
+    if (idx < 0 || idx >= visible.length) return;
     state.currentIndex = idx;
   }
 
+  // ==============================
+  // CORRECT PROGRESS COUNTER
+  // ==============================
   function getProgressInfo() {
-    const current = state.currentIndex + 1;
-    const total   = STEPS.length;
-    return { current, total };
+    const visible = getVisibleSteps();
+    const currentStep = getCurrentStep();
+
+    const currentIndex = visible.indexOf(currentStep) + 1;
+    const total = visible.length;
+
+    return {
+      current: currentIndex > 0 ? currentIndex : 1,
+      total
+    };
   }
 
   function setAnswer(stepId, value) {
     state.answers[stepId] = value;
   }
 
-  // -----------------------------
-  // LocalStorage helpers
-  // -----------------------------
+  // ==============================
+  // LOCAL STORAGE
+  // ==============================
   function saveState() {
     try {
       const payload = {
@@ -115,11 +136,8 @@
       if (parsed.answers && typeof parsed.answers === "object") {
         state.answers = parsed.answers;
       }
-      if (
-        typeof parsed.currentIndex === "number" &&
-        parsed.currentIndex >= 0 &&
-        parsed.currentIndex < STEPS.length
-      ) {
+
+      if (typeof parsed.currentIndex === "number") {
         state.currentIndex = parsed.currentIndex;
       } else {
         state.currentIndex = 0;
@@ -140,9 +158,9 @@
     }
   }
 
-  // -----------------------------
-  // Init
-  // -----------------------------
+  // ==============================
+  // INIT
+  // ==============================
   function init() {
     state.currentIndex = 0;
     state.answers = {};
@@ -152,10 +170,9 @@
     state.featureMap = {};
   }
 
-  // -----------------------------
-  // Expose base ChestEngine object
-  // (other engine modules will extend this)
-// -----------------------------
+  // ==============================
+  // EXPOSE ENGINE
+  // ==============================
   const Engine = {
     sections:  SECTIONS,
     steps:     STEPS,
@@ -171,8 +188,10 @@
     prevStep,
     goToStep,
     getProgressInfo,
+
     getStepType,
     getStepById,
+    getVisibleSteps,
     setAnswer,
 
     saveState,

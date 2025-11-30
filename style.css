@@ -782,3 +782,27 @@ body.lang-en * {
     padding: 6px 10px;
   }
 }
+body.lang-en .question-text {
+    direction: ltr !important;
+    text-align: left !important;
+}
+.reason-text {
+  font-size: 0.82rem !important;   /* أصغر */
+  color: #cbd5e1 !important;       /* أفتح من العنوان */
+  line-height: 1.45;
+}
+.reason-text strong,
+.reason-text .critical {
+  color: #f87171 !important;       /* أحمر طبي واضح */
+  font-weight: 700;
+}
+.reason-text span.danger {
+  color: #fb923c !important;       /* برتقالي تحذيري */
+  font-weight: 600;
+}
+.disease-tag {
+  background: rgba(239,68,68,0.15);   /* أحمر فاتح */
+  border: 1px solid rgba(239,68,68,0.35);
+  color: #ef4444 !important;          /* أحمر قوي */
+  font-weight: 600;
+}

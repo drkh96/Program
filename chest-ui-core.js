@@ -1,24 +1,48 @@
 // ========================================
 // chest-ui-core.js
 // Connect ChestEngine with the 3-card UI
-// - step rendering
-// - navigation (Prev / Next / Reset / Print)
-// - validation
-// - optional state persistence
 // ========================================
 
 "use strict";
 
+// =====================
+// GLOBAL STEP FILTER
+// =====================
+function isStepVisible(step) {
+  const ans = window.ChestEngine.state.answers;
+
+  const dep = ans["department"];
+  if (!dep) return false;
+
+  if (dep === "internal") {
+    const system = ans["system"];
+
+    if (!system) return step.sectionId === "entry";
+    if (system === "cvs") return step.sectionId === "cardiac";
+    if (system === "resp") return step.sectionId === "respiratory";
+    return false;
+  }
+
+  if (dep === "peds") return step.sectionId === "peds";
+  if (dep === "surgery") return step.sectionId === "surgery";
+
+  return false;
+}
+
+// ========================================
+// MAIN UI CORE
+// ========================================
 (function () {
   const engine = window.ChestEngine;
   window._uiRender = renderCurrentStep;
-window._uiEngine = engine;
+  window._uiEngine = engine;
+
   if (!engine) {
     console.error("ChestEngine is not available.");
     return;
   }
 
-  // ---------- DOM elements ----------
+  // DOM elements
   const elQuestionText     = document.getElementById("questionText");
   const elOptionsContainer = document.getElementById("optionsContainer");
   const elSectionLabel     = document.getElementById("sectionLabel");
@@ -45,26 +69,19 @@ window._uiEngine = engine;
     return;
   }
 
-  // -----------------------------------
-  // Small fade animation helper
-  // -----------------------------------
+  // Fade animation helper
   function animateFade(elem) {
     if (!elem) return;
     elem.classList.remove("fade-in");
-    // Force reflow
     void elem.offsetWidth;
     elem.classList.add("fade-in");
   }
 
-  // -----------------------------------
-  // Validation for required steps
-  // -----------------------------------
+  // validation
   function validateStep(step) {
     if (!step || !step.required) {
-      if (elValidation) {
-        elValidation.textContent = "";
-        elValidation.classList.remove("validation-show");
-      }
+      elValidation.textContent = "";
+      elValidation.classList.remove("validation-show");
       return true;
     }
 
@@ -76,108 +93,90 @@ window._uiEngine = engine;
       (Array.isArray(val) && val.length === 0);
 
     if (empty) {
-      if (elValidation) {
-        elValidation.textContent =
-          "Please answer this question before continuing.";
-        elValidation.classList.add("validation-show");
-      }
+      elValidation.textContent = "Please answer this question before continuing.";
+      elValidation.classList.add("validation-show");
       return false;
     }
 
-    if (elValidation) {
-      elValidation.textContent = "";
-      elValidation.classList.remove("validation-show");
-    }
+    elValidation.textContent = "";
+    elValidation.classList.remove("validation-show");
     return true;
   }
 
-  // -----------------------------------
-  // Save state (if engine supports it)
-  // -----------------------------------
+  // Save state
   function saveStateIfPossible() {
     if (typeof engine.saveState === "function") {
       try {
         engine.saveState();
-      } catch (e) {
-        console.warn("UI Core: saveState failed:", e);
-      }
+      } catch {}
     }
   }
 
-  // -----------------------------------
-  // Render current step on the UI
-  // -----------------------------------
+  // ========================================
+  // RENDER CURRENT STEP
+  // ========================================
   function renderCurrentStep() {
-    const step = engine.getCurrentStep();
+    let step = engine.getCurrentStep();
     if (!step) return;
 
-    // Clear validation when changing step
-    if (elValidation) {
-      elValidation.textContent = "";
-      elValidation.classList.remove("validation-show");
+    // ⭐ ADDED — تخطي الأسئلة المخفية تلقائياً
+    while (step && !isStepVisible(step)) {
+      engine.nextStep();
+      step = engine.getCurrentStep();
     }
+    if (!step) return;
 
-    // Global progress
+    // clear validation
+    elValidation.textContent = "";
+    elValidation.classList.remove("validation-show");
+
+    // Progress info
     const prog = engine.getProgressInfo();
     elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
 
-    // Section label + per-section progress
     elSectionLabel.textContent = step.sectionLabel || "";
+   
 
-    const stepsInSection = engine.steps.filter(
-      (s) => s.sectionId === step.sectionId
-    );
-    const indexInSection = stepsInSection.findIndex((s) => s.id === step.id) + 1;
-    elSectionStepCtr.textContent = step.sectionLabel || "";
+    // ⭐ ADDED — اتجاه السؤال عند الإنجليزية
+    const text = appLang === "en" ? step.questionEn : step.question;
+    elQuestionText.textContent = text || "";
+    elQuestionText.setAttribute("dir", appLang === "en" ? "ltr" : "rtl");
+    elQuestionText.style.textAlign = appLang === "en" ? "left" : "right";
 
-    // Question text (Arabic, RTL)
-    elQuestionText.textContent = (appLang === "en" ? step.questionEn : step.question) || "";
-elQuestionText.setAttribute("dir", appLang === "en" ? "ltr" : "rtl");
-
-    // Render options via UIOptions module
-    if (window.UIOptions && typeof window.UIOptions.renderOptions === "function") {
+    // Render options
+    if (window.UIOptions) {
       window.UIOptions.renderOptions(step, appLang);
     } else {
       elOptionsContainer.innerHTML = "<p>Options module not loaded.</p>";
     }
 
-    // Render DDx panel
-    if (window.UIDDx && typeof window.UIDDx.renderDDx === "function") {
-      window.UIDDx.renderDDx();
-    }
+    // Render DDx & Reasoning
+    if (window.UIDDx) UIDDx.renderDDx();
+    if (window.UIReasoning) UIReasoning.render(step);
 
-    // Render clinical reasoning for this step
-    if (window.UIReasoning && typeof window.UIReasoning.render === "function") {
-      window.UIReasoning.render(step);
-    }
-
-    // Step transition animation
     animateFade(elQuestionText);
     animateFade(elOptionsContainer);
 
-    // Buttons state
+    // Buttons
     const isFirst = engine.state.currentIndex === 0;
-    const isLast  = engine.state.currentIndex >= engine.steps.length - 1;
+    const isLast = engine.state.currentIndex >= engine.steps.length - 1;
 
     elBtnPrev.disabled = isFirst;
     elBtnNext.textContent = isLast ? "Case Presentation" : "Next";
   }
 
   // -----------------------------------
-  // Navigation handlers
+  // Navigation
   // -----------------------------------
   function handleNext() {
     const step = engine.getCurrentStep();
     if (!validateStep(step)) return;
 
     const isLast = engine.state.currentIndex >= engine.steps.length - 1;
+
     if (isLast) {
-      // Open case modal
-      if (window.UICaseModal && typeof window.UICaseModal.openModal === "function") {
-        window.UICaseModal.openModal();
-      } else {
-        console.warn("UICaseModal module not available.");
-      }
+      // ⭐ ADDED — بعد آخر سؤال افتح الكيس برزنتيشن
+      if (window.UICaseModal) window.UICaseModal.openModal();
       return;
     }
 
@@ -193,75 +192,46 @@ elQuestionText.setAttribute("dir", appLang === "en" ? "ltr" : "rtl");
   }
 
   function handleReset() {
-    if (typeof engine.resetCase === "function") {
-      engine.resetCase();
-    } else if (typeof engine.init === "function") {
-      engine.init();
-    }
+    if (engine.resetCase) engine.resetCase();
+    else engine.init();
 
     saveStateIfPossible();
 
-    // Clear reasoning + ddx if modules exist
-    if (window.UIReasoning && typeof window.UIReasoning.clear === "function") {
-      window.UIReasoning.clear();
-    }
-    if (window.UIDDx && typeof window.UIDDx.renderDDx === "function") {
-      window.UIDDx.renderDDx();
-    }
+    if (window.UIReasoning) UIReasoning.clear();
+    if (window.UIDDx) UIDDx.renderDDx();
 
     renderCurrentStep();
   }
 
   function handlePrint() {
-    if (window.UICaseModal && typeof window.UICaseModal.printCase === "function") {
-      window.UICaseModal.printCase();
-    } else {
-      // fallback: normal print
-      window.print();
-    }
+    if (window.UICaseModal) window.UICaseModal.printCase();
+    else window.print();
   }
 
   // -----------------------------------
-  // Init engine state (with optional loadState)
+  // Init engine
   // -----------------------------------
   function initEngineState() {
     let loaded = false;
 
-    if (typeof engine.loadState === "function") {
+    if (engine.loadState) {
       try {
         loaded = !!engine.loadState();
-      } catch (e) {
-        console.warn("UI Core: loadState failed:", e);
-      }
+      } catch {}
     }
 
-    if (!loaded && typeof engine.init === "function") {
-      // First time: clean state
-      engine.init();
-    }
+    if (!loaded) engine.init();
   }
 
-  // -----------------------------------
   // Wire events
-  // -----------------------------------
   function wireEvents() {
-    if (elBtnNext) {
-      elBtnNext.addEventListener("click", handleNext);
-    }
-    if (elBtnPrev) {
-      elBtnPrev.addEventListener("click", handlePrev);
-    }
-    if (elBtnReset) {
-      elBtnReset.addEventListener("click", handleReset);
-    }
-    if (elBtnPrint) {
-      elBtnPrint.addEventListener("click", handlePrint);
-    }
+    elBtnNext.addEventListener("click", handleNext);
+    elBtnPrev.addEventListener("click", handlePrev);
+    elBtnReset.addEventListener("click", handleReset);
+    elBtnPrint.addEventListener("click", handlePrint);
   }
 
-  // -----------------------------------
-  // Entry point
-  // -----------------------------------
+  // init
   function initUI() {
     initEngineState();
     wireEvents();
@@ -274,19 +244,16 @@ elQuestionText.setAttribute("dir", appLang === "en" ? "ltr" : "rtl");
     initUI();
   }
 })();
+
 // ========================
-// Language Toggle (fixed)
+// Language Toggle
 // ========================
-let appLang = "ar";  // default Arabic
+let appLang = "ar";
 
 function setLanguage(lang) {
   appLang = lang;
   document.documentElement.setAttribute("lang", lang);
-
-  // إعادة رسم السؤال الحالي
-  if (window._uiRender && typeof window._uiRender === "function") {
-    window._uiRender();
-  }
+  if (window._uiRender) window._uiRender();
 }
 
 document.querySelector(".lang-toggle").addEventListener("click", () => {
