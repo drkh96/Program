@@ -10,16 +10,19 @@ window.CHEST_SECTIONS_MAIN = [
     id: "entry",
     label: "Case Type",
     steps: [
-      // 1) اختيار الفرع الرئيسي
+
+      // 1) اختيار القسم الرئيسي
       {
         id: "department",
         sectionId: "entry",
         sectionLabel: "Department",
-        question: "اختر القسم الرئيسي للحالة:",
+
+        question:    "اختر القسم الرئيسي للحالة:",
+        questionEn:  "Choose the main department:",
+
         type: "single",
         required: true,
 
-        // ✔ خيارات صحيحة داخل options
         options: {
           internal: { label: "Internal Medicine" },
           surgery:  { label: "Surgery" },
@@ -28,23 +31,23 @@ window.CHEST_SECTIONS_MAIN = [
         }
       },
 
-      // 2) اختيار الجهاز – للبــاطنية فقط
+      // 2) اختيار الجهاز داخل الباطنية فقط
       {
         id: "system",
         sectionId: "entry",
         sectionLabel: "System",
-        question: "اختر الجهاز داخل الباطنية:",
+
+        question:   "اختر الجهاز داخل الباطنية:",
+        questionEn: "Choose the internal medicine system:",
+
         type: "single",
         required: true,
 
-        // ✔ الشرط صحيح
         visibleWhen: { stepId: "department", equals: "internal" },
 
-        // ✔ خيارات صحيحة داخل options
         options: {
           cvs:  { label: "Cardiovascular System" },
           resp: { label: "Respiratory System" }
-          // باقي الأجهزة نضيفها لاحقاً
         }
       }
     ]
