@@ -2,138 +2,225 @@
 // chest-data-personal.js (FIXED & CLEAN)
 // ========================================
 
+// ========================================
+// chest-data-hPI.js (FIXED & CLEAN)
+// ========================================
+
 "use strict";
 
-// --- Prevent crashes from undefined helpers ---
-function dx(arr) {
-  return Array.isArray(arr) ? arr : [];
-}
+function dx(arr){ return Array.isArray(arr) ? arr : []; }
+function r(text, diseases){ return { text, diseases: Array.isArray(diseases)? diseases : [] }; }
 
-function r(text, diseases) {
-  return {
-    text: text || "",
-    diseases: Array.isArray(diseases) ? diseases : []
-  };
-}
-
-window.CHEST_SECTIONS_PERSONAL = [
+window.CHEST_SECTIONS_HPI = [
   {
-    id: "personal",
-    label: "البيانات الشخصية",
-    labelEn: "Personal Data",
+    id: "hpi",
+    label: "History of Present Illness",
     steps: [
-      {
-        id: "name",
-        sectionId: "personal",
-        sectionLabel: "Personal Data",
-        question: "ما اسم المريض؟",
-        questionEn: "What is the patient's name?",
-        type: "text",
-        required: false,
-        placeholder: "اكتب اسم المريض هنا",
-        placeholderEn: "Type the patient's name"
-      },
-      {
-        id: "ageText",
-        sectionId: "personal",
-        sectionLabel: "Personal Data",
-        question: "كم عمر المريض؟",
-        questionEn: "How old is the patient?",
-        type: "text",
-        required: true,
-        placeholder: "مثال: 55 سنة",
-        placeholderEn: "e.g. 55 years"
-      },
-      {
-        id: "sex",
-        sectionId: "personal",
-        sectionLabel: "Personal Data",
-        question: "ما جنس المريض؟",
-        questionEn: "What is the patient's sex?",
-        type: "single",
-        required: true,
-        options: {
-          male: {
-            label: "ذكر",
-            labelEn: "Male",
-            dxAdd: ["IHD", "MI", "ACS"],
-            reasoning: [
-              r(
-                "Being a middle-aged male increases baseline risk of coronary artery disease.",
-                ["IHD", "MI", "ACS"]
-              )
-            ]
-          },
-          female: {
-            label: "أنثى",
-            labelEn: "Female",
-            dxAdd: [],
-            reasoning: [
-              r(
-                "Premenopausal females have lower baseline coronary artery disease risk.",
-                ["IHD"]
-              )
-            ]
-          }
-        }
-      }
-    ]
-  },
 
-  // ============================================
-  // FIXED — Chief Complaint now uses correct sectionId
-  // ============================================
-  {
-    id: "cc",
-    label: "الشكوى الرئيسية",
-    labelEn: "Chief Complaint",
-    steps: [
+      // ========= ONSET =========
       {
-        id: "mainSymptom",
-        sectionId: "cardiac",      // FIXED
-        sectionLabel: "Chief Complaint",
-        question: "ما هي الشكوى الرئيسية؟",
-        questionEn: "What is the main presenting complaint?",
+        id: "onset",
+        sectionId: "cardiac",
+        sectionLabel: "HPI",
+        question: "كيف كانت بداية الألم؟",
+        questionEn: "How did the pain start?",
         type: "single",
         required: true,
 
-        options: {
-          chestPain: {
-            label: "ألم في الصدر",
-            labelEn: "Chest pain",
-            dxAdd: dx(["IHD", "MI", "ACS", "PEMajor", "Pericarditis", "Musculoskeletal", "GERD"]),
-            reasoning: [
-              r(
-                "Chest pain increases probability of ischemic, thromboembolic, inflammatory, or musculoskeletal causes.",
-                ["IHD", "MI", "ACS", "PEMajor", "Pericarditis", "Musculoskeletal", "GERD"]
-              )
-            ]
-          },
+        visibleWhen: {
+          all: [
+            { stepId: "department", equals:"internal" },
+            { stepId: "system", equals:"cvs" },
+            { stepId: "mainSymptom", equals:"chestPain" }
+          ]
+        },
 
-          palpitations: {
-            label: "خفقان",
-            labelEn: "Palpitations",
-            dxAdd: dx(["Arrhythmia", "Anxiety"]),
-            reasoning: [
-              r(
-                "Palpitations suggest arrhythmias or anxiety-related causes.",
-                ["Arrhythmia", "Anxiety"]
-              )
-            ]
+        options: {
+          sudden1min: {
+            label: "بداية فجائية خلال دقيقة",
+            dxAdd: dx(["MI","PEMajor","Dissection"])
+          },
+          sudden10min: {
+            label: "بداية خلال 10 دقائق",
+            dxAdd: dx(["MI","PEMajor"])
+          },
+          gradualHours: {
+            label: "بداية تدريجية لساعات",
+            dxAdd: dx(["Pericarditis","Pneumonia"])
+          },
+          gradualDays: {
+            label: "بداية لأيام",
+            dxAdd: dx(["Pneumonia","GERD"])
           }
         }
       },
 
+      // ========= SITE =========
       {
-        id: "ccDuration",
-        sectionId: "cardiac",    // FIXED
-        sectionLabel: "Chief Complaint",
-        question: "منذ متى بدأت الشكوى؟",
-        questionEn: "For how long has this complaint been present?",
-        type: "text",
+        id: "site",
+        sectionId: "cardiac",
+        sectionLabel: "HPI",
+        question: "أين يتركّز الألم؟",
+        type: "single",
         required: true,
-        placeholder: "مثال: منذ 3 ساعات / يومين",
-        placeholderEn: "e.g. for 3 hours / 2 days"
+
+        visibleWhen: {
+          all: [
+            { stepId: "department", equals:"internal" },
+            { stepId: "system", equals:"cvs" },
+            { stepId: "mainSymptom", equals:"chestPain" }
+          ]
+        },
+
+        options: {
+          retrosternal: { label: "خلف القص", dxAdd: dx(["IHD","MI","GERD"]) },
+          leftChest:    { label: "الجانب الأيسر", dxAdd: dx(["IHD","MI"]) },
+          pleuriticSide:{ label: "جانبي مع النفس", dxAdd: dx(["Pneumonia","PEMajor"]) },
+          pointTender:  { label: "موضعي بالإصبع", dxAdd: dx(["Musculoskeletal"]) }
+        }
+      },
+
+      // ========= CHARACTER =========
+      {
+        id: "character",
+        sectionId: "cardiac",
+        question: "طبيعة الألم؟",
+        type: "single",
+        required: true,
+
+        visibleWhen: {
+          all: [
+            { stepId: "department", equals:"internal" },
+            { stepId: "system", equals:"cvs" },
+            { stepId: "mainSymptom", equals:"chestPain" }
+          ]
+        },
+
+        options: {
+          pressure:     { label: "ضاغط", dxAdd: dx(["IHD","MI"]) },
+          sharpPleuritic:{label:"طاعن مع النفس", dxAdd:dx(["Pneumonia","PEMajor"])},
+          burning:      { label: "حرقة", dxAdd: dx(["GERD"]) },
+          tearingBack:  { label: "ماحق للظهر", dxAdd: dx(["Dissection"]) }
+        }
+      },
+
+      // ========= RADIATION =========
+      {
+        id: "radiation",
+        sectionId: "cardiac",
+        question: "هل ينتشر الألم؟",
+        type: "single",
+        required: true,
+
+        visibleWhen: {
+          all: [
+            { stepId: "department", equals:"internal" },
+            { stepId: "system", equals:"cvs" },
+            { stepId: "mainSymptom", equals:"chestPain" }
+          ]
+        },
+
+        options: {
+          leftArmJaw: { label: "ذراع أيسر/فك", dxAdd: dx(["MI","IHD"]) },
+          backBetweenScapulae:{label:"بين لوحي الكتف",dxAdd:dx(["Dissection","PEMajor"])},
+          none: { label: "لا يوجد" }
+        }
+      },
+
+      // ========= AGGRAVATING =========
+      {
+        id: "aggravating",
+        sectionId: "cardiac",
+        question: "ما يزيد الألم؟",
+        type: "single",
+        required: true,
+
+        visibleWhen: {
+          all: [
+            { stepId: "department", equals:"internal" },
+            { stepId: "system", equals:"cvs" },
+            { stepId: "mainSymptom", equals:"chestPain" }
+          ]
+        },
+
+        options: {
+          exertion:{ label:"الجهد", dxAdd:dx(["IHD","StableAngina"]) },
+          emotionalStress:{ label:"التوتر", dxAdd:dx(["IHD","Anxiety"])},
+          deepInspiration:{ label:"الشهيق", dxAdd:dx(["PEMajor","Pneumonia"])},
+          movementPalpation:{ label:"الحركة/الضغط", dxAdd:dx(["Musculoskeletal"])},
+          postMeal:{ label:"بعد الأكل", dxAdd:dx(["GERD"]) }
+        }
+      },
+
+      // ========= RELIEF =========
+      {
+        id: "relief",
+        sectionId: "cardiac",
+        question: "ما يخفف الألم؟",
+        type: "single",
+        required: true,
+
+        visibleWhen: {
+          all: [
+            { stepId: "department", equals:"internal" },
+            { stepId: "system", equals:"cvs" },
+            { stepId: "mainSymptom", equals:"chestPain" }
+          ]
+        },
+
+        options: {
+          rest:{ label:"الراحة", dxAdd:dx(["StableAngina"]) },
+          gtn:{ label:"GTN", dxAdd:dx(["IHD","StableAngina"]) },
+          leaningForward:{ label:"الانحناء للأمام", dxAdd:dx(["Pericarditis"])},
+          antacids:{ label:"مضادات الحموضة", dxAdd:dx(["GERD"]) }
+        }
+      },
+
+      // ========= EPISODE DURATION =========
+      {
+        id: "episodeDuration",
+        sectionId: "cardiac",
+        question: "مدة النوبة:",
+        type: "single",
+        required: true,
+
+        visibleWhen: {
+          all: [
+            { stepId: "department", equals:"internal" },
+            { stepId: "system", equals:"cvs" },
+            { stepId: "mainSymptom", equals:"chestPain" }
+          ]
+        },
+
+        options: {
+          seconds:{ label:"ثوانٍ", dxAdd:dx(["Musculoskeletal","Anxiety"]) },
+          fiveTo20:{ label:"5-20 دقيقة", dxAdd:dx(["StableAngina"]) },
+          more20:{ label:">20 دقيقة", dxAdd:dx(["MI"]) }
+        }
+      },
+
+      // ========= ASSOCIATED =========
+      {
+        id: "associated",
+        sectionId: "cardiac",
+        question: "أعراض مصاحبة؟",
+        type: "multi",
+        required: true,
+
+        visibleWhen: {
+          all: [
+            { stepId: "department", equals:"internal" },
+            { stepId: "system", equals:"cvs" },
+            { stepId: "mainSymptom", equals:"chestPain" }
+          ]
+        },
+
+        options: {
+          dyspnea:{ label:"ضيق نفس", dxAdd:dx(["MI","HF","PEMajor"]) },
+          diaphoresis:{ label:"تعرق", dxAdd:dx(["MI"]) },
+          nausea:{ label:"غثيان", dxAdd:dx(["MI","GERD"]) },
+          syncope:{ label:"إغماء", dxAdd:dx(["Arrhythmia","PEMajor"]) }
+        }
       }
     ]
   }
