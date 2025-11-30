@@ -1,6 +1,5 @@
 // ========================================
-// chest-data-ros.js
-// Review of Systems (bilingual labels, EN reasoning)
+// chest-data-ros.js (NO FILTERS VERSION)
 // ========================================
 
 "use strict";
@@ -19,6 +18,8 @@ window.CHEST_SECTIONS_ROS = [
     label: "Review of Systems",
     labelEn: "Review of Systems",
     steps: [
+
+      // ========================= CVS =========================
       {
         id: "rosCVS",
         sectionId: "ros",
@@ -28,36 +29,22 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "Cardiovascular symptoms (select all that apply):",
         type: "multi",
         required: false,
-        visibleWhen: {
-          all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
-            { stepId: "mainSymptom", equals: "chestPain" }
-          ]
-        },
+
         options: {
           palpitations: {
             label: "خفقان",
             labelEn: "Palpitations",
             dxAdd: dxR(["Arrhythmia"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Palpitations with chest discomfort raise suspicion for clinically significant arrhythmia.",
-                ["Arrhythmia"]
-              )
+              rR("Palpitations with chest discomfort raise suspicion for arrhythmia.", ["Arrhythmia"])
             ]
           },
           orthopneaPND: {
             label: "Orthopnea / PND / تورّم القدمين",
             labelEn: "Orthopnea / PND / ankle swelling",
             dxAdd: dxR(["HF"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Orthopnea, PND, and peripheral edema are classic features of heart failure.",
-                ["HF"]
-              )
+              rR("Orthopnea and edema strongly indicate heart failure.", ["HF"])
             ]
           },
           noCVSsymptoms: {
@@ -66,14 +53,13 @@ window.CHEST_SECTIONS_ROS = [
             dxAdd: dxR([]),
             dxRemove: dxR(["HF", "Arrhythmia"]),
             reasoning: [
-              rR(
-                "Absence of additional cardiovascular symptoms lowers the likelihood of overt heart failure or major arrhythmia.",
-                ["HF", "Arrhythmia"]
-              )
+              rR("Absence of CVS symptoms lowers HF and arrhythmia likelihood.", ["HF", "Arrhythmia"])
             ]
           }
         }
       },
+
+      // ========================= RESP =========================
       {
         id: "rosResp",
         sectionId: "ros",
@@ -83,64 +69,45 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "Respiratory symptoms (select all that apply):",
         type: "multi",
         required: false,
-        visibleWhen: {
-          all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
-            { stepId: "mainSymptom", equals: "chestPain" }
-          ]
-        },
+
         options: {
           chronicCough: {
             label: "كحّة مزمنة",
             labelEn: "Chronic cough",
             dxAdd: dxR(["COPD", "Asthma", "Pneumonia"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Chronic cough suggests underlying chronic lung disease such as COPD or asthma, or chronic infection.",
-                ["COPD", "Asthma", "Pneumonia"]
-              )
+              rR("Chronic cough suggests COPD, asthma, or chronic infection.", ["COPD", "Asthma", "Pneumonia"])
             ]
           },
           wheeze: {
             label: "صفير بالصدر (Wheeze)",
             labelEn: "Wheeze",
             dxAdd: dxR(["Asthma", "COPD"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Wheezing usually reflects airway obstruction as seen in asthma or COPD.",
-                ["Asthma", "COPD"]
-              )
+              rR("Wheezing indicates airway obstruction.", ["Asthma", "COPD"])
             ]
           },
           acuteDyspnea: {
             label: "ضيق نفس حاد جديد",
-            labelEn: "New acute shortness of breath",
+            labelEn: "New acute dyspnea",
             dxAdd: dxR(["PEMajor", "HF", "Pneumonia"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Acute dyspnea with chest pain may indicate pulmonary embolism, acute heart failure, or acute pneumonia.",
-                ["PEMajor", "HF", "Pneumonia"]
-              )
+              rR("Acute dyspnea suggests PE, HF, or pneumonia.", ["PEMajor", "HF", "Pneumonia"])
             ]
           },
           noRespsx: {
             label: "لا توجد أعراض تنفسية إضافية مهمة",
-            labelEn: "No additional significant respiratory symptoms",
+            labelEn: "No significant respiratory symptoms",
             dxAdd: dxR([]),
             dxRemove: dxR(["Pneumonia", "PEMajor"]),
             reasoning: [
-              rR(
-                "Absence of respiratory symptoms makes overt pneumonia and clinically obvious PE less likely.",
-                ["Pneumonia", "PEMajor"]
-              )
+              rR("No respiratory symptoms lowers PE/pneumonia likelihood.", ["Pneumonia", "PEMajor"])
             ]
           }
         }
       },
+
+      // ========================= GIT =========================
       {
         id: "rosGIT",
         sectionId: "ros",
@@ -150,52 +117,37 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "Gastrointestinal symptoms (select all that apply):",
         type: "multi",
         required: false,
-        visibleWhen: {
-          all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
-            { stepId: "mainSymptom", equals: "chestPain" }
-          ]
-        },
+
         options: {
           heartburn: {
             label: "حُرقة خلف القص / ارتجاع حمضي",
-            labelEn: "Retrosternal heartburn / acid reflux",
+            labelEn: "Heartburn / reflux",
             dxAdd: dxR(["GERD"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Retrosternal burning with acid reflux is typical for GERD.",
-                ["GERD"]
-              )
+              rR("Burning chest pain with reflux is typical of GERD.", ["GERD"])
             ]
           },
           epigastricPain: {
             label: "ألم شرسوفي مرتبط بالطعام",
             labelEn: "Epigastric pain related to meals",
             dxAdd: dxR(["PepticUlcer", "GERD"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Epigastric pain related to food supports peptic ulcer disease or GERD.",
-                ["PepticUlcer", "GERD"]
-              )
+              rR("Epigastric pain with food supports PUD or GERD.", ["PepticUlcer", "GERD"])
             ]
           },
           noGITsx: {
             label: "لا توجد أعراض هضمية إضافية مهمة",
-            labelEn: "No additional significant gastrointestinal symptoms",
+            labelEn: "No significant GI symptoms",
             dxAdd: dxR([]),
             dxRemove: dxR(["GERD", "PepticUlcer"]),
             reasoning: [
-              rR(
-                "Absence of GI symptoms makes GERD and peptic ulcer disease less likely as the primary cause.",
-                ["GERD", "PepticUlcer"]
-              )
+              rR("Absence of GI symptoms lowers GERD/PUD likelihood.", ["GERD", "PepticUlcer"])
             ]
           }
         }
       },
+
+      // ========================= CNS =========================
       {
         id: "rosCNS",
         sectionId: "ros",
@@ -205,24 +157,14 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "Neurological symptoms (select all that apply):",
         type: "multi",
         required: false,
-        visibleWhen: {
-          all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
-            { stepId: "mainSymptom", equals: "chestPain" }
-          ]
-        },
+
         options: {
           focalDeficit: {
             label: "ضعف أو خدر في أحد الأطراف / أعراض بؤرية",
-            labelEn: "Focal weakness or numbness / focal deficits",
+            labelEn: "Focal weakness / numbness",
             dxAdd: dxR(["Stroke"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Focal neurological deficits support a diagnosis of stroke or TIA.",
-                ["Stroke"]
-              )
+              rR("Focal deficits strongly suggest stroke or TIA.", ["Stroke"])
             ]
           },
           noCNSsx: {
@@ -231,53 +173,38 @@ window.CHEST_SECTIONS_ROS = [
             dxAdd: dxR([]),
             dxRemove: dxR(["Stroke"]),
             reasoning: [
-              rR(
-                "Lack of neurological symptoms makes stroke less likely as a cause of the presentation.",
-                ["Stroke"]
-              )
+              rR("No neurological symptoms lowers stroke likelihood.", ["Stroke"])
             ]
           }
         }
       },
+
+      // ========================= LIMBS / MSK =========================
       {
         id: "rosLM",
         sectionId: "ros",
         sectionLabel: "ROS",
         sectionLabelEn: "ROS",
-        question: "أعراض الأطراف / الجهاز الحركي (اختر كل ما ينطبق):",
-        questionEn: "Limb / musculoskeletal symptoms (select all that apply):",
+        question: "أعراض الأطراف (اختر كل ما ينطبق):",
+        questionEn: "Limb symptoms (select all that apply):",
         type: "multi",
         required: false,
-        visibleWhen: {
-          all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
-            { stepId: "mainSymptom", equals: "chestPain" }
-          ]
-        },
+
         options: {
           unilateralSwelling: {
             label: "تورّم أحادي مؤلم في الساق",
-            labelEn: "Painful unilateral leg swelling",
+            labelEn: "Unilateral painful leg swelling",
             dxAdd: dxR(["DVT", "PEMajor"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Unilateral painful leg swelling is a key sign of DVT and therefore raises suspicion for PE.",
-                ["DVT", "PEMajor"]
-              )
+              rR("Unilateral swelling is classic for DVT → possible PE.", ["DVT", "PEMajor"])
             ]
           },
           bilateralEdema: {
-            label: "تورّم ثنائي في الطرفين السفليين",
+            label: "تورّم ثنائي في الطرفين",
             labelEn: "Bilateral leg edema",
             dxAdd: dxR(["HF"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Bilateral lower-limb edema supports heart failure or fluid overload.",
-                ["HF"]
-              )
+              rR("Bilateral edema suggests HF or fluid overload.", ["HF"])
             ]
           },
           noLMsx: {
@@ -286,14 +213,13 @@ window.CHEST_SECTIONS_ROS = [
             dxAdd: dxR([]),
             dxRemove: dxR(["DVT", "HF"]),
             reasoning: [
-              rR(
-                "Absence of limb swelling or DVT signs lowers the probability of PE and overt heart failure.",
-                ["DVT", "HF"]
-              )
+              rR("Absence of limb findings lowers DVT and HF likelihood.", ["DVT", "HF"])
             ]
           }
         }
       },
+
+      // ========================= GENERAL / HEMA =========================
       {
         id: "rosHema",
         sectionId: "ros",
@@ -303,60 +229,39 @@ window.CHEST_SECTIONS_ROS = [
         questionEn: "General / hematologic symptoms (select all that apply):",
         type: "multi",
         required: false,
-        visibleWhen: {
-          all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
-            { stepId: "mainSymptom", equals: "chestPain" }
-          ]
-        },
+
         options: {
           weightLoss: {
             label: "نقص وزن غير مفسّر",
             labelEn: "Unintentional weight loss",
             dxAdd: dxR(["Cancer"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Unintentional weight loss raises suspicion for underlying malignancy.",
-                ["Cancer"]
-              )
+              rR("Unexplained weight loss may suggest malignancy.", ["Cancer"])
             ]
           },
           feverNightSweats: {
             label: "حرارة / تعرّق ليلي",
-            labelEn: "Fever or night sweats",
+            labelEn: "Fever / night sweats",
             dxAdd: dxR(["Infection", "Pneumonia", "TB"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Fever and night sweats suggest infection or chronic inflammatory disease such as TB.",
-                ["Infection", "Pneumonia", "TB"]
-              )
+              rR("Fever/night sweats indicate infection or TB.", ["Infection", "Pneumonia", "TB"])
             ]
           },
           easyBruising: {
             label: "كدمات بسهولة / نزف متكرر",
-            labelEn: "Easy bruising or recurrent bleeding",
+            labelEn: "Easy bruising / bleeding",
             dxAdd: dxR(["Coagulopathy"]),
-            dxRemove: dxR([]),
             reasoning: [
-              rR(
-                "Easy bruising and frequent bleeding episodes suggest an underlying coagulopathy.",
-                ["Coagulopathy"]
-              )
+              rR("Easy bruising indicates coagulopathy.", ["Coagulopathy"])
             ]
           },
           noHemasx: {
             label: "لا توجد أعراض عامة مهمة",
-            labelEn: "No significant general or hematologic symptoms",
+            labelEn: "No significant general symptoms",
             dxAdd: dxR([]),
             dxRemove: dxR(["Infection", "Cancer"]),
             reasoning: [
-              rR(
-                "Absence of systemic symptoms makes chronic infection and advanced malignancy less likely.",
-                ["Infection", "Cancer"]
-              )
+              rR("No systemic symptoms lowers infection/malignancy likelihood.", ["Infection", "Cancer"])
             ]
           }
         }

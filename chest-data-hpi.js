@@ -1,5 +1,5 @@
 // ========================================
-// chest-data-hPI.js (FIXED & CLEAN)
+// chest-data-hPI.js (NO FILTERS VERSION)
 // ========================================
 
 "use strict";
@@ -22,14 +22,6 @@ window.CHEST_SECTIONS_HPI = [
         questionEn: "How did the pain start?",
         type: "single",
         required: true,
-
-        visibleWhen: {
-          all: [
-            { stepId: "department", equals:"internal" },
-            { stepId: "system", equals:"cvs" },
-            { stepId: "mainSymptom", equals:"chestPain" }
-          ]
-        },
 
         options: {
           sudden1min: {
@@ -60,14 +52,6 @@ window.CHEST_SECTIONS_HPI = [
         type: "single",
         required: true,
 
-        visibleWhen: {
-          all: [
-            { stepId: "department", equals:"internal" },
-            { stepId: "system", equals:"cvs" },
-            { stepId: "mainSymptom", equals:"chestPain" }
-          ]
-        },
-
         options: {
           retrosternal: { label: "خلف القص", dxAdd: dx(["IHD","MI","GERD"]) },
           leftChest:    { label: "الجانب الأيسر", dxAdd: dx(["IHD","MI"]) },
@@ -84,17 +68,9 @@ window.CHEST_SECTIONS_HPI = [
         type: "single",
         required: true,
 
-        visibleWhen: {
-          all: [
-            { stepId: "department", equals:"internal" },
-            { stepId: "system", equals:"cvs" },
-            { stepId: "mainSymptom", equals:"chestPain" }
-          ]
-        },
-
         options: {
           pressure:     { label: "ضاغط", dxAdd: dx(["IHD","MI"]) },
-          sharpPleuritic:{label:"طاعن مع النفس", dxAdd:dx(["Pneumonia","PEMajor"])},
+          sharpPleuritic:{ label:"طاعن مع النفس", dxAdd:dx(["Pneumonia","PEMajor"]) },
           burning:      { label: "حرقة", dxAdd: dx(["GERD"]) },
           tearingBack:  { label: "ماحق للظهر", dxAdd: dx(["Dissection"]) }
         }
@@ -108,17 +84,9 @@ window.CHEST_SECTIONS_HPI = [
         type: "single",
         required: true,
 
-        visibleWhen: {
-          all: [
-            { stepId: "department", equals:"internal" },
-            { stepId: "system", equals:"cvs" },
-            { stepId: "mainSymptom", equals:"chestPain" }
-          ]
-        },
-
         options: {
           leftArmJaw: { label: "ذراع أيسر/فك", dxAdd: dx(["MI","IHD"]) },
-          backBetweenScapulae:{label:"بين لوحي الكتف",dxAdd:dx(["Dissection","PEMajor"])},
+          backBetweenScapulae:{ label:"بين لوحي الكتف", dxAdd:dx(["Dissection","PEMajor"]) },
           none: { label: "لا يوجد" }
         }
       },
@@ -131,19 +99,11 @@ window.CHEST_SECTIONS_HPI = [
         type: "single",
         required: true,
 
-        visibleWhen: {
-          all: [
-            { stepId: "department", equals:"internal" },
-            { stepId: "system", equals:"cvs" },
-            { stepId: "mainSymptom", equals:"chestPain" }
-          ]
-        },
-
         options: {
           exertion:{ label:"الجهد", dxAdd:dx(["IHD","StableAngina"]) },
-          emotionalStress:{ label:"التوتر", dxAdd:dx(["IHD","Anxiety"])},
-          deepInspiration:{ label:"الشهيق", dxAdd:dx(["PEMajor","Pneumonia"])},
-          movementPalpation:{ label:"الحركة/الضغط", dxAdd:dx(["Musculoskeletal"])},
+          emotionalStress:{ label:"التوتر", dxAdd:dx(["IHD","Anxiety"]) },
+          deepInspiration:{ label:"الشهيق", dxAdd:dx(["PEMajor","Pneumonia"]) },
+          movementPalpation:{ label:"الحركة/الضغط", dxAdd:dx(["Musculoskeletal"]) },
           postMeal:{ label:"بعد الأكل", dxAdd:dx(["GERD"]) }
         }
       },
@@ -156,18 +116,10 @@ window.CHEST_SECTIONS_HPI = [
         type: "single",
         required: true,
 
-        visibleWhen: {
-          all: [
-            { stepId: "department", equals:"internal" },
-            { stepId: "system", equals:"cvs" },
-            { stepId: "mainSymptom", equals:"chestPain" }
-          ]
-        },
-
         options: {
           rest:{ label:"الراحة", dxAdd:dx(["StableAngina"]) },
           gtn:{ label:"GTN", dxAdd:dx(["IHD","StableAngina"]) },
-          leaningForward:{ label:"الانحناء للأمام", dxAdd:dx(["Pericarditis"])},
+          leaningForward:{ label:"الانحناء للأمام", dxAdd:dx(["Pericarditis"]) },
           antacids:{ label:"مضادات الحموضة", dxAdd:dx(["GERD"]) }
         }
       },
@@ -179,14 +131,6 @@ window.CHEST_SECTIONS_HPI = [
         question: "مدة النوبة:",
         type: "single",
         required: true,
-
-        visibleWhen: {
-          all: [
-            { stepId: "department", equals:"internal" },
-            { stepId: "system", equals:"cvs" },
-            { stepId: "mainSymptom", equals:"chestPain" }
-          ]
-        },
 
         options: {
           seconds:{ label:"ثوانٍ", dxAdd:dx(["Musculoskeletal","Anxiety"]) },
@@ -202,14 +146,6 @@ window.CHEST_SECTIONS_HPI = [
         question: "أعراض مصاحبة؟",
         type: "multi",
         required: true,
-
-        visibleWhen: {
-          all: [
-            { stepId: "department", equals:"internal" },
-            { stepId: "system", equals:"cvs" },
-            { stepId: "mainSymptom", equals:"chestPain" }
-          ]
-        },
 
         options: {
           dyspnea:{ label:"ضيق نفس", dxAdd:dx(["MI","HF","PEMajor"]) },
