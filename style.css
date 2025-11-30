@@ -1,347 +1,808 @@
 /* =========================================
-   FIX 0 — GLOBAL PATCHES (Required)
+   1) THEME VARIABLES (Unified + Clean)
+========================================= */
+:root {
+  /* Base Gradient Background */
+  --bg-grad-top: #020617;
+  --bg-grad-mid: #020617;
+  --bg-grad-bot: #000000;
+
+  /* Base Surfaces */
+  --bg-card: #020617;
+  --bg-deep: #020617;
+  --bg-ddx-header: #0f172a;
+
+  /* Text Colors */
+  --text-main: #e5e7eb;
+  --text-secondary: #9ca3af;
+
+  /* Primary Palette */
+  --primary: #38bdf8;
+  --primary-light: #7dd3fc;
+  --secondary: #a5b4fc;
+  --accent: #f97316;
+
+  /* Borders */
+  --border-soft: rgba(148, 163, 184, 0.35);
+  --border-strong: rgba(148, 163, 184, 0.6);
+
+  /* Shadows */
+  --shadow-card: 0 18px 40px rgba(0, 0, 0, 0.9);
+  --shadow-inset: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+
+  /* Royal Theme Palette */
+  --royal-primary: #0ea5e9;
+  --royal-primary-light: #7dd3fc;
+  --royal-secondary: #a5b4fc;
+  --royal-accent: #f97316;
+  --royal-card: #0f172a;
+  --royal-soft-text: #9ca3af;
+  --royal-strong-text: #e5e7eb;
+
+  /* Device Card Colors (Soft Vibrant) */
+  --card-cardiac: rgba(255, 80, 80, 0.12);
+  --card-cardiac-border: rgba(255, 80, 80, 0.35);
+
+  --card-pulmonary: rgba(80,180,255,0.12);
+  --card-pulmonary-border: rgba(80,180,255,0.35);
+
+  --card-aorta: rgba(255,200,80,0.12);
+  --card-aorta-border: rgba(255,200,80,0.35);
+
+  --card-gi: rgba(255,140,60,0.12);
+  --card-gi-border: rgba(255,140,60,0.35);
+
+  --card-msk: rgba(100,255,180,0.12);
+  --card-msk-border: rgba(100,255,180,0.35);
+
+  --card-psych: rgba(160,120,255,0.12);
+  --card-psych-border: rgba(160,120,255,0.35);
+
+  --card-other: rgba(180,180,180,0.10);
+  --card-other-border: rgba(180,180,180,0.35);
+}
+
+/* =========================================
+   2) RESET & BASE
+========================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* UI language direction — changed dynamically */
+html {
+  direction: ltr;
+}
+
+body {
+  font-family: "Inter", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(
+    circle at top,
+    var(--bg-grad-top) 0,
+    var(--bg-grad-mid) 55%,
+    var(--bg-grad-bot) 100%
+  );
+  color: var(--text-main);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  padding-top: 60px; 
+  overflow: hidden;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+/* Arabic Mode Fix */
+body.lang-en * {
+  direction: ltr !important;
+  text-align: left !important;
+}
+/* =========================================
+   3) HEADER
 ========================================= */
 
-/* الأساسية: حتى ميخنق الصفحة */
-body {
-  overflow: auto !important;
-}
-
-/* حاوية التطبيق */
-#app {
-  width: 100%;
-  padding: 10px;
-  margin-top: 70px;
-}
-
-/* كونتينرات اللوحات (ddx / reasoning / history) */
-.panel-section {
-  margin-top: 20px;
-  padding: 10px;
-}
-
-/* Fix modal overlay (ID-based because HTML uses id not class) */
-#caseModal {
+.app-header {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.70);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 200;
+  inset: 0 0 auto 0;
+  z-index: 20;
+  padding: 14px 24px;
+  text-align: left;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.98),
+    rgba(15, 23, 42, 0.92)
+  );
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
 }
 
-#caseModal:not(.hidden) {
-  display: flex;
+.app-header h1 {
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  color: var(--primary-light);
+  text-transform: uppercase;
 }
 
-#caseModalContent {
-  flex: 1;
-  overflow-y: auto;
-  max-height: 70vh;
-  padding: 10px;
+.app-subtitle {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
-.modal-content {
-  width: min(650px, 94vw);
-  max-height: 80vh;
-  background: #0f172a;
-  border-radius: 18px;
-  padding: 12px;
-  border: 1px solid rgba(148,163,184,0.25);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+/* =========================================
+   4) MAIN 3-CARD LAYOUT
+========================================= */
+
+.app-layout {
+  max-width: 1200px;
+  margin: 80px auto 0;
+  padding: 0 16px 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-areas: "ddx reason history";
+  gap: 16px;
+  height: calc(100dvh - 80px);
+}
+
+/* Card Areas */
+.card-ddx    { grid-area: ddx; }
+.card-reason { grid-area: reason; }
+.card-history{ grid-area: history; }
+
+/* =========================================
+   5) CARD BASE (Premium Royal)
+========================================= */
+
+.card {
+  position: relative;
+  border-radius: 22px;
+  padding: 14px 16px;
+  background: radial-gradient(
+      circle at top left,
+      rgba(148,163,184,0.08),
+      transparent 45%
+    ),
+    var(--royal-card);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-}
-
-#caseModalClose,
-#caseModalClose2 {
-  cursor: pointer;
-  background: #1e293b;
+  overflow: hidden;
   border: 1px solid rgba(148,163,184,0.25);
-  padding: 6px 14px;
-  border-radius: 10px;
-  color: #e5e7eb;
-  transition: 0.15s ease;
 }
 
-#caseModalClose:hover,
-#caseModalClose2:hover {
-  background: #334155;
+.card-header {
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
-#caseModalCopy {
-  cursor: pointer;
-  border: none;
-  background: #0ea5e9;
-  color: #0f172a;
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-weight: 600;
-  margin-top: 10px;
+.card-title {
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--royal-primary);
+  font-weight: 700;
 }
 
-/* =========================================
-   FIX 1 — card ddx / reason / history
-========================================= */
-
-.card-ddx,
-.card-reason,
-.card-history {
-  background: #0f172a;
-  padding: 14px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  border: 1px solid rgba(148,163,184,0.2);
-  margin-bottom: 20px;
+/* Scrollable content */
+.card-body {
+  padding-top: 4px;
+  flex: 1;
+  overflow-y: auto;
 }
 
-/* =========================================
-   FIX 2 — unify disease-tag
-========================================= */
-.disease-tag {
-  background: rgba(56,189,248,0.18);
-  color: #38bdf8;
-  border: 1px solid rgba(56,189,248,0.35);
-  padding: 3px 8px;
+.card-body::-webkit-scrollbar {
+  width: 6px;
+}
+.card-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.card-body::-webkit-scrollbar-thumb {
+  background: #4b5563;
   border-radius: 999px;
+}
+/* =========================================
+   6) QUESTION + OPTIONS (RTL/LTR Support)
+========================================= */
+
+.section-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--royal-secondary);
+}
+
+.section-step-counter {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.step-counter {
+  margin-top: 4px;
   font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+/* السؤال */
+.question-text {
+  margin-top: 6px;
+  border-radius: 14px;
+  padding: 14px;
+  background: #0f172a;
+  color: var(--royal-secondary);
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,0.18);
+  font-size: 1.05rem;
+  text-align: right;
+  direction: rtl;
+}
+
+/* خيارات */
+.options-container {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  direction: rtl;
+}
+
+/* خيار واحد */
+.option-row {
+  background: #0a1120;
+  padding: 10px;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,0.25);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 120ms cubic-bezier(0.19,1,0.22,1);
+}
+
+.option-row:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 12px rgba(56,189,248,0.35);
+}
+
+/* إذا اختير */
+.ui-option-row.clicked {
+  transform: scale(0.98);
+  background: rgba(56,189,248,0.15);
+}
+
+.option-label {
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+/* إخفاء الراديو default */
+.option-row.radio-option input[type="radio"] {
+  display: none;
+}
+
+.option-row.radio-option.selected {
+  background: var(--royal-primary);
+  color: #0b1120;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(14,165,233,0.55);
+}
+
+/* حقول الإدخال */
+.option-row input[type="text"],
+.option-row input[type="number"] {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  padding: 6px 10px;
+  background: #020617;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.option-row input[type="text"]:focus,
+.option-row input[type="number"]:focus {
+  border-color: var(--royal-primary);
+}
+
+/* رسالة الفحص */
+.validation-message {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: #fca5a5;
+}
+
+.validation-show {
+  opacity: 1;
+}
+
+/* =========================================
+   7) NAVIGATION BUTTONS (Royal Soft Vibrant)
+========================================= */
+
+.controls-row {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(2,6,23,0.72);
+  backdrop-filter: blur(12px);
+  padding: 12px 10px 14px;
+  margin-top: 8px !important;
+  border-top: 1px solid rgba(148,163,184,0.25);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  z-index: 50;
+  border-radius: 0 0 20px 20px;
+}
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: 150ms cubic-bezier(0.19,1,0.22,1);
+  font-weight: 600;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--royal-primary), #0284c7);
+  color: #0b1120;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(56,189,248,0.45);
+}
+
+.btn-secondary {
+  background: #0f172a;
+  color: var(--royal-strong-text);
+  border: 1px solid rgba(148,163,184,0.35);
+}
+
+.btn-secondary:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 8px rgba(165,180,252,0.35);
+}
+
+/* Buttons small sizing tweak */
+.btn {
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  min-height: 33px;
+}
+/* =========================================
+   8) DDX CARD (Groups + Diseases)
+========================================= */
+
+#ddxContainer {
+  height: 100%;
+}
+
+.dd-empty {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* DDX Group Card */
+.device-card {
+  border-radius: 22px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  background: rgba(0,0,0,0.30);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  box-shadow: 0 6px 26px rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.10);
+  max-height: 280px;
+  overflow-y: auto;
+  animation: royalFade 0.25s ease-out;
+}
+
+.device-card-header {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  margin-bottom: 10px;
+  color: var(--royal-primary-light);
+}
+
+/* Device colors - Soft Vibrant */
+.device-card.cardiac {
+  background: var(--card-cardiac);
+  border: 1px solid var(--card-cardiac-border);
+}
+.device-card.pulmonary {
+  background: var(--card-pulmonary);
+  border: 1px solid var(--card-pulmonary-border);
+}
+.device-card.aorta {
+  background: var(--card-aorta);
+  border: 1px solid var(--card-aorta-border);
+}
+.device-card.gi {
+  background: var(--card-gi);
+  border: 1px solid var(--card-gi-border);
+}
+.device-card.msk {
+  background: var(--card-msk);
+  border: 1px solid var(--card-msk-border);
+}
+.device-card.psych {
+  background: var(--card-psych);
+  border: 1px solid var(--card-psych-border);
+}
+.device-card.other {
+  background: var(--card-other);
+  border: 1px solid var(--card-other-border);
+}
+
+/* Disease box inside device card */
+.dd-disease-box {
+  background: rgba(255,255,255,0.06);
+  padding: 12px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+  transition: 160ms ease;
+}
+
+.dd-disease-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(56,189,248,0.30);
+}
+
+.dd-disease-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--royal-strong-text);
+}
+
+.dd-disease-score {
+  font-size: 0.8rem;
+  color: var(--royal-soft-text);
+  margin-top: 4px;
+}
+
+/* =========================================
+   9) REASONING CARD (Royal)
+========================================= */
+
+.reason-headline {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 10px;
+  letter-spacing: 0.03em;
+}
+
+.reason-card {
+  background: rgba(255,255,255,0.04);
+  border-radius: 20px;
+  padding: 14px;
+  border: 1px solid rgba(148,163,184,0.15);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+  margin-bottom: 14px;
+}
+
+.reason-item-royal {
+  background: rgba(15,23,42,0.55);
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,0.1);
+  color: #cbd5e1;
+}
+
+.reason-disease-tags {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.disease-tag {
+  background: rgba(56,189,248,0.2);
+  border: 1px solid rgba(56,189,248,0.4);
+  color: #38bdf8;
+  padding: 3px 8px;
+  font-size: 0.78rem;
+  border-radius: 999px;
   font-weight: 600;
   backdrop-filter: blur(6px);
 }
 
+/* Positive features (glass tags) */
+.pos-features-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pos-feature-tag {
+  background: rgba(56,189,248,0.20);
+  border: 1px solid rgba(56,189,248,0.40);
+  color: #38bdf8;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  transition: 0.15s ease;
+}
+
+.pos-feature-tag:hover {
+  transform: scale(1.05);
+}
+
 /* =========================================
-   BELOW THIS: YOUR ORIGINAL STYLES (UNCHANGED)
+   10) CASE PRESENTATION SCENARIO
 ========================================= */
-/* ======== iOS-SMOOTH STEP CHANGE ======== */
-.step-transition-enter {
-  opacity: 0;
-  transform: translateY(6px);
-}
 
-.step-transition-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 180ms ease-out, transform 180ms ease-out;
-}
-
-.step-transition-exit {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.step-transition-exit-active {
-  opacity: 0;
-  transform: translateY(-6px);
-  transition: opacity 150ms ease-in, transform 150ms ease-in;
-}
-.card-ddx,
-.card-reason,
-.card-history {
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 22px;
-  padding: 16px;
-  animation: royalFade 0.25s ease-out;
-}
-.btn-primary {
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  color: #0f172a;
-  font-weight: 700;
-  box-shadow: 0 0 20px rgba(56,189,248,0.45);
-  transition: 150ms ease;
-}
-
-.btn-primary:hover {
-  transform: scale(1.06);
-  box-shadow: 0 0 26px rgba(56,189,248,0.6);
-}
-#caseModal:not(.hidden) .modal-content {
-  animation: modalSlideUp 0.25s ease-out;
-}
-
-@keyframes modalSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.option-row:hover {
-  transform: translateX(-4px);
-  box-shadow: 0 0 16px rgba(56,189,248,0.35);
-}
-/* =============================
-   iPadOS 3-PANEL DASHBOARD
-============================= */
-
-#app {
-  display: grid;
-  grid-template-columns: 1fr 1.1fr 1fr; /* left - center - right */
-  gap: 20px;
+.scenario-block {
+  background: rgba(255,255,255,0.04);
   padding: 20px;
-  margin-top: 90px;
-  height: calc(100dvh - 110px);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 20px;
 }
 
-.panel-left {
-  grid-column: 1 / 2;
+.scenario-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
 }
 
-.panel-center {
-  grid-column: 2 / 3;
+.scenario-text {
+  font-size: 0.95rem;
+  color: #e2e8f0;
+  line-height: 1.5;
+  margin-bottom: 10px;
 }
 
-.panel-right {
-  grid-column: 3 / 4;
+.highlight {
+  color: #38bdf8;
+  font-weight: 600;
 }
 
-/* Make center panel (the questions) elegant glass */
-.panel-center {
-  background: rgba(15,23,42,0.45);
-  border-radius: 20px;
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.07);
-  box-shadow: 0 18px 40px rgba(0,0,0,0.5);
-  overflow: hidden;
+.risk-tag {
+  background: rgba(56,189,248,0.25);
+  padding: 3px 8px;
+  border-radius: 10px;
+  margin-right: 6px;
+  font-size: 0.8rem;
+  color: #38bdf8;
+}
+
+/* =========================================
+   11) CASE PRESENTATION MODAL
+========================================= */
+
+.case-modal {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at top,
+    rgba(15, 23, 42, 0.96),
+    rgba(2, 6, 23, 0.92)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.case-modal.hidden {
+  display: none;
+}
+
+.case-modal-dialog {
+  width: min(640px, 95vw);
+  max-height: 80vh;
+  border-radius: 24px;
+  background: var(--royal-card);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
   display: flex;
   flex-direction: column;
-}
-
-.panel-left,
-.panel-right {
-  background: rgba(15,23,42,0.25);
-  border-radius: 20px;
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.05);
-  padding: 16px;
-  overflow-y: auto;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-}
-.glass-card {
-  background: rgba(255,255,255,0.05);
-  border-radius: 18px;
   padding: 14px;
-  backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.45);
-  margin-bottom: 16px;
-  animation: royalFade 0.23s ease;
-}
-.question-fade {
-  animation: fadeQ 0.25s ease-out;
+  border: 1px solid rgba(148,163,184,0.35);
 }
 
-@keyframes fadeQ {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.modal-content {
-  border-radius: 24px;
-  background: rgba(15,23,42,0.65);
-  backdrop-filter: blur(20px) saturate(170%);
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-#caseModal:not(.hidden) .modal-content {
-  animation: sheetUp 0.28s cubic-bezier(.16,1,.3,1);
-}
-
-@keyframes sheetUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-/* ========== PROGRESS BAR ========== */
-#progressBarContainer {
-  position: fixed;
-  top: 60px;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: rgba(30,41,59,0.5);
-  z-index: 200;
-}
-
-#progressBar {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #38bdf8, #0ea5e9);
-  transition: width 0.25s ease-out;
-}
-.question-glow {
-  animation: glowPulse 0.8s ease-out;
-}
-
-@keyframes glowPulse {
-  0% { box-shadow: 0 0 0 rgba(56,189,248,0); }
-  40% { box-shadow: 0 0 20px rgba(56,189,248,0.35); }
-  100% { box-shadow: 0 0 0 rgba(56,189,248,0); }
-}
-.btn:active {
-  transform: translateY(2px) scale(0.97);
-  filter: brightness(0.92);
-}
-.ddx-refresh {
-  animation: ddxFade 0.25s ease-out;
-}
-
-@keyframes ddxFade {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-#btnStart {
-  background: linear-gradient(135deg,#38bdf8,#0ea5e9);
-  border-radius: 50px;
-  padding: 14px 36px;
-  font-size: 1.1rem;
-  color: #0f172a;
-  border: none;
-  font-weight: 700;
-  transition: 180ms;
-}
-
-#btnStart:hover {
-  transform: scale(1.07);
-  box-shadow: 0 0 20px rgba(56,189,248,0.6);
-}
-.hint-box {
-  margin-top: 12px;
+.case-modal-header {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-strong);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+.case-modal-title {
+  font-size: 0.95rem;
+  color: var(--royal-primary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.case-modal-close {
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.case-modal-close:hover {
+  color: var(--text-main);
+}
+
+.case-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 2px;
+}
+
+.case-section {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(148,163,184,0.25);
+}
+
+.case-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--royal-secondary);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.case-section-line {
+  font-size: 0.86rem;
+  color: var(--royal-strong-text);
+}
+
+.case-modal-footer {
+  border-top: 1px solid var(--border-strong);
+  padding-top: 6px;
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
   gap: 8px;
 }
 
-.hint {
-  padding: 6px 12px;
-  background: rgba(56,189,248,0.15);
-  border: 1px solid rgba(56,189,248,0.4);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.15s;
+.case-modal-footer .btn {
+  font-size: 0.85rem;
+}
+/* =========================================
+   12) ANIMATIONS (Royal Fade)
+========================================= */
+
+.fade-in {
+  animation: fadeInStep 0.18s ease-out;
 }
 
-.hint:hover {
-  background: rgba(56,189,248,0.3);
-  transform: scale(1.06);
-}
-@keyframes bgMove {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
+@keyframes fadeInStep {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-body {
-  background: linear-gradient(140deg,#020617,#0a0f24,#000000);
-  background-size: 300% 300%;
-  animation: bgMove 20s ease infinite;
+/* Royal Fade for cards */
+@keyframes royalFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-royal {
+  animation: royalFade 0.22s ease-out;
+}
+
+/* =========================================
+   13) RESPONSIVE DESIGN
+========================================= */
+
+/* ————— Tablets & Mobile ————— */
+@media (max-width: 768px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "history"
+      "ddx"
+      "reason";
+    height: auto;
+    margin-top: 76px;
+  }
+
+  body {
+    overflow: auto; /* خلي الصفحة تسوي scroll على الموبايل */
+  }
+
+  .controls-row {
+    position: relative;
+    border-radius: 12px;
+  }
+}
+
+/* ————— Small Screens ————— */
+@media (max-width: 640px) {
+  .app-header {
+    padding: 10px 12px;
+  }
+
+  .app-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .app-layout {
+    padding: 0 8px 8px;
+  }
+
+  .card {
+    border-radius: 18px;
+    padding: 10px;
+  }
+
+  .question-text {
+    font-size: 0.95rem;
+  }
+
+  .device-card {
+    max-height: 220px;
+  }
+
+  .btn {
+    font-size: 0.78rem;
+    padding: 6px 10px;
+  }
+}
+body.lang-en .question-text {
+    direction: ltr !important;
+    text-align: left !important;
+}
+.reason-text {
+  font-size: 0.82rem !important;   /* أصغر */
+  color: #cbd5e1 !important;       /* أفتح من العنوان */
+  line-height: 1.45;
+}
+.reason-text strong,
+.reason-text .critical {
+  color: #f87171 !important;       /* أحمر طبي واضح */
+  font-weight: 700;
+}
+.reason-text span.danger {
+  color: #fb923c !important;       /* برتقالي تحذيري */
+  font-weight: 600;
+}
+.disease-tag {
+  background: rgba(239,68,68,0.15);   /* أحمر فاتح */
+  border: 1px solid rgba(239,68,68,0.35);
+  color: #ef4444 !important;          /* أحمر قوي */
+  font-weight: 600;
 }

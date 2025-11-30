@@ -1,66 +1,60 @@
 // ========================================
-// chest-engine-config.js  (CLEAN VERSION)
-// Connects CHEST_DATA_MASTER → ENGINE
+// chest-engine-config.js
+// Loads sections, steps, diagnoses, and base mappings
 // ========================================
 
 "use strict";
 
 (function (global) {
 
-  const Data = global.CHEST_DATA_MASTER;
-
+  const Data = global.ChestData;
   if (!Data) {
-    console.error("❌ FATAL: CHEST_DATA_MASTER not loaded.");
+    console.error("ChestData is not loaded.");
     return;
   }
 
-  // ----------------------------------------
-  // 1) Load All Sections From All Data Files
-  // ----------------------------------------
-  const ALL_SECTIONS = [
-    ...Data.main,
-    ...Data.personal,
-    ...Data.hpi,
-    ...Data.ros,
-    ...Data.background,
-    ...Data.peds
-  ];
+  // -----------------------------
+  // 1) SECTIONS (as provided by ChestData)
+  // -----------------------------
+  const SECTIONS = Data.sections || [];
 
-  // ----------------------------------------
-  // 2) Flatten all steps into a single list
-  // ----------------------------------------
-  const ALL_STEPS = [];
-  ALL_SECTIONS.forEach((section) => {
-    if (section.steps && Array.isArray(section.steps)) {
-      section.steps.forEach((step) => {
-        ALL_STEPS.push(step);
-      });
-    }
+  // -----------------------------
+  // 2) Build STEPS (Flattened)
+  // -----------------------------
+  const STEPS = [];
+  SECTIONS.forEach((sec) => {
+    (sec.steps || []).forEach((st) => {
+      // Ensure each step inherits section data
+      st.sectionId = st.sectionId || sec.id;
+      st.sectionLabel = st.sectionLabel || sec.label || "";
+      STEPS.push(st);
+    });
   });
 
-  // ----------------------------------------
-  // 3) Diagnoses List
-  // ----------------------------------------
-  const DIAGNOSES = Data.dxList || [];
-  const DIAG_GROUPS = Data.dxGroups || {};
+  // -----------------------------
+  // 3) Diagnoses List & Pretty Names
+  // -----------------------------
+  const DIAGNOSES = Data.diagnoses || [];
 
-  // Pretty name mapping
-  const DX_PRETTY = {};
+  const PRETTY_NAME = {};
   DIAGNOSES.forEach((dx) => {
-    DX_PRETTY[dx.id] = dx.label || dx.id;
+    PRETTY_NAME[dx.id] = dx.label || dx.id;
   });
 
-  // ----------------------------------------
-  // 4) Export to Global ENGINE
-  // ----------------------------------------
-  global.CHEST_ENGINE_CONFIG = {
-    sections: ALL_SECTIONS,
-    steps: ALL_STEPS,
-    diagnoses: DIAGNOSES,
-    dxGroups: DIAG_GROUPS,
-    dxPretty: DX_PRETTY
-  };
+  // -----------------------------
+  // 4) Diagnosis Groups (Colors / Order / UI Grouping)
+  // -----------------------------
+  const DX_GROUPS = Data.dxGroups || {};
 
-  console.log("✅ ENGINE CONFIG LOADED");
+  // -----------------------------
+  // 5) Expose config globally
+  // -----------------------------
+  global.ChestConfig = {
+    SECTIONS,
+    STEPS,
+    DIAGNOSES,
+    PRETTY_NAME,
+    DX_GROUPS
+  };
 
 })(window);

@@ -5,85 +5,133 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Focus History</title>
 
+  <!-- CSS (ضع style.css بنفس الفولدر) -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <!-- ========== HEADER ========== -->
+  <!-- ===========================
+       HEADER
+  ============================ -->
   <header class="app-header">
     <h1>FOCUS HISTORY</h1>
-    <button class="btn-start" id="btnStart">ابدأ</button>
+    <p class="app-subtitle"></p> <!-- نفس النقطة اللي بالصورة -->
+
+    <button class="lang-toggle">التبديل إلى English</button>
   </header>
 
-  <!-- ========== MAIN 3-PANEL LAYOUT ========== -->
-  <div class="app-layout">
+  <!-- ===========================
+       MAIN 3-CARD LAYOUT
+  ============================ -->
+  <main class="app-layout">
 
-      <!-- HISTORY PANEL -->
-      <div class="card card-history">
-        <div id="app"></div>
+    <!-- ========== CARD 1: DDx ========== -->
+    <section class="card card-ddx">
+      <header class="card-header">
+        <h2 class="card-title">DIFFERENTIAL DIAGNOSIS</h2>
+      </header>
+      <div id="ddxContainer" class="card-body ddx-body">
+        <p class="dd-empty">Start answering questions to build the DDx.</p>
+      </div>
+    </section>
+
+    <!-- ========== CARD 2: Clinical Reasoning ========== -->
+    <section class="card card-reason">
+      <header class="card-header">
+        <h2 class="card-title">CLINICAL REASONING</h2>
+      </header>
+
+      <div class="card-body">
+        <div id="reasonQuestion" class="reason-title">
+          Select an option to see clinical reasoning.
+        </div>
+        <ul id="reasonList" class="reason-list"></ul>
+      </div>
+    </section>
+
+    <!-- ========== CARD 3: Questions ========== -->
+    <section class="card card-history">
+      <header class="card-header card-header--question">
+        <span id="sectionLabel" class="section-label">Section</span>
+        <span id="sectionStepCounter" class="section-step-counter"></span>
+      </header>
+
+      <div class="card-body">
+
+        <div id="stepCounter" class="step-counter"></div>
+
+        <!-- السؤال بالعربي -->
+        <div id="questionText" class="question-text" dir="rtl"></div>
+
+        <!-- validation -->
+        <div id="validationMessage" class="validation-message" dir="ltr"></div>
+
+        <!-- الخيارات -->
+        <div id="optionsContainer" class="options-container" dir="rtl"></div>
+
       </div>
 
-      <!-- DDX PANEL -->
-      <div class="card card-ddx">
-        <div id="ddxContainer"></div>
-      </div>
+      <footer class="card-footer">
+        <div class="controls-row">
+          <button id="btnPrev"  class="btn btn-secondary">Previous</button>
+          <button id="btnNext"  class="btn btn-primary">Next</button>
+          <button id="btnReset" class="btn btn-secondary">Reset</button>
+          <button id="btnPrint" class="btn btn-secondary">Print</button>
+        </div>
+      </footer>
+    </section>
 
-      <!-- REASONING PANEL -->
-      <div class="card card-reason">
-        <div id="reasonContainer"></div>
-      </div>
+  </main>
 
-  </div>
+  <!-- ===========================
+       CASE MODAL
+  ============================ -->
+  <div id="caseModal" class="case-modal hidden">
+    <div class="case-modal-backdrop"></div>
 
-  <!-- ========== CASE SUMMARY MODAL ========== -->
-  <div id="caseModal" class="modal hidden">
-    <div class="modal-content">
-      <span id="caseModalClose" class="modal-close">×</span>
-      <div id="caseModalContent"></div>
+    <div class="case-modal-dialog">
+      <header class="case-modal-header">
+        <h2>Case Presentation</h2>
+        <button id="caseModalClose" class="case-modal-close">&times;</button>
+      </header>
 
-      <button id="caseModalCopy" class="btn-copy">Copy Case</button>
-      <button id="caseModalClose2" class="btn-close">Close</button>
+      <div id="caseModalContent" class="case-modal-content"></div>
+
+      <footer class="case-modal-footer">
+        <button id="caseModalCopy"  class="btn btn-secondary">Copy</button>
+        <button id="caseModalClose2" class="btn btn-primary">Close</button>
+      </footer>
     </div>
   </div>
 
-  <!-- ========== SCRIPT ORDER (IMPORTANT) ========== -->
+  <!-- ===========================
+       SCRIPTS  (بدون مجلدات)
+  ============================ -->
 
-  <!-- ID helpers -->
+    <!-- DATA -->
   <script src="chest-ids.js"></script>
-
-  <!-- DATA FILES -->
   <script src="main-data.js"></script>
-  <script src="chest-data-main.js"></script>
   <script src="chest-data-personal.js"></script>
   <script src="chest-data-hpi.js"></script>
   <script src="chest-data-ros.js"></script>
   <script src="chest-data-background.js"></script>
   <script src="chest-data-peds.js"></script>
-  <script src="chest-data-dx.js"></script>
+  <script src="chest-data-main.js"></script>
 
-  <!-- ENGINE ORDER -->
+  <!-- ENGINE -->
   <script src="chest-engine-config.js"></script>
   <script src="chest-engine-state.js"></script>
-  <script src="chest-engine-core.js"></script>
+  <script src="chest-engine-scoring.js"></script>
   <script src="chest-engine-recompute.js"></script>
   <script src="chest-engine-output.js"></script>
+  <script src="chest-engine-core.js"></script>
 
-  <!-- UI LAYER -->
+  <!-- UI -->
   <script src="chest-ui-core.js"></script>
   <script src="chest-ui-ddx.js"></script>
   <script src="chest-ui-reasoning.js"></script>
+  <script src="chest-ui-options.js"></script>
   <script src="chest-ui-case-modal.js"></script>
-
-  <!-- ========== START APP (FULL BOOT) ========== -->
-  <script>
-    document.getElementById("btnStart").onclick = function () {
-      CHEST_ENGINE.init();
-
-      if (window.CHEST_UI_DDX) CHEST_UI_DDX.render();
-      if (window.CHEST_UI_REASONING) CHEST_UI_REASONING.render();
-    };
-  </script>
-
 </body>
 </html>
