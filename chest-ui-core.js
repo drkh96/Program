@@ -119,7 +119,7 @@ window._uiEngine = engine;
 
     // Global progress
     const prog = engine.getProgressInfo();
-    elStepCounter.textContent = "";
+    elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
 
     // Section label + per-section progress
     elSectionLabel.textContent = step.sectionLabel || "";
@@ -128,12 +128,11 @@ window._uiEngine = engine;
       (s) => s.sectionId === step.sectionId
     );
     const indexInSection = stepsInSection.findIndex((s) => s.id === step.id) + 1;
-    elSectionStepCtr.textContent = `${step.sectionLabel || ""} — Question ${indexInSection}/${stepsInSection.length}`;
+    elSectionStepCtr.textContent = step.sectionLabel || "";
 
     // Question text (Arabic, RTL)
     elQuestionText.textContent = (appLang === "en" ? step.questionEn : step.question) || "";
 elQuestionText.setAttribute("dir", appLang === "en" ? "ltr" : "rtl");
-    elQuestionText.setAttribute("dir", "rtl");
 
     // Render options via UIOptions module
     if (window.UIOptions && typeof window.UIOptions.renderOptions === "function") {
