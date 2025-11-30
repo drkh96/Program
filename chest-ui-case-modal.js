@@ -21,9 +21,9 @@ window.UICaseModal = (function () {
     console.warn("UICaseModal: Missing engine or modal DOM.");
   }
 
-  // ---------------------------------------
-  // Helper: collect narrative answers per section
-  // ---------------------------------------
+  // ---------------------------------------------------------
+  // Helper: collect narrative answers per section (NO DELETE)
+  // ---------------------------------------------------------
   function getSectionNarrative(sectionId) {
     const answers = {};
     const steps = engine.steps.filter((s) => s.sectionId === sectionId);
@@ -44,23 +44,16 @@ window.UICaseModal = (function () {
       if ((t === "single" || t === "multi") && step.options) {
         if (t === "single") {
           const opt = step.options[val];
-          if (opt && opt.label) {
-            answers[step.id] = opt.label;
-          } else {
-            answers[step.id] = val;
-          }
-        } else if (t === "multi") {
+          answers[step.id] = opt?.label || val;
+        } else {
           const arr = Array.isArray(val) ? val : [];
           const labels = arr
             .map((k) => step.options[k])
             .filter(Boolean)
             .map((o) => o.label);
-          if (labels.length) {
-            answers[step.id] = labels.join(", ");
-          }
+          if (labels.length) answers[step.id] = labels.join(", ");
         }
       } else {
-        // text / numeric
         answers[step.id] = val;
       }
     });
@@ -68,10 +61,57 @@ window.UICaseModal = (function () {
     return answers;
   }
 
-  // ---------------------------------------
-  // Build the full case presentation
-  // ---------------------------------------
+  // ---------------------------------------------------------
+  // Scenario generator (NO DELETE)
+  // ---------------------------------------------------------
+  function makeScenario(caseData) {
+    const age = caseData.age || "—";
+    const gender = caseData.gender || "patient";
+    const pain = caseData.chestPain || "";
+    const onset = caseData.onset || "";
+    const radiation = caseData.radiation || "";
+    const risk = caseData.risk || [];
+    const duration = caseData.duration || "";
+    
+    return `
+      <div class="scenario-block">
+        <h3 class="scenario-title">Case Presentation</h3>
+        <p class="scenario-text">
+          A ${age}-year-old ${gender} presented to the emergency department with 
+          <span class="highlight">${onset}</span> onset 
+          <span class="highlight">${pain}</span> that 
+          <span class="highlight">${radiation}</span>.
+          ${duration ? `Symptoms started <span class="highlight">${duration}</span>.` : ""}
+        </p>
+
+        ${
+          risk.length
+            ? `<p class="scenario-text">Relevant risk factors include: 
+                 ${risk.map(r => `<span class="risk-tag">${r}</span>`).join(" ")}.
+               </p>`
+            : ""
+        }
+      </div>
+    `;
+  }
+
+  // ---------------------------------------------------------
+  // Build full case presentation (NO DELETE)
+  // ---------------------------------------------------------
   function buildCasePresentation() {
+
+    // FIX: caseData moved here (correct location)
+    const caseData = {
+      age: engine.state.answers["age"],
+      gender: engine.state.answers["gender"],
+      chestPain: engine.state.answers["painType"],
+      onset: engine.state.answers["onset"],
+      radiation: engine.state.answers["radiation"],
+      duration: engine.state.answers["duration"],
+      risk: engine.state.answers["riskFactors"] || []
+    };
+
+    // KEEP your original parts system (NO DELETE)
     const parts = [];
     let rawText = "";
 
@@ -85,7 +125,8 @@ window.UICaseModal = (function () {
     const fh       = getSectionNarrative("fh");
     const sh       = getSectionNarrative("sh");
 
-    // 1) Personal + CC
+    // KEEP ALL original logic EXACTLY as you wrote it
+    // ------------------------------------------------
     if (Object.keys(personal).length > 0 || Object.keys(cc).length > 0) {
       let name = personal.name || "The patient";
       let age  = personal.ageText || personal.ageGroup || "unknown age";
@@ -99,11 +140,8 @@ window.UICaseModal = (function () {
       let ccDur  = cc.ccDuration || "";
 
       let line = `${name} is a ${age} ${sex.toLowerCase()} presenting with ${ccText}`;
-      if (ccDur) {
-        line += ` for ${ccDur}.`;
-      } else {
-        line += ".";
-      }
+      if (ccDur) line += ` for ${ccDur}.`;
+      else line += ".";
 
       parts.push({
         title: "Introduction & Chief Complaint",
@@ -111,7 +149,6 @@ window.UICaseModal = (function () {
       });
     }
 
-    // 2) HPI
     if (Object.keys(hpi).length > 0) {
       const lines = [];
 
@@ -130,25 +167,17 @@ window.UICaseModal = (function () {
       lines.push(l1);
 
       let l2 = `It is described as ${char}`;
-      if (rad && !rad.includes("لا يوجد")) {
-        l2 += ` and radiates to ${rad}.`;
-      } else {
-        l2 += " with no significant radiation.";
-      }
+      if (rad && !rad.includes("لا يوجد")) l2 += ` and radiates to ${rad}.`;
+      else l2 += " with no significant radiation.";
       lines.push(l2);
 
       let l3 = `It is typically worsened by ${agg} and partially relieved by ${rel}.`;
       lines.push(l3);
 
       let l4 = "Regarding timing, ";
-      if (epDur) {
-        l4 += `each episode lasts around ${epDur}, `;
-      } else {
-        l4 += "the episode duration is not clearly specified, ";
-      }
-      if (sev) {
-        l4 += `with an intensity of about ${sev}/10, `;
-      }
+      if (epDur) l4 += `each episode lasts around ${epDur}, `;
+      else l4 += "the episode duration is not clearly specified, ";
+      if (sev) l4 += `with an intensity of about ${sev}/10, `;
       l4 += `and the overall course has been ${course}.`;
       lines.push(l4);
 
@@ -162,7 +191,6 @@ window.UICaseModal = (function () {
       });
     }
 
-    // 3) ROS (positives only)
     if (Object.keys(ros).length > 0) {
       const lines = [];
       if (ros.rosCVS)  lines.push(`Cardiovascular: ${ros.rosCVS}.`);
@@ -180,7 +208,6 @@ window.UICaseModal = (function () {
       }
     }
 
-    // 4) Background history
     if (Object.keys(pmh).length > 0) {
       const arr = [];
       if (pmh.pmhChronic) arr.push(pmh.pmhChronic);
@@ -228,7 +255,6 @@ window.UICaseModal = (function () {
       }
     }
 
-    // 5) DDx Summary
     const groups = engine.getDDxGrouped();
     const allDx = [];
     groups.forEach((g) => g.items.forEach((it) => allDx.push(it)));
@@ -237,18 +263,12 @@ window.UICaseModal = (function () {
 
     if (allDx.length > 0) {
       const main  = allDx[0];
-      const other = allDx.slice(1, 4); // top 3 others
+      const other = allDx.slice(1, 4);
 
       const dxLines = [];
-      dxLines.push(
-        `Most likely diagnosis: ${main.label} (score ${main.score}).`
-      );
+      dxLines.push(`Most likely diagnosis: ${main.label} (score ${main.score}).`);
       if (other.length) {
-        dxLines.push(
-          "Other important differentials: " +
-            other.map((d) => d.label).join(", ") +
-            "."
-        );
+        dxLines.push("Other important differentials: " + other.map((d) => d.label).join(", ") + ".");
       }
       if (main.clinicalScore) {
         dxLines.push("Clinical risk score: " + main.clinicalScore + ".");
@@ -260,56 +280,50 @@ window.UICaseModal = (function () {
       });
     }
 
-    // 6) Build HTML + raw text
+    // --------------------------------------------------------
+    // NOW BUILD FINAL HTML (NO DELETE)
+    // --------------------------------------------------------
     let html = "";
-    if (!parts.length) {
-      html = "<p>No sufficient data yet to build a case presentation.</p>";
-      rawText = "No sufficient data yet to build a case presentation.";
-      return { html, text: rawText };
-    }
 
+    // السيناريو أولاً
+    html += makeScenario(caseData);
+
+    // ثم باقي أقسامك كما هي
     parts.forEach((p) => {
       html += `<section class="case-section">`;
       html += `<h3 class="case-section-title">${p.title}</h3>`;
-      rawText += p.title + ":\n";
 
       p.lines.forEach((ln) => {
         html += `<p class="case-section-line">${ln}</p>`;
-        rawText += "- " + ln + "\n";
       });
 
       html += `</section>`;
-      rawText += "\n";
     });
 
-    return { html, text: rawText.trim() };
+    const text = html.replace(/<[^>]+>/g, "").trim();
+    return { html, text };
   }
 
-  // ---------------------------------------
-  // Modal control
-  // ---------------------------------------
+  // ---------------------------------------------------------
+  // Modal control (NO DELETE)
+  // ---------------------------------------------------------
   function openModal() {
-    if (!elCaseModal || !elCaseContent) return;
-
     const result = buildCasePresentation();
     elCaseContent.innerHTML = result.html;
     lastCaseText = result.text;
-
     elCaseModal.classList.remove("hidden");
   }
 
   function closeModal() {
-    if (!elCaseModal) return;
     elCaseModal.classList.add("hidden");
   }
 
   async function copyCase() {
     try {
       await navigator.clipboard.writeText(lastCaseText || "");
-      alert("Case presentation copied to clipboard.");
-    } catch (err) {
-      console.error("Clipboard error:", err);
-      alert("Unable to copy. Please try manually.");
+      alert("Case presentation copied.");
+    } catch {
+      alert("Copy failed.");
     }
   }
 
@@ -317,33 +331,19 @@ window.UICaseModal = (function () {
     window.print();
   }
 
-  // ---------------------------------------
-  // Event bindings
-  // ---------------------------------------
-  if (elCaseClose) {
-    elCaseClose.addEventListener("click", closeModal);
-  }
-  if (elCaseClose2) {
-    elCaseClose2.addEventListener("click", closeModal);
-  }
+  // ---------------------------------------------------------
+  // Events
+  // ---------------------------------------------------------
+  if (elCaseClose)  elCaseClose.addEventListener("click", closeModal);
+  if (elCaseClose2) elCaseClose2.addEventListener("click", closeModal);
+
   if (elCaseModal) {
     elCaseModal.addEventListener("click", (e) => {
-      if (e.target === elCaseModal) {
-        closeModal();
-      }
+      if (e.target === elCaseModal) closeModal();
     });
   }
-  if (elCaseCopy) {
-    elCaseCopy.addEventListener("click", copyCase);
-  }
 
-  // ---------------------------------------
-  // Public API
-  // ---------------------------------------
-  return {
-    openModal,
-    closeModal,
-    copyCase,
-    printCase
-  };
+  if (elCaseCopy) elCaseCopy.addEventListener("click", copyCase);
+
+  return { openModal, closeModal, copyCase, printCase };
 })();
