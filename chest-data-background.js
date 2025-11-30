@@ -6,7 +6,21 @@
 
 "use strict";
 
+// --------------------------------------------------
+// FIXED → Define dxB() and rB() globally for this file
+// --------------------------------------------------
+function dxB(ids) {
+  return ids || [];
+}
+
+function rB(text, diseases) {
+  return { text, diseases: diseases || [] };
+}
+
 window.CHEST_SECTIONS_BACKGROUND = [
+  // ==============================
+  // Past Medical History (PMH)
+  // ==============================
   {
     id: "pmh",
     label: "Past Medical History",
@@ -18,13 +32,14 @@ window.CHEST_SECTIONS_BACKGROUND = [
         sectionLabel: "PMH",
         sectionLabelEn: "PMH",
         question: "هل لدى المريض أمراض مزمنة؟ (اختر كل ما ينطبق)",
-        questionEn: "Does the patient have any chronic medical conditions? (select all that apply)",
+        questionEn:
+          "Does the patient have any chronic medical conditions? (select all that apply)",
         type: "multi",
         required: false,
         visibleWhen: {
           all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
+            { stepId: "department", equals: "internal" },
+            { stepId: "system", equals: "cvs" },
             { stepId: "mainSymptom", equals: "chestPain" }
           ]
         },
@@ -72,7 +87,7 @@ window.CHEST_SECTIONS_BACKGROUND = [
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "A history of MI or coronary intervention makes current chest pain very likely to be cardiac in origin.",
+                "A history of MI or coronary intervention makes current chest pain very likely to be cardiac.",
                 ["IHD", "MI", "ACS"]
               )
             ]
@@ -96,7 +111,7 @@ window.CHEST_SECTIONS_BACKGROUND = [
             dxRemove: dxB(["IHD", "HF", "PEMajor"]),
             reasoning: [
               rB(
-                "Absence of major chronic diseases reduces the burden of cardiac and thrombotic risk factors.",
+                "Absence of major chronic diseases reduces the burden of cardiac/thrombotic risk.",
                 ["IHD", "HF", "PEMajor"]
               )
             ]
@@ -106,6 +121,9 @@ window.CHEST_SECTIONS_BACKGROUND = [
     ]
   },
 
+  // ==============================
+  // Past Surgical History (PSH)
+  // ==============================
   {
     id: "psh",
     label: "Past Surgical History",
@@ -124,8 +142,8 @@ window.CHEST_SECTIONS_BACKGROUND = [
         required: false,
         visibleWhen: {
           all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
+            { stepId: "department", equals: "internal" },
+            { stepId: "system", equals: "cvs" },
             { stepId: "mainSymptom", equals: "chestPain" }
           ]
         },
@@ -137,31 +155,31 @@ window.CHEST_SECTIONS_BACKGROUND = [
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Recent major surgery with reduced mobility is a major risk factor for DVT and pulmonary embolism.",
+                "Recent major surgery with reduced mobility increases risk of DVT/PE.",
                 ["PEMajor", "DVT"]
               )
             ]
           },
           prolongedImmobilisation: {
-            label: "عدم حركة لأكثر من 3 أيام (سرير/جبيرة)",
-            labelEn: "Prolonged immobilisation >3 days (bed-bound or cast)",
+            label: "عدم حركة لأكثر من 3 أيام",
+            labelEn: "Prolonged immobilisation >3 days",
             dxAdd: dxB(["DVT", "PEMajor"]),
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Prolonged immobilisation increases venous stasis and risk of DVT and subsequent PE.",
+                "Prolonged immobilisation causes venous stasis and raises DVT/PE risk.",
                 ["DVT", "PEMajor"]
               )
             ]
           },
           noPSH: {
-            label: "لا توجد عمليات كبرى أو عدم حركة مهم",
+            label: "لا توجد عمليات أو عدم حركة مهم",
             labelEn: "No major surgery or significant immobilisation",
             dxAdd: dxB([]),
             dxRemove: dxB(["DVT", "PEMajor"]),
             reasoning: [
               rB(
-                "Absence of recent surgery or immobilisation lowers the probability of provoked DVT/PE.",
+                "Absence of surgical/immobilisation history lowers probability of provoked PE/DVT.",
                 ["DVT", "PEMajor"]
               )
             ]
@@ -171,6 +189,9 @@ window.CHEST_SECTIONS_BACKGROUND = [
     ]
   },
 
+  // ==============================
+  // Drug History (DH)
+  // ==============================
   {
     id: "dh",
     label: "Drug History",
@@ -181,76 +202,73 @@ window.CHEST_SECTIONS_BACKGROUND = [
         sectionId: "dh",
         sectionLabel: "DH",
         sectionLabelEn: "DH",
-        question: "ما الأدوية التي يتناولها المريض بانتظام؟",
+        question: "ما الأدوية التي يتناولها المريض؟",
         questionEn: "Which medications does the patient take regularly?",
         type: "multi",
         required: false,
         visibleWhen: {
           all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
+            { stepId: "department", equals: "internal" },
+            { stepId: "system", equals: "cvs" },
             { stepId: "mainSymptom", equals: "chestPain" }
           ]
         },
         options: {
           aspirin: {
             label: "أسبرين / مضادات صفائح",
-            labelEn: "Aspirin / antiplatelet agents",
+            labelEn: "Aspirin / antiplatelets",
             dxAdd: dxB([]),
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Use of aspirin or antiplatelets often indicates known ischemic heart disease.",
+                "Use of antiplatelets may indicate underlying ischemic heart disease.",
                 ["IHD", "MI"]
               )
             ]
           },
           anticoagulant: {
-            label: "مضادات تخثر (Warfarin / DOAC)",
-            labelEn: "Anticoagulants (warfarin / DOAC)",
+            label: "مضادات تخثر",
+            labelEn: "Anticoagulants",
             dxAdd: dxB([]),
             dxRemove: dxB(["PEMajor", "DVT"]),
             reasoning: [
               rB(
-                "Therapeutic anticoagulation reduces the probability of a new DVT/PE, although it does not completely exclude it.",
+                "Anticoagulation reduces risk of thromboembolism but does not fully exclude it.",
                 ["PEMajor", "DVT"]
               )
             ]
           },
           ocp: {
-            label: "حبوب منع الحمل (OCP)",
+            label: "حبوب منع الحمل",
             labelEn: "Oral contraceptive pills",
             dxAdd: dxB(["DVT", "PEMajor"]),
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Combined oral contraceptives are a well-known risk factor for venous thromboembolism.",
+                "OCPs increase the risk of venous thromboembolism.",
                 ["DVT", "PEMajor"]
               )
             ]
           },
           steroids: {
-            label: "ستيرويدات / أدوية مثبطة للمناعة",
-            labelEn: "Steroids / immunosuppressive drugs",
+            label: "ستيرويدات / مثبطات مناعة",
+            labelEn: "Steroids / immunosuppressants",
             dxAdd: dxB(["Infection"]),
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Immunosuppression increases susceptibility to infections, including pneumonia and systemic sepsis.",
+                "Immunosuppression increases risk of severe infections.",
                 ["Infection"]
               )
             ]
           },
           noDrugs: {
-            label: "لا يتناول أدوية مزمنة مهمة",
-            labelEn: "No significant chronic medications",
+            label: "لا توجد أدوية مهمة",
+            labelEn: "No significant medications",
             dxAdd: dxB([]),
             dxRemove: dxB([]),
             reasoning: [
-              rB(
-                "Absence of chronic medication does not strongly modify risk, but suggests fewer known chronic conditions.",
-                []
-              )
+              rB("Absence of medications gives little diagnostic weight.", [])
             ]
           }
         }
@@ -258,6 +276,9 @@ window.CHEST_SECTIONS_BACKGROUND = [
     ]
   },
 
+  // ==============================
+  // Family History (FH)
+  // ==============================
   {
     id: "fh",
     label: "Family History",
@@ -274,32 +295,32 @@ window.CHEST_SECTIONS_BACKGROUND = [
         required: false,
         visibleWhen: {
           all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
+            { stepId: "department", equals: "internal" },
+            { stepId: "system", equals: "cvs" },
             { stepId: "mainSymptom", equals: "chestPain" }
           ]
         },
         options: {
           prematureIHD: {
-            label: "إصابة قلبية (IHD/MI) في عمر مبكر ضمن العائلة",
-            labelEn: "Premature IHD/MI in a first-degree relative",
+            label: "إصابة قلبية مبكرة بالعائلة",
+            labelEn: "Premature IHD/MI in family",
             dxAdd: dxB(["IHD", "MI"]),
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Premature coronary disease in first-degree relatives suggests a genetic predisposition to IHD.",
+                "Family history of premature IHD suggests genetic predisposition.",
                 ["IHD", "MI"]
               )
             ]
           },
           suddenDeath: {
-            label: "وفاة مفاجئة غير مفسّرة في أحد الأقارب",
-            labelEn: "Unexplained sudden death in a relative",
+            label: "وفاة مفاجئة غير مفسّرة",
+            labelEn: "Unexplained sudden death in family",
             dxAdd: dxB(["Arrhythmia"]),
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Unexplained sudden death in the family may indicate inherited cardiomyopathy or channelopathy causing arrhythmia.",
+                "Sudden unexplained death suggests inherited arrhythmia disorders.",
                 ["Arrhythmia"]
               )
             ]
@@ -311,7 +332,7 @@ window.CHEST_SECTIONS_BACKGROUND = [
             dxRemove: dxB(["IHD"]),
             reasoning: [
               rB(
-                "Lack of positive family history reduces hereditary contribution to ischemic heart disease risk.",
+                "Absence of family history reduces hereditary cardiac risk.",
                 ["IHD"]
               )
             ]
@@ -321,6 +342,9 @@ window.CHEST_SECTIONS_BACKGROUND = [
     ]
   },
 
+  // ==============================
+  // Social History (SH)
+  // ==============================
   {
     id: "sh",
     label: "Social History",
@@ -332,13 +356,14 @@ window.CHEST_SECTIONS_BACKGROUND = [
         sectionLabel: "SH",
         sectionLabelEn: "SH",
         question: "ما هي العادات ونمط الحياة؟ (اختر كل ما ينطبق)",
-        questionEn: "What are the patient's habits and lifestyle? (select all that apply)",
+        questionEn:
+          "What are the patient's habits and lifestyle? (select all that apply)",
         type: "multi",
         required: false,
         visibleWhen: {
           all: [
-            { stepId: "department",  equals: "internal" },
-            { stepId: "system",      equals: "cvs" },
+            { stepId: "department", equals: "internal" },
+            { stepId: "system", equals: "cvs" },
             { stepId: "mainSymptom", equals: "chestPain" }
           ]
         },
@@ -350,7 +375,7 @@ window.CHEST_SECTIONS_BACKGROUND = [
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Current smoking is a major risk factor for ischemic heart disease, MI, and chronic lung disease.",
+                "Current smoking is a major risk factor for IHD, MI, and chronic lung disease.",
                 ["IHD", "MI", "COPD"]
               )
             ]
@@ -362,7 +387,7 @@ window.CHEST_SECTIONS_BACKGROUND = [
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "A history of smoking remains a cardiovascular and respiratory risk factor, although less than active smoking.",
+                "Ex-smokers still carry elevated cardiovascular risk.",
                 ["IHD", "COPD"]
               )
             ]
@@ -374,31 +399,31 @@ window.CHEST_SECTIONS_BACKGROUND = [
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Low physical activity contributes to cardiovascular risk and predisposes to heart failure.",
+                "Sedentary lifestyle contributes to cardiovascular risk and HF.",
                 ["IHD", "HF"]
               )
             ]
           },
           highStress: {
-            label: "ضغوط نفسية عالية / عمل مرهق",
-            labelEn: "High psychological stress / demanding job",
+            label: "ضغوط نفسية عالية",
+            labelEn: "High psychological stress",
             dxAdd: dxB(["Anxiety", "IHD"]),
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "High stress may trigger panic attacks and is also associated with increased cardiac risk.",
+                "High stress may trigger panic attacks and worsen cardiac ischemia.",
                 ["Anxiety", "IHD"]
               )
             ]
           },
           noSH: {
-            label: "لا توجد عوامل اجتماعية واضحة مؤثرة",
-            labelEn: "No clearly relevant social factors",
+            label: "لا توجد عوامل اجتماعية مهمة",
+            labelEn: "No significant social factors",
             dxAdd: dxB([]),
             dxRemove: dxB([]),
             reasoning: [
               rB(
-                "Absence of obvious social risk factors does not exclude disease but removes some lifestyle-related risks.",
+                "Absence of social risk factors removes some lifestyle-related risks.",
                 []
               )
             ]

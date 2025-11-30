@@ -1,30 +1,79 @@
 // ========================================
 // chest-ui-core.js
-// Connect ChestEngine with the 3-card UI
+// CLEAN + FIXED VERSION
 // ========================================
 
 "use strict";
 
 // =====================
-// GLOBAL STEP FILTER
+// GLOBAL STEP VISIBILITY
 // =====================
 function isStepVisible(step) {
   const ans = window.ChestEngine.state.answers;
 
   const dep = ans["department"];
-  if (!dep) return false;
+  const sys = ans["system"];
+  const cc  = ans["mainSymptom"];
 
+  // -----------------
+  // أول خطوة: entry فقط
+  // -----------------
+  if (!dep) {
+    return step.sectionId === "entry";
+  }
+
+  // -----------------
+  // Internal Medicine
+  // -----------------
   if (dep === "internal") {
-    const system = ans["system"];
+    // قبل اختيار الجهاز
+    if (!sys) {
+      return step.sectionId === "entry";
+    }
 
-    if (!system) return step.sectionId === "entry";
-    if (system === "cvs") return step.sectionId === "cardiac";
-    if (system === "resp") return step.sectionId === "respiratory";
+    // --------------------
+    // Cardiovascular System
+    // --------------------
+    if (sys === "cvs") {
+      return [
+        "entry",       // department + system
+        "personal",    // personal data
+        "cc",          // chief complaint
+        "hpi",         // history of present illness
+        "ros",         // review of systems
+        "pmh", "psh", "dh", "fh", "sh" // background
+      ].includes(step.sectionId);
+    }
+
+    // --------------------
+    // Respiratory System (لاحقاً)
+    // --------------------
+    if (sys === "resp") {
+      return [
+        "entry",
+        "personal",
+        "cc",
+        "respHpi",
+        "respRos"
+      ].includes(step.sectionId);
+    }
+
     return false;
   }
 
-  if (dep === "peds") return step.sectionId === "peds";
-  if (dep === "surgery") return step.sectionId === "surgery";
+  // -----------------
+  // Pediatrics
+  // -----------------
+  if (dep === "peds") {
+    return step.sectionId === "peds";
+  }
+
+  // -----------------
+  // Surgery
+  // -----------------
+  if (dep === "surgery") {
+    return step.sectionId === "surgery";
+  }
 
   return false;
 }
@@ -55,21 +104,7 @@ function isStepVisible(step) {
   const elBtnReset = document.getElementById("btnReset");
   const elBtnPrint = document.getElementById("btnPrint");
 
-  // Safety check
-  if (
-    !elQuestionText ||
-    !elOptionsContainer ||
-    !elSectionLabel ||
-    !elSectionStepCtr ||
-    !elStepCounter ||
-    !elBtnPrev ||
-    !elBtnNext
-  ) {
-    console.error("UI Core: some required DOM elements are missing.");
-    return;
-  }
-
-  // Fade animation helper
+  // Fade animation
   function animateFade(elem) {
     if (!elem) return;
     elem.classList.remove("fade-in");
@@ -77,7 +112,7 @@ function isStepVisible(step) {
     elem.classList.add("fade-in");
   }
 
-  // validation
+  // Validation
   function validateStep(step) {
     if (!step || !step.required) {
       elValidation.textContent = "";
@@ -106,9 +141,7 @@ function isStepVisible(step) {
   // Save state
   function saveStateIfPossible() {
     if (typeof engine.saveState === "function") {
-      try {
-        engine.saveState();
-      } catch {}
+      try { engine.saveState(); } catch {}
     }
   }
 
@@ -119,14 +152,14 @@ function isStepVisible(step) {
     let step = engine.getCurrentStep();
     if (!step) return;
 
-    // ⭐ ADDED — تخطي الأسئلة المخفية تلقائياً
+    // تخطي الأسئلة المخفية
     while (step && !isStepVisible(step)) {
       engine.nextStep();
       step = engine.getCurrentStep();
     }
     if (!step) return;
 
-    // clear validation
+    // Clear validation
     elValidation.textContent = "";
     elValidation.classList.remove("validation-show");
 
@@ -135,9 +168,8 @@ function isStepVisible(step) {
     elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
 
     elSectionLabel.textContent = step.sectionLabel || "";
-   
 
-    // ⭐ ADDED — اتجاه السؤال عند الإنجليزية
+    // Language toggle (Arabic default)
     const text = appLang === "en" ? step.questionEn : step.question;
     elQuestionText.textContent = text || "";
     elQuestionText.setAttribute("dir", appLang === "en" ? "ltr" : "rtl");
@@ -159,15 +191,13 @@ function isStepVisible(step) {
 
     // Buttons
     const isFirst = engine.state.currentIndex === 0;
-    const isLast = engine.state.currentIndex >= engine.steps.length - 1;
+    const isLast  = engine.state.currentIndex >= engine.steps.length - 1;
 
     elBtnPrev.disabled = isFirst;
     elBtnNext.textContent = isLast ? "Case Presentation" : "Next";
   }
 
-  // -----------------------------------
   // Navigation
-  // -----------------------------------
   function handleNext() {
     const step = engine.getCurrentStep();
     if (!validateStep(step)) return;
@@ -175,7 +205,6 @@ function isStepVisible(step) {
     const isLast = engine.state.currentIndex >= engine.steps.length - 1;
 
     if (isLast) {
-      // ⭐ ADDED — بعد آخر سؤال افتح الكيس برزنتيشن
       if (window.UICaseModal) window.UICaseModal.openModal();
       return;
     }
@@ -208,18 +237,12 @@ function isStepVisible(step) {
     else window.print();
   }
 
-  // -----------------------------------
   // Init engine
-  // -----------------------------------
   function initEngineState() {
     let loaded = false;
-
     if (engine.loadState) {
-      try {
-        loaded = !!engine.loadState();
-      } catch {}
+      try { loaded = !!engine.loadState(); } catch {}
     }
-
     if (!loaded) engine.init();
   }
 
@@ -231,7 +254,7 @@ function isStepVisible(step) {
     elBtnPrint.addEventListener("click", handlePrint);
   }
 
-  // init
+  // Init UI
   function initUI() {
     initEngineState();
     wireEvents();
