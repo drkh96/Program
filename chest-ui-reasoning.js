@@ -1,112 +1,202 @@
-// =========================================
-// chest-ui-reasoning.js (FIXED VERSION)
-// Supports multi-select reasoning
-// ========================================
+// =======================================================
+// chest-ui-reasoning.js — ADVANCED AI CLINICAL ENGINE
+// Full diagnostic reasoning + severity + red flags
+// =======================================================
 
 "use strict";
 
-window.UIReasoning = (function () {
-  const engine = window.ChestEngine;
-  const elReasonQuestion = document.getElementById("reasonQuestion");
-  const elReasonList     = document.getElementById("reasonList");
+(function (global) {
 
-  if (!engine || !elReasonQuestion || !elReasonList) {
-    console.warn("UIReasoning: Missing DOM elements or engine.");
+  const Engine = global.CHEST_ENGINE;
+  if (!Engine) {
+    console.warn("❌ ADVANCED-AI: CHEST_ENGINE not ready.");
+    return;
   }
 
-  // Animation
-  function animateReason() {
-    if (!elReasonList) return;
-    elReasonList.classList.remove("fade-in");
-    void elReasonList.offsetWidth;
-    elReasonList.classList.add("fade-in");
+  function container() {
+    return document.getElementById("reasonContainer");
   }
 
-  // ---------------------------
-  // Render reasoning for a step
-  // ---------------------------
-  function render(step) {
-    if (!step || !engine) return;
+  // Group color classes
+  const GROUP_CLASS = {
+    cardiac: "cardiac",
+    pulmonary: "pulmonary",
+    aorta: "aorta",
+    gi: "gi",
+    msk: "msk",
+    psych: "psych",
+    other: "other"
+  };
 
-    const val = engine.state.answers[step.id];
+  // =======================================================
+  // 1) AI Clinical Summary Generator
+  // =======================================================
+  function generateAISummary(mainDx, features) {
+    if (!mainDx) return "No diagnostic pattern detected yet.";
 
-    // If no answer yet
-    if (val === undefined || val === null || val === "" || (Array.isArray(val) && val.length === 0)) {
-      elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
-      elReasonList.innerHTML = "";
-      return;
+    let summary = `
+      The clinical pattern suggests <strong>${mainDx.label}</strong> as the leading diagnosis. 
+      The case shows features that align with this condition, including:<br><br>
+      ${features.map(f => "• " + f).join("<br>")}
+      <br><br>
+      This combination of findings forms a pattern commonly encountered in patients 
+      with <strong>${mainDx.label}</strong>.
+    `;
+
+    return summary;
+  }
+
+  // =======================================================
+  // 2) Severity Predictor
+  // =======================================================
+  function predictSeverity(features, missing, score) {
+    let severity = "Low Risk";
+
+    if (score > 14 || features.includes("severe chest pain") || features.includes("hypotension")) {
+      severity = "🚨 EMERGENCY RISK";
+    } else if (score > 8 || features.includes("shortness of breath")) {
+      severity = "⚠️ Moderate Risk";
+    } else if (score > 3) {
+      severity = "🟡 Mild–Moderate Risk";
     }
 
-    // Handle multi-select
-    let reasons = [];
+    return severity;
+  }
 
-    if (Array.isArray(val)) {
-      val.forEach((v) => {
-        const r = engine.getReasoningFor(step, v);
-        if (Array.isArray(r)) reasons.push(...r);
-      });
-    } else {
-      const r = engine.getReasoningFor(step, val);
-      if (Array.isArray(r)) reasons = r;
-    }
+  // =======================================================
+  // 3) Red Flags Detector
+  // =======================================================
+  function detectRedFlags(features) {
+    const flags = [];
 
-    // If still no reasons
-    if (!reasons.length) {
-      elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
-      elReasonList.innerHTML = "";
-      return;
-    }
+    const redCriteria = [
+      "radiation to left arm",
+      "diaphoresis",
+      "syncope",
+      "acute tearing pain",
+      "hypotension",
+      "sudden severe dyspnea"
+    ];
 
-    // عنوان عام
-    elReasonQuestion.textContent = "Clinical Reasoning";
-    elReasonQuestion.className = "reason-headline";
-
-    // Clear list
-    elReasonList.innerHTML = "";
-
-    // Main card
-    const mainCard = document.createElement("div");
-    mainCard.className = "reason-card fade-royal";
-
-    reasons.forEach((r) => {
-      const item = document.createElement("div");
-      item.className = "reason-item-royal";
-
-      // النص الرئيسي
-      const txt = document.createElement("div");
-      txt.className = "reason-text";
-      txt.textContent = r.text || "";
-
-      // Related disease tags
-      const names = r.diseases || r.related || r.dx || r.names || [];
-
-      const dis = document.createElement("div");
-      dis.className = "reason-disease-tags";
-
-      names.forEach((nm) => {
-        const tag = document.createElement("span");
-        tag.className = "disease-tag";
-        tag.textContent = nm;
-        dis.appendChild(tag);
-      });
-
-      item.appendChild(txt);
-      if (names.length) item.appendChild(dis);
-
-      mainCard.appendChild(item);
+    redCriteria.forEach(flag => {
+      if (features.some(f => f.toLowerCase().includes(flag))) {
+        flags.push(flag);
+      }
     });
 
-    elReasonList.appendChild(mainCard);
-    animateReason();
+    return flags;
   }
 
-  function clear() {
-    elReasonQuestion.textContent = "Select an option to see clinical reasoning.";
-    elReasonList.innerHTML = "";
+  // =======================================================
+  // 4) What to Do Next (Clinical Actions)
+  // =======================================================
+  function nextSteps(mainDx) {
+    if (!mainDx) return "Not enough data to suggest next steps.";
+
+    switch (mainDx.id) {
+      case "MI":
+      case "ACS":
+        return `
+          • Obtain ECG immediately<br>
+          • Measure Troponin levels<br>
+          • Start aspirin unless contraindicated<br>
+          • Prepare for urgent cardiology evaluation
+        `;
+      case "PEMajor":
+        return `
+          • D-dimer if low/intermediate risk<br>
+          • CT Pulmonary Angiography<br>
+          • Start oxygen<br>
+          • Assess hemodynamic stability
+        `;
+      case "AorticDissection":
+        return `
+          • Urgent CT-Aorta<br>
+          • Control BP aggressively<br>
+          • Surgical team consultation immediately
+        `;
+      default:
+        return `
+          • Complete vital signs<br>
+          • ECG + CXR baseline<br>
+          • Appropriate labs based on pattern
+        `;
+    }
   }
 
-  return {
-    render,
-    clear
+  // =======================================================
+  // 5) Render Function
+  // =======================================================
+  function renderReasoning() {
+    const box = container();
+    if (!box) return;
+
+    const groups = Engine.getDDxGrouped();
+    if (!groups || groups.length === 0) {
+      box.innerHTML = `
+        <h3 class="reason-headline">🧠 AI Clinical Reasoning</h3>
+        <p class="reason-text">Provide more history to unlock AI analysis.</p>
+      `;
+      return;
+    }
+
+    const allDx = [];
+    groups.forEach(g => g.items.forEach(i => allDx.push(i)));
+    const mainDx = allDx[0];
+
+    const features = mainDx.features || [];
+    const missing = mainDx.missing || [];
+
+    const severity = predictSeverity(features, missing, mainDx.score);
+    const redFlags = detectRedFlags(features);
+
+    let html = `
+      <h3 class="reason-headline">🧠 Advanced AI Clinical Reasoning</h3>
+      
+      <div class="reason-card fade-royal">
+        <div class="device-card-header">PRIMARY DIAGNOSIS</div>
+        <p class="reason-text"><strong>${mainDx.label}</strong> is currently the most likely diagnosis.</p>
+      </div>
+
+      <div class="reason-card fade-royal">
+        <div class="device-card-header">AI Summary</div>
+        <p class="reason-text">${generateAISummary(mainDx, features)}</p>
+      </div>
+
+      <div class="reason-card fade-royal">
+        <div class="device-card-header">Severity Prediction</div>
+        <p class="reason-text"><strong>${severity}</strong></p>
+      </div>
+
+      <div class="reason-card fade-royal">
+        <div class="device-card-header">Red Flags</div>
+        <p class="reason-text">
+          ${
+            redFlags.length > 0
+              ? redFlags.map(f => "• " + f).join("<br>")
+              : "No major red flags detected."
+          }
+        </p>
+      </div>
+
+      <div class="reason-card fade-royal">
+        <div class="device-card-header">Recommended Next Steps</div>
+        <p class="reason-text">${nextSteps(mainDx)}</p>
+      </div>
+    `;
+
+    box.innerHTML = html;
+  }
+
+  // =======================================================
+  // Auto update after each answer
+  // =======================================================
+  Engine.onAfterAnswer = function () {
+    renderReasoning();
   };
-})();
+
+  global.CHEST_UI_REASONING = { render: renderReasoning };
+
+  console.log("🤖 ADVANCED AI REASONING READY");
+
+})(window);

@@ -1,292 +1,237 @@
 // ========================================
-// chest-ui-core.js
-// CLEAN + FIXED VERSION
+// chest-ui-core.js (SUPER PREMIUM UI VERSION)
 // ========================================
 
 "use strict";
 
-// =====================
-// GLOBAL STEP VISIBILITY
-// =====================
-function isStepVisible(step) {
-  const ans = window.ChestEngine.state.answers;
+(function (global) {
 
-  const dep = ans["department"];
-  const sys = ans["system"];
-  const cc  = ans["mainSymptom"];
+  const Engine = global.CHEST_ENGINE;
+  const STATE  = global.CHEST_ENGINE_STATE;
 
-  // -----------------
-  // أول خطوة: entry فقط
-  // -----------------
-  if (!dep) {
-    return step.sectionId === "entry";
-  }
-
-  // -----------------
-  // Internal Medicine
-  // -----------------
-  if (dep === "internal") {
-    // قبل اختيار الجهاز
-    if (!sys) {
-      return step.sectionId === "entry";
-    }
-
-    // --------------------
-    // Cardiovascular System
-    // --------------------
-    if (sys === "cvs") {
-      return [
-        "entry",       // department + system
-        "personal",    // personal data
-        "cc",          // chief complaint
-        "hpi",         // history of present illness
-        "ros",         // review of systems
-        "pmh", "psh", "dh", "fh", "sh" // background
-      ].includes(step.sectionId);
-    }
-
-    // --------------------
-    // Respiratory System (لاحقاً)
-    // --------------------
-    if (sys === "resp") {
-      return [
-        "entry",
-        "personal",
-        "cc",
-        "respHpi",
-        "respRos"
-      ].includes(step.sectionId);
-    }
-
-    return false;
-  }
-
-  // -----------------
-  // Pediatrics
-  // -----------------
-  if (dep === "peds") {
-    return step.sectionId === "peds";
-  }
-
-  // -----------------
-  // Surgery
-  // -----------------
-  if (dep === "surgery") {
-    return step.sectionId === "surgery";
-  }
-
-  return false;
-}
-
-// ========================================
-// MAIN UI CORE
-// ========================================
-(function () {
-  const engine = window.ChestEngine;
-  window._uiRender = renderCurrentStep;
-  window._uiEngine = engine;
-
-  if (!engine) {
-    console.error("ChestEngine is not available.");
+  if (!Engine) {
+    console.error("❌ UI cannot load: CHEST_ENGINE not found");
     return;
   }
 
-  // DOM elements
-  const elQuestionText     = document.getElementById("questionText");
-  const elOptionsContainer = document.getElementById("optionsContainer");
-  const elSectionLabel     = document.getElementById("sectionLabel");
-  const elSectionStepCtr   = document.getElementById("sectionStepCounter");
-  const elStepCounter      = document.getElementById("stepCounter");
-  const elValidation       = document.getElementById("validationMessage");
+  const app = document.getElementById("historyContainer") || document.getElementById("app");
+  const ddxContainer = document.getElementById("ddxContainer");
+  const reasonContainer = document.getElementById("reasonContainer");
 
-  const elBtnPrev  = document.getElementById("btnPrev");
-  const elBtnNext  = document.getElementById("btnNext");
-  const elBtnReset = document.getElementById("btnReset");
-  const elBtnPrint = document.getElementById("btnPrint");
-
-  // Fade animation
-  function animateFade(elem) {
-    if (!elem) return;
-    elem.classList.remove("fade-in");
-    void elem.offsetWidth;
-    elem.classList.add("fade-in");
+  // ================================================
+  // SOUND FX
+  // ================================================
+  const clickSound = new Audio("click.mp3");
+  function playClick() {
+    try {
+      clickSound.currentTime = 0;
+      clickSound.play();
+    } catch {}
   }
 
-  // Validation
-  function validateStep(step) {
-    if (!step || !step.required) {
-      elValidation.textContent = "";
-      elValidation.classList.remove("validation-show");
-      return true;
-    }
-
-    const val = engine.state.answers[step.id];
-    const empty =
-      val === undefined ||
-      val === null ||
-      val === "" ||
-      (Array.isArray(val) && val.length === 0);
-
-    if (empty) {
-      elValidation.textContent = "Please answer this question before continuing.";
-      elValidation.classList.add("validation-show");
-      return false;
-    }
-
-    elValidation.textContent = "";
-    elValidation.classList.remove("validation-show");
-    return true;
+  // ================================================
+  // VIBRATION
+  // ================================================
+  function vibrateSmall() {
+    if (navigator.vibrate) navigator.vibrate(12);
   }
 
-  // Save state
-  function saveStateIfPossible() {
-    if (typeof engine.saveState === "function") {
-      try { engine.saveState(); } catch {}
+  // ================================================
+  // PROGRESS BAR UPDATE
+  // ================================================
+  function updateProgressBar() {
+    const bar = document.getElementById("progressBar");
+    if (!bar) return;
+    const p = Math.round(
+      (STATE.currentIndex + 1) / Engine.totalSteps * 100
+    );
+    bar.style.width = p + "%";
+  }
+
+  // ================================================
+  // SCROLL TO TOP
+  // ================================================
+  function scrollToTop() {
+    const panel = document.querySelector(".panel-center") || window;
+    try {
+      panel.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      window.scrollTo(0, 0);
     }
   }
 
-  // ========================================
-  // RENDER CURRENT STEP
-  // ========================================
-  function renderCurrentStep() {
-    let step = engine.getCurrentStep();
-    if (!step) return;
-
-    // تخطي الأسئلة المخفية
-    while (step && !isStepVisible(step)) {
-      engine.nextStep();
-      step = engine.getCurrentStep();
-    }
-    if (!step) return;
-
-    // Clear validation
-    elValidation.textContent = "";
-    elValidation.classList.remove("validation-show");
-
-    // Progress info
-    const prog = engine.getProgressInfo();
-    elStepCounter.textContent = `Step ${prog.current} of ${prog.total}`;
-
-    elSectionLabel.textContent = step.sectionLabel || "";
-
-    // Language toggle (Arabic default)
-    const text = appLang === "en" ? step.questionEn : step.question;
-    elQuestionText.textContent = text || "";
-    elQuestionText.setAttribute("dir", appLang === "en" ? "ltr" : "rtl");
-    elQuestionText.style.textAlign = appLang === "en" ? "left" : "right";
-
-    // Render options
-    if (window.UIOptions) {
-      window.UIOptions.renderOptions(step, appLang);
-    } else {
-      elOptionsContainer.innerHTML = "<p>Options module not loaded.</p>";
-    }
-
-    // Render DDx & Reasoning
-    if (window.UIDDx) UIDDx.renderDDx();
-    if (window.UIReasoning) UIReasoning.render(step);
-
-    animateFade(elQuestionText);
-    animateFade(elOptionsContainer);
-
-    // Buttons
-    const isFirst = engine.state.currentIndex === 0;
-    const isLast  = engine.state.currentIndex >= engine.steps.length - 1;
-
-    elBtnPrev.disabled = isFirst;
-    elBtnNext.textContent = isLast ? "Case Presentation" : "Next";
+  // ================================================
+  // AUTO-SAVE
+  // ================================================
+  function autoSave() {
+    const data = JSON.stringify(STATE.answers);
+    localStorage.setItem("fh_answers", data);
   }
 
-  // Navigation
-  function handleNext() {
-    const step = engine.getCurrentStep();
-    if (!validateStep(step)) return;
+  Engine.onStepChange = function () {
+    autoSave();
+  };
 
-    const isLast = engine.state.currentIndex >= engine.steps.length - 1;
+  // ================================================
+  // HINT SYSTEM (AI-like suggestions)
+  // ================================================
+  function showHint(list) {
+    const box = document.createElement("div");
+    box.className = "hint-box";
+    box.innerHTML = list.map(item => `<div class="hint">${item}</div>`).join("");
 
-    if (isLast) {
-      if (window.UICaseModal) window.UICaseModal.openModal();
+    app.appendChild(box);
+
+    box.querySelectorAll(".hint").forEach(h => {
+      h.onclick = () => {
+        const input = app.querySelector("input, textarea, select");
+        if (input) input.value = h.innerText;
+      };
+    });
+  }
+
+  // ================================================
+  // RENDER STEP
+  // ================================================
+  function renderStep(step, answers) {
+    if (!step) {
+      app.innerHTML = `<p>⚠ لا توجد خطوات أخرى.</p>`;
       return;
     }
 
-    engine.nextStep();
-    saveStateIfPossible();
-    renderCurrentStep();
-  }
+    // Container
+    let html = `
+      <div class="step-block question-fade question-glow">
+        <h2 class="step-question">${step.question}</h2>
+    `;
 
-  function handlePrev() {
-    engine.prevStep();
-    saveStateIfPossible();
-    renderCurrentStep();
-  }
-
-  function handleReset() {
-    if (engine.resetCase) engine.resetCase();
-    else engine.init();
-
-    saveStateIfPossible();
-
-    if (window.UIReasoning) UIReasoning.clear();
-    if (window.UIDDx) UIDDx.renderDDx();
-
-    renderCurrentStep();
-  }
-
-  function handlePrint() {
-    if (window.UICaseModal) window.UICaseModal.printCase();
-    else window.print();
-  }
-
-  // Init engine
-  function initEngineState() {
-    let loaded = false;
-    if (engine.loadState) {
-      try { loaded = !!engine.loadState(); } catch {}
+    // Single
+    if (step.type === "single" && step.options) {
+      for (const key in step.options) {
+        const opt = step.options[key];
+        html += `
+        <label class="step-option option-row radio-option">
+          <input type="radio" name="${step.id}" value="${key}"
+            ${answers[step.id] === key ? "checked" : ""}>
+          ${opt.label}
+        </label>`;
+      }
     }
-    if (!loaded) engine.init();
+
+    // Multi
+    if (step.type === "multi" && step.options) {
+      const selected = answers[step.id] || [];
+      for (const key in step.options) {
+        const opt = step.options[key];
+        html += `
+        <label class="step-option option-row">
+          <input type="checkbox" name="${step.id}" value="${key}"
+            ${selected.includes(key) ? "checked" : ""}>
+          ${opt.label}
+        </label>`;
+      }
+    }
+
+    // Text
+    if (step.type === "text") {
+      html += `
+        <textarea id="field_${step.id}" class="step-text">${answers[step.id] || ""}</textarea>
+      `;
+    }
+
+    // Number
+    if (step.type === "number") {
+      html += `
+        <input type="number" id="field_${step.id}" class="step-number"
+         value="${answers[step.id] || ""}">
+      `;
+    }
+
+    html += `</div>`;
+
+    // NAVIGATION BUTTONS
+    html += `
+      <div class="nav-buttons">
+        <button id="btnBack" class="btn btn-secondary">السابق</button>
+        <button id="btnNext" class="btn btn-primary">التالي</button>
+      </div>
+    `;
+
+    app.innerHTML = html;
+
+    // HINTS BASED ON STEP ID
+    if (step.id === "site") {
+      showHint(["Central chest", "Left chest", "Right chest", "Epigastric"]);
+    }
+    if (step.id === "onset") {
+      showHint(["Sudden", "Gradual", "Over minutes"]);
+    }
+    if (step.id === "duration") {
+      showHint(["5 minutes", "30 minutes", "2 hours"]);
+    }
+
+    // Glow remove
+    setTimeout(() => {
+      const elem = document.querySelector(".question-glow");
+      if (elem) elem.classList.remove("question-glow");
+    }, 900);
+
+    attachHandlers(step);
+    updateProgressBar();
+    scrollToTop();
   }
 
-  // Wire events
-  function wireEvents() {
-    elBtnNext.addEventListener("click", handleNext);
-    elBtnPrev.addEventListener("click", handlePrev);
-    elBtnReset.addEventListener("click", handleReset);
-    elBtnPrint.addEventListener("click", handlePrint);
+  // ================================================
+  // SAVE USER INPUT
+  // ================================================
+  function collectAnswer(step) {
+    if (step.type === "single") {
+      const checked = document.querySelector(`input[name="${step.id}"]:checked`);
+      return checked ? checked.value : null;
+    }
+
+    if (step.type === "multi") {
+      return Array.from(
+        document.querySelectorAll(`input[name="${step.id}"]:checked`)
+      ).map(x => x.value);
+    }
+
+    if (step.type === "text") {
+      return document.getElementById(`field_${step.id}`).value;
+    }
+
+    if (step.type === "number") {
+      return document.getElementById(`field_${step.id}`).value;
+    }
   }
 
-  // Init UI
-  function initUI() {
-    initEngineState();
-    wireEvents();
-    renderCurrentStep();
+  // ================================================
+  // HANDLERS
+  // ================================================
+  function attachHandlers(step) {
+
+    document.getElementById("btnBack").onclick = () => {
+      playClick();
+      vibrateSmall();
+      Engine.back();
+    };
+
+    document.getElementById("btnNext").onclick = () => {
+      playClick();
+      vibrateSmall();
+      const val = collectAnswer(step);
+      Engine.answer(step.id, val);
+      Engine.next();
+    };
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initUI);
-  } else {
-    initUI();
-  }
-})();
+  // ================================================
+  // CONNECT UI TO ENGINE
+  // ================================================
+  Engine.onRender = function ({ step, answers }) {
+    renderStep(step, answers);
+  };
 
-// ========================
-// Language Toggle
-// ========================
-let appLang = "ar";
+  console.log("💎 UI CORE FULLY UPGRADED");
 
-function setLanguage(lang) {
-  appLang = lang;
-  document.documentElement.setAttribute("lang", lang);
-  if (window._uiRender) window._uiRender();
-}
-
-document.querySelector(".lang-toggle").addEventListener("click", () => {
-  const btn = document.querySelector(".lang-toggle");
-
-  if (appLang === "ar") {
-    setLanguage("en");
-    btn.textContent = "العربية";
-  } else {
-    setLanguage("ar");
-    btn.textContent = "English";
-  }
-});
+})(window);

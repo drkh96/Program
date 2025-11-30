@@ -1,57 +1,25 @@
 // =============================
 // chest-ids.js
-// Common helpers for all data
+// Clean helper functions
 // =============================
+
 "use strict";
 
+/**
+ * Return an array of disease IDs
+ * Example: dx(["mi","pe"])
+ */
 function dx(ids) {
-  return ids || [];
+  return Array.isArray(ids) ? ids : [];
 }
 
+/**
+ * Return a reasoning block
+ * Example: r("Chest pain worsens with exertion", ["mi"])
+ */
 function r(text, diseases) {
-  return { text, diseases: diseases || [] };
+  return {
+    text: text || "",
+    diseases: Array.isArray(diseases) ? diseases : []
+  };
 }
-
-function dxR(ids) {
-  return ids || [];
-}
-
-function rR(text, diseases) {
-  return { text, diseases: diseases || [] };
-}
-
-function dxB(ids) {
-  return ids || [];
-}
-
-function rB(text, diseases) {
-  return { text, diseases: diseases || [] };
-}
-// ========================================
-// Step IDs used by the scoring engine
-// ========================================
-window.ChestIds = {
-  steps: {
-    ageText: "ageText",
-    mainSymptom: "mainSymptom",
-    ccDuration: "ccDuration",
-
-    site: "site",
-    onset: "onset",
-    character: "character",
-    radiation: "radiation",
-    aggravating: "aggravating",
-    relief: "relief",
-    episodeDuration: "episodeDuration",
-    course: "course",
-    associated: "associated",
-    redFlags: "redFlags",
-
-    pmhChronic: "pmhChronic",
-    familyHistory: "familyHistory",
-    socialHistory: "socialHistory",
-    pshOps: "pshOps",
-
-    rosLM: "rosLM"
-  }
-};
