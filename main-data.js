@@ -18,10 +18,14 @@ window.CHEST_SECTIONS_MAIN = [
         question: "اختر القسم الرئيسي للحالة:",
         type: "single",
         required: true,
-        internal: { label: "Internal Medicine" },
-surgery:  { label: "Surgery" },
-peds:     { label: "Pediatrics" },
-obgyn:    { label: "Ob/Gyn" }
+
+        // ✔ خيارات صحيحة داخل options
+        options: {
+          internal: { label: "Internal Medicine" },
+          surgery:  { label: "Surgery" },
+          peds:     { label: "Pediatrics" },
+          obgyn:    { label: "Ob/Gyn" }
+        }
       },
 
       // 2) اختيار الجهاز – للبــاطنية فقط
@@ -32,11 +36,15 @@ obgyn:    { label: "Ob/Gyn" }
         question: "اختر الجهاز داخل الباطنية:",
         type: "single",
         required: true,
+
+        // ✔ الشرط صحيح
         visibleWhen: { stepId: "department", equals: "internal" },
+
+        // ✔ خيارات صحيحة داخل options
         options: {
-          cvs:  { label: "cardiovascular system￼" },
-          resp: { label: "Respiratory" }
-          // باقي الأجهزة نضيفها مستقبلاً
+          cvs:  { label: "Cardiovascular System" },
+          resp: { label: "Respiratory System" }
+          // باقي الأجهزة نضيفها لاحقاً
         }
       }
     ]
