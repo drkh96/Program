@@ -1,60 +1,31 @@
-// ========================================
+// =======================================================
 // chest-engine-config.js
-// Loads sections, steps, diagnoses, and base mappings
-// ========================================
+// Global Configuration for Chest Engine
+// =======================================================
 
 "use strict";
 
 (function (global) {
 
-  const Data = global.ChestData;
-  if (!Data) {
-    console.error("ChestData is not loaded.");
-    return;
-  }
+  const EngineConfig = {
 
-  // -----------------------------
-  // 1) SECTIONS (as provided by ChestData)
-  // -----------------------------
-  const SECTIONS = Data.sections || [];
+    // هل نسمح بطباعة معلومات debug في console؟
+    debug: false,
 
-  // -----------------------------
-  // 2) Build STEPS (Flattened)
-  // -----------------------------
-  const STEPS = [];
-  SECTIONS.forEach((sec) => {
-    (sec.steps || []).forEach((st) => {
-      // Ensure each step inherits section data
-      st.sectionId = st.sectionId || sec.id;
-      st.sectionLabel = st.sectionLabel || sec.label || "";
-      STEPS.push(st);
-    });
-  });
+    // هل نسمح باستخدام خطوات غير مرئية؟ (لا)
+    allowHiddenSteps: false,
 
-  // -----------------------------
-  // 3) Diagnoses List & Pretty Names
-  // -----------------------------
-  const DIAGNOSES = Data.diagnoses || [];
+    // هل نسمح بإعادة الإجابة بعد الانتهاء؟ (نتركها false)
+    allowEditingAfterFinish: false,
 
-  const PRETTY_NAME = {};
-  DIAGNOSES.forEach((dx) => {
-    PRETTY_NAME[dx.id] = dx.label || dx.id;
-  });
+    // هل نسمح للخطوات أن تُعاد كتابتها من الواجهة؟ (لا)
+    freezeSteps: true,
 
-  // -----------------------------
-  // 4) Diagnosis Groups (Colors / Order / UI Grouping)
-  // -----------------------------
-  const DX_GROUPS = Data.dxGroups || {};
-
-  // -----------------------------
-  // 5) Expose config globally
-  // -----------------------------
-  global.ChestConfig = {
-    SECTIONS,
-    STEPS,
-    DIAGNOSES,
-    PRETTY_NAME,
-    DX_GROUPS
+    // احتياطي لمستقبل البرنامج (أجهزة أخرى)
+    defaultDepartment: "internal",
+    defaultSystem: "cvs"
   };
+
+  global.ChestEngineConfig = EngineConfig;
 
 })(window);

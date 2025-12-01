@@ -1,136 +1,110 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Focus History</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> focus history ￼</title>
 
-  <!-- CSS (ضع style.css بنفس الفولدر) -->
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- MAIN STYLE (Glass Premium UI) -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <!-- ===========================
-       HEADER
-  ============================ -->
-  <header class="app-header">
-    <h1>FOCUS HISTORY</h1>
-    <p class="app-subtitle"></p> <!-- نفس النقطة اللي بالصورة -->
+  <!-- ========================================================= -->
+  <!-- MAIN LAYOUT: Left (Questions + Analysis) / Right (DDx)   -->
+  <!-- ========================================================= -->
+  <div class="main-layout">
 
-    <button class="lang-toggle">التبديل إلى English</button>
-  </header>
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
 
-  <!-- ===========================
-       MAIN 3-CARD LAYOUT
-  ============================ -->
-  <main class="app-layout">
+      <!-- QUESTIONS CARD -->
+      <div class="glass-card questions-card">
+        <div class="card-title">Questions</div>
 
-    <!-- ========== CARD 1: DDx ========== -->
-    <section class="card card-ddx">
-      <header class="card-header">
-        <h2 class="card-title">DIFFERENTIAL DIAGNOSIS</h2>
-      </header>
-      <div id="ddxContainer" class="card-body ddx-body">
-        <p class="dd-empty">Start answering questions to build the DDx.</p>
-      </div>
-    </section>
+        <div class="question-body"></div>
 
-    <!-- ========== CARD 2: Clinical Reasoning ========== -->
-    <section class="card card-reason">
-      <header class="card-header">
-        <h2 class="card-title">CLINICAL REASONING</h2>
-      </header>
-
-      <div class="card-body">
-        <div id="reasonQuestion" class="reason-title">
-          Select an option to see clinical reasoning.
+        <div class="buttons-row">
+          <button id="backBtn">Back</button>
+          <button id="langBtn">AR / EN</button>
+          <button id="nextBtn">Next</button>
         </div>
-        <ul id="reasonList" class="reason-list"></ul>
-      </div>
-    </section>
-
-    <!-- ========== CARD 3: Questions ========== -->
-    <section class="card card-history">
-      <header class="card-header card-header--question">
-        <span id="sectionLabel" class="section-label">Section</span>
-        <span id="sectionStepCounter" class="section-step-counter"></span>
-      </header>
-
-      <div class="card-body">
-
-        <div id="stepCounter" class="step-counter"></div>
-
-        <!-- السؤال بالعربي -->
-        <div id="questionText" class="question-text" dir="rtl"></div>
-
-        <!-- validation -->
-        <div id="validationMessage" class="validation-message" dir="ltr"></div>
-
-        <!-- الخيارات -->
-        <div id="optionsContainer" class="options-container" dir="rtl"></div>
-
       </div>
 
-      <footer class="card-footer">
-        <div class="controls-row">
-          <button id="btnPrev"  class="btn btn-secondary">Previous</button>
-          <button id="btnNext"  class="btn btn-primary">Next</button>
-          <button id="btnReset" class="btn btn-secondary">Reset</button>
-          <button id="btnPrint" class="btn btn-secondary">Print</button>
-        </div>
-      </footer>
-    </section>
+      <!-- ANALYSIS CARD -->
+      <div class="glass-card analysis-card">
+        <div class="card-title">Clinical Reasoning</div>
+      </div>
 
-  </main>
-
-  <!-- ===========================
-       CASE MODAL
-  ============================ -->
-  <div id="caseModal" class="case-modal hidden">
-    <div class="case-modal-backdrop"></div>
-
-    <div class="case-modal-dialog">
-      <header class="case-modal-header">
-        <h2>Case Presentation</h2>
-        <button id="caseModalClose" class="case-modal-close">&times;</button>
-      </header>
-
-      <div id="caseModalContent" class="case-modal-content"></div>
-
-      <footer class="case-modal-footer">
-        <button id="caseModalCopy"  class="btn btn-secondary">Copy</button>
-        <button id="caseModalClose2" class="btn btn-primary">Close</button>
-      </footer>
     </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+      <!-- DIFFERENTIAL DIAGNOSIS CARD -->
+      <div class="glass-card ddx-card">
+        <div class="card-title">Differential Diagnosis</div>
+      </div>
+
+      <!-- CASE SCENARIO CARD (hidden until end) -->
+      <div class="glass-card case-scenario-card" style="margin-top: 18px;">
+        <div class="card-title">Case Scenario</div>
+      </div>
+
+    </div>
+
   </div>
 
-  <!-- ===========================
-       SCRIPTS  (بدون مجلدات)
-  ============================ -->
 
-    <!-- DATA -->
-  <script src="chest-ids.js"></script>
-  <script src="main-data.js"></script>
-  <script src="chest-data-personal.js"></script>
-  <script src="chest-data-hpi.js"></script>
-  <script src="chest-data-ros.js"></script>
-  <script src="chest-data-background.js"></script>
-  <script src="chest-data-main.js"></script>
-
-  <!-- ENGINE -->
-  <script src="chest-engine-config.js"></script>
+  <!-- ========================================================= -->
+  <!-- ENGINE FILES                                              -->
+  <!-- ========================================================= -->
   <script src="chest-engine-state.js"></script>
-  <script src="chest-engine-scoring.js"></script>
+  <script src="chest-engine-config.js"></script>
+  <script src="chest-engine-core.js"></script>
+  <script src="chest-engine-steps.js"></script>
+  <script src="chest-engine-options.js"></script>
+  <script src="chest-engine-collect.js"></script>
   <script src="chest-engine-recompute.js"></script>
   <script src="chest-engine-output.js"></script>
-  <script src="chest-engine-core.js"></script>
 
-  <!-- UI -->
-  <script src="chest-ui-core.js"></script>
-  <script src="chest-ui-ddx.js"></script>
-  <script src="chest-ui-reasoning.js"></script>
-  <script src="chest-ui-options.js"></script>
-  <script src="chest-ui-case-modal.js"></script>
+  <!-- DATA FILES -->
+  <script src="main-data.js"></script>
+  <script src="rules-scoring.js"></script>
+  <script src="rules-visibility.js"></script>
+  <script src="personal-chest.js"></script>
+  <script src="cc-chest.js"></script>
+  <script src="hpi-chest.js"></script>
+  <script src="ros-chest.js"></script>
+  <script src="background-chest.js"></script>
+  <script src="dx-chest.js"></script>
+
+  <!-- ========================================================= -->
+  <!-- UI FILES                                                  -->
+  <!-- ========================================================= -->
+  <script src="ui-language.js"></script>
+  <script src="ui-utils.js"></script>
+  <script src="ui-questions.js"></script>
+  <script src="ui-analysis.js"></script>
+  <script src="ui-differentials.js"></script>
+  <script src="ui-case-scenario.js"></script>
+  <script src="ui-layout.js"></script>
+  <script src="ui-bind.js"></script>
+
+  <!-- BOOTSTRAP THE ENGINE + UI -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.UIBinder) {
+        UIBinder.init();
+      } else {
+        console.error("UIBinder not found.");
+      }
+    });
+  </script>
+
 </body>
 </html>

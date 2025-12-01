@@ -1,151 +1,66 @@
-// ========================================
+// =======================================================
 // chest-engine-output.js
-// Provides DDx grouping and reasoning API
-// on top of Engine.recomputeDxScores.
-// ========================================
+// Formats dxScores + metadata → ready for UI
+// =======================================================
 
 "use strict";
 
 (function (global) {
+
   const Engine = global.ChestEngine;
+  const State  = global.ChestEngineState;
+
   if (!Engine) {
-    console.error("ChestEngine is not available. Make sure previous engine modules are loaded.");
+    console.error("ChestEngine not loaded");
     return;
   }
 
-  const DIAGNOSES = Engine.diagnoses || [];
-  const DX_GROUPS = Engine.dxGroups || {};
-  const state     = Engine.state;
+  const Output = {
 
-  // -----------------------------
-  // Grouped DDx for UI
-  // -----------------------------
-  function getDDxGrouped() {
-    if (typeof Engine.recomputeDxScores === "function") {
-      Engine.recomputeDxScores();
-    }
+    // ===================================================
+    // (1) Convert dxScores into full objects ready for UI
+    // ===================================================
+    getDxList() {
 
-    const dxScores = state.dxScores || {};
+      const dxScores = State.dxScores || {};
+      const dxMeta   = global.CHEST_PAIN_DX || [];
 
-    // Convert to array and sort by score desc
-    const rows = Object.keys(dxScores)
-      .map((id) => {
-        const dx = DIAGNOSES.find((d) => d.id === id) || { id, label: id, group: "other" };
+      // -----------------------------------------------
+      // دمج النتائج + الميتاداتا
+      // -----------------------------------------------
+      let dxList = dxMeta.map(dx => {
+
+        const score = dxScores[dx.id] || 0;
+
         return {
-          id,
-          label: dx.label || id,
-          group: dx.group || "other",
-          score: dxScores[id] || 0,
-          keyMissingFeatures: dx.keyMissingFeatures || []
+          id: dx.id,
+          name: dx.labelEn,              // English only
+          group: dx.group,               // chestPain
+          features: dx.keyMissingFeatures || [],
+          score: parseFloat(score.toFixed(1))
         };
-      })
-      .filter((r) => r.score !== 0)
-      .sort((a, b) => b.score - a.score);
-
-    if (!rows.length) return [];
-
-    const maxScore = rows[0].score || 1;
-
-    const groupsMap = {};
-    rows.forEach((row) => {
-      const g = DX_GROUPS[row.group] || { id: row.group, label: row.group };
-      if (!groupsMap[g.id]) {
-        groupsMap[g.id] = {
-          id: g.id,
-          label: g.label,
-          items: []
-        };
-      }
-
-      const featuresSet = state.featureMap && state.featureMap[row.id];
-      const features    = featuresSet ? Array.from(featuresSet) : [];
-
-      let clinicalScore = null;
-      if (
-        ["IHD", "StableAngina", "UnstableAngina", "MI", "ACS", "HF"].includes(row.id) &&
-        state.heartScore
-      ) {
-        clinicalScore = `HEART-style (H/A/R only): ${state.heartScore.score} – ${state.heartScore.category}`;
-      }
-      if (["PEMajor"].includes(row.id) && state.peScore) {
-        clinicalScore = `PE heuristic score: ${state.peScore.score.toFixed(
-          1
-        )} – ${state.peScore.category}`;
-      }
-
-      groupsMap[g.id].items.push({
-        id: row.id,
-        label: row.label,
-        score: Math.round(row.score * 10) / 10,
-        level: row.score / maxScore,
-        clinicalScore,
-        features,
-        missing: row.keyMissingFeatures || []
       });
-    });
 
-    Object.values(groupsMap).forEach((g) => {
-      g.items.sort((a, b) => b.score - a.score);
-    });
+      // -----------------------------------------------
+      // ترتيب الأعلى احتمالاً
+      // -----------------------------------------------
+      dxList.sort((a, b) => b.score - a.score);
 
-    const result = Object.values(groupsMap).sort((a, b) => {
-      const ga = DX_GROUPS[a.id];
-      const gb = DX_GROUPS[b.id];
-      const oa = ga && typeof ga.order === "number" ? ga.order : 999;
-      const ob = gb && typeof gb.order === "number" ? gb.order : 999;
-      return oa - ob;
-    });
+      return dxList;
+    },
 
-    return result;
-  }
+    // ===================================================
+    // (2) Top 3 diagnoses for case scenario
+    // ===================================================
+    getTopThreeDx() {
 
-  // -----------------------------
-  // Reasoning per step
-  // -----------------------------
-  function getReasoningFor(step, value) {
-    if (!step) return [];
-
-    const type = Engine.getStepType(step);
-
-    // Numeric
-    if (type === "numeric") {
-      if (Array.isArray(step.reasoningForNumeric)) {
-        return step.reasoningForNumeric;
-      }
-      return [];
+      const list = this.getDxList();
+      return list.slice(0, 3);
     }
+  };
 
-    // Text: no predefined reasoning
-    if (type === "text") return [];
-
-    if (!step.options) return [];
-
-    // Single
-    if (type === "single") {
-      const opt = step.options[value];
-      if (opt && Array.isArray(opt.reasoning)) {
-        return opt.reasoning;
-      }
-      return [];
-    }
-
-    // Multi
-    if (type === "multi" && Array.isArray(value)) {
-      const acc = [];
-      value.forEach((v) => {
-        const opt = step.options[v];
-        if (opt && Array.isArray(opt.reasoning)) {
-          acc.push(...opt.reasoning);
-        }
-      });
-      return acc;
-    }
-
-    return [];
-  }
-
-  // Attach to Engine
-  Engine.getDDxGrouped   = getDDxGrouped;
-  Engine.getReasoningFor = getReasoningFor;
+  // expose:
+  global.ChestEngine.getDxList      = Output.getDxList.bind(Output);
+  global.ChestEngine.getTopThreeDx = Output.getTopThreeDx.bind(Output);
 
 })(window);
