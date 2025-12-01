@@ -3,29 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title> focus history ￼</title>
+  <title>Focus History</title>
 
   <!-- FONT -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <!-- MAIN STYLE (Glass Premium UI) -->
+  <!-- MAIN STYLE -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <!-- ========================================================= -->
-  <!-- MAIN LAYOUT: Left (Questions + Analysis) / Right (DDx)   -->
-  <!-- ========================================================= -->
   <div class="main-layout">
 
-    <!-- LEFT PANEL -->
     <div class="left-panel">
 
-      <!-- QUESTIONS CARD -->
       <div class="glass-card questions-card">
         <div class="card-title">Questions</div>
-
         <div class="question-body"></div>
 
         <div class="buttons-row">
@@ -35,22 +29,18 @@
         </div>
       </div>
 
-      <!-- ANALYSIS CARD -->
       <div class="glass-card analysis-card">
         <div class="card-title">Clinical Reasoning</div>
       </div>
 
     </div>
 
-    <!-- RIGHT PANEL -->
     <div class="right-panel">
 
-      <!-- DIFFERENTIAL DIAGNOSIS CARD -->
       <div class="glass-card ddx-card">
         <div class="card-title">Differential Diagnosis</div>
       </div>
 
-      <!-- CASE SCENARIO CARD (hidden until end) -->
       <div class="glass-card case-scenario-card" style="margin-top: 18px;">
         <div class="card-title">Case Scenario</div>
       </div>
@@ -59,41 +49,39 @@
 
   </div>
 
+  <!-- ENGINE -->
+  <script src="chest-engine-state.js"></script>
+  <script src="chest-engine-config.js"></script>
+  <script src="chest-engine-core.js"></script>
+  <script src="chest-engine-steps.js"></script>
+  <script src="chest-engine-options.js"></script>
+  <script src="chest-engine-collect.js"></script>
+  <script src="chest-engine-recompute.js"></script>
+  <script src="chest-engine-output.js"></script>
 
-<script src="chest-engine-state.js"></script>
-<script src="chest-engine-config.js"></script>
-<script src="chest-engine-core.js"></script>
-<script src="chest-engine-steps.js"></script>
-<script src="chest-engine-options.js"></script>
-<script src="chest-engine-collect.js"></script>
-<script src="chest-engine-recompute.js"></script>
-<script src="chest-engine-output.js"></script>
-
+  <!-- DATA -->
   <script src="main-data.js"></script>
-<script src="rules-scoring.js"></script>
-<script src="personal-chest.js"></script>
-<script src="cc-chest.js"></script>
-<script src="hpi-chest.js"></script>
-<script src="ros-chest.js"></script>
-<script src="background-chest.js"></script>
-<script src="dx-chest.js"></script>
-  <script src="ui-language.js"></script>
-<script src="ui-utils.js"></script>
-<script src="ui-questions.js"></script>
-<script src="ui-analysis.js"></script>
-<script src="ui-differentials.js"></script>
-<script src="ui-case-scenario.js"></script>
-<script src="ui-layout.js"></script>
-<script src="ui-bind.js"></script>
+  <script src="rules-scoring.js"></script>
+  <script src="personal-chest.js"></script>
+  <script src="cc-chest.js"></script>
+  <script src="hpi-chest.js"></script>
+  <script src="ros-chest.js"></script>
+  <script src="background-chest.js"></script>
+  <script src="dx-chest.js"></script>
 
-  <!-- BOOTSTRAP THE ENGINE + UI -->
+  <!-- UI -->
+  <script src="ui-language.js"></script>
+  <script src="ui-utils.js"></script>
+  <script src="ui-questions.js"></script>
+  <script src="ui-analysis.js"></script>
+  <script src="ui-differentials.js"></script>
+  <script src="ui-case-scenario.js"></script>
+  <script src="ui-layout.js"></script>
+  <script src="ui-bind.js"></script>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      if (window.UIBinder) {
-        UIBinder.init();
-      } else {
-        console.error("UIBinder not found.");
-      }
+      UIBinder.init();
     });
   </script>
 
