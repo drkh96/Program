@@ -556,3 +556,39 @@ body.lang-en * {
     padding: 6px 10px;
   }
 }
+/* =========================================
+   DDx FEATURE & INVESTIGATION TAGS (SOFT MEDICAL THEME)
+========================================= */
+
+/* FEATURE TAGS */
+.ddx-dropdown .dd-line {
+    background: rgba(56, 189, 248, 0.08);  /* soft medical blue */
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    color: #cbd5e1;  /* gentle clinical text */
+    padding: 8px 12px;
+    margin: 6px 0;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    transition: 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.ddx-dropdown .dd-line:hover {
+    background: rgba(56, 189, 248, 0.15);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.20);
+}
+
+
+/* INVESTIGATION TAGS */
+.ddx-dropdown.inv .dd-line {
+    background: rgba(139, 92, 246, 0.10); /* soft purple */
+    border: 1px solid rgba(139, 92, 246, 0.22);
+    color: #e2e8f0;
+}
+
+.ddx-dropdown.inv .dd-line:hover {
+    background: rgba(139, 92, 246, 0.18);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.20);
+    transform: translateX(4px);
+}

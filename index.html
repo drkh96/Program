@@ -2,78 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Bleeding Tendency Simulator</title>
-
-    <!-- LINK YOUR CSS -->
-<link rel="stylesheet" href="style.css" />
+    <title>Bleeding Tendency Clinical Simulator</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<!-- ====================================================
-     HEADER
-==================================================== -->
-<header class="app-header">
-    <h1>Bleeding Tendency</h1>
-    <div class="app-subtitle">Interactive Clinical Reasoning Simulator</div>
-</header>
+    <!-- =======================================================
+         HEADER
+    ======================================================== -->
+    <header class="app-header">
+        <h1>Bleeding Tendency Simulator</h1>
+        <div class="app-subtitle">Interactive Clinical History & Reasoning System</div>
+    </header>
 
 
-<!-- ====================================================
-     MAIN LAYOUT — 3 CARDS
-==================================================== -->
-<div class="app-layout">
+    <!-- =======================================================
+         MAIN 3-CARD LAYOUT
+    ======================================================== -->
+    <div class="app-layout">
 
-    <!-- ========= 1) DDX PANEL ========= -->
-    <div class="card card-ddx fade-royal">
-        <div class="card-header">
-            <div class="card-title">Differential Diagnosis</div>
-        </div>
+        <!-- ============= 1) DIFFERENTIAL DIAGNOSIS PANEL ============= -->
+        <div class="card card-ddx" id="ddxCard">
+            <div class="card-header">
+                <div class="card-title">Differential Diagnosis</div>
+            </div>
 
-        <div class="card-body" id="ddxContainer">
-            <div class="dd-empty">Differential diagnoses will appear here as you answer questions.</div>
-        </div>
-    </div>
-
-
-
-    <!-- ========= 2) REASONING PANEL ========= -->
-    <div class="card card-reason fade-royal">
-        <div class="card-header">
-            <div class="card-title">Clinical Reasoning</div>
-        </div>
-
-        <div class="card-body" id="reasonContainer">
-            <div class="reason-text">
-                Reasoning for each answer will appear here soon (optional).  
-                <br><br>
-                *Current version displays DDx only — reasoning engine can be added later.*
+            <div class="card-body" id="ddxContainer">
+                <!-- JS will render DDx here -->
             </div>
         </div>
-    </div>
 
 
+        <!-- ============= 2) CLINICAL REASONING PANEL ============= -->
+        <div class="card card-reason">
+            <div class="card-header">
+                <div class="card-title">Clinical Reasoning</div>
+            </div>
 
-    <!-- ========= 3) QUESTIONS PANEL ========= -->
-    <div class="card card-history fade-royal">
-        <div class="card-header">
-            <div class="card-title">Questions</div>
-            <div class="section-step-counter" id="stepCounter">Step 1</div>
+            <div class="card-body" id="reasoningCardBody">
+                <!-- JS will render reasoning here -->
+            </div>
         </div>
 
-        <div class="card-body" id="questionContainer">
-            <!-- JS will inject questions here -->
+
+        <!-- ============= 3) QUESTIONS PANEL ============= -->
+        <div class="card card-history">
+            <div class="card-header">
+                <div class="card-title">Questions</div>
+            </div>
+
+            <div class="card-body" id="questionsCard">
+                <!-- JS renders the questions here -->
+            </div>
+
+            <div class="controls-row">
+                <button id="btnNext" class="btn btn-primary">Next</button>
+            </div>
         </div>
-    </div>
 
-</div> <!-- END LAYOUT -->
-
+    </div> <!-- END app-layout -->
 
 
-<!-- ====================================================
-     JS FILE — FULL ENGINE
-==================================================== -->
-<script src="program.js"></script>
+    <!-- =======================================================
+         SCRIPT IMPORTS (VERY IMPORTANT ORDER)
+    ======================================================== -->
+
+    <!-- 1) DATA (Questions) -->
+    <script src="bleeding-data.js"></script>
+
+    <!-- 2) DDX DATA -->
+    <script src="bleeding-ddx.js"></script>
+
+    <!-- 3) ENGINE (Logic) -->
+    <script src="bleeding-engine.js"></script>
+
+    <!-- 4) UI UTILITIES -->
+    <script src="ui-utils.js"></script>
+
+    <!-- 5) MAIN UI RENDERING -->
+    <script src="bleeding-ui.js"></script>
 
 </body>
 </html>
