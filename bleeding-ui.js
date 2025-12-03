@@ -8,6 +8,8 @@ const qPanel = document.getElementById("questionsCard");
 const reasoningPanel = document.getElementById("reasoningCardBody");
 const ddxPanel = document.getElementById("ddxContainer");
 const nextBtn = document.getElementById("btnNext");
+const backBtn = document.getElementById("btnBack");
+const restartBtn = document.getElementById("btnRestart");
 
 
 /***********************************************************
@@ -19,6 +21,7 @@ function renderCurrentQuestion() {
     // Finished all questions
     if (index >= Questions.length) {
         renderFinalCase();
+        updateProgressBar();
         return;
     }
 
@@ -36,8 +39,8 @@ function renderCurrentQuestion() {
     const optionsBox = document.getElementById("optionsBox");
 
     if (q.type === "single") {
-    nextBtn.style.display = "none";
-        // RADIO OPTIONS
+        nextBtn.style.display = "none";
+
         q.options.forEach(opt => {
             let row = document.createElement("div");
             row.className = "option-row radio-option";
@@ -49,7 +52,10 @@ function renderCurrentQuestion() {
             `;
             row.onclick = () => {
                 row.querySelector("input").checked = true;
+
+                recordStateBeforeAnswer(q.id, opt.value); // ← BACK SUPPORT
                 handleAnswer(q.id, opt.value);
+
                 updatePanels();
                 renderCurrentQuestion();
             };
@@ -58,20 +64,24 @@ function renderCurrentQuestion() {
     }
 
     else if (q.type === "text") {
-        // TEXT INPUT
         optionsBox.innerHTML = `
             <input type="text" id="input_${q.id}" placeholder="Enter here..." class="option-row">
         `;
-        
-nextBtn.style.display = "block";
+
+        nextBtn.style.display = "block";
         nextBtn.onclick = () => {
             const v = document.getElementById(`input_${q.id}`).value.trim();
             if (!v) return;
+
+            recordStateBeforeAnswer(q.id, v); // ← BACK SUPPORT
             handleAnswer(q.id, v);
+
             updatePanels();
             renderCurrentQuestion();
         };
     }
+
+    updateProgressBar(); // ← Progress bar update
 }
 
 
@@ -142,13 +152,31 @@ function renderDDx() {
 
         ddxPanel.appendChild(card);
     });
+
     afterDDXRender();
 }
 
-/***********************************************************
- * DROPDOWN OPEN/CLOSE
- ***********************************************************/
 
+/***********************************************************
+ * BACK BUTTON LOGIC
+ ***********************************************************/
+backBtn.onclick = () => {
+    const ok = undoLastAnswer();
+    if (!ok) return;
+
+    renderCurrentQuestion();
+    renderReasoning();
+    renderDDx();
+    updateProgressBar();
+};
+
+
+/***********************************************************
+ * RESTART BUTTON LOGIC
+ ***********************************************************/
+restartBtn.onclick = () => {
+    restartSimulation();
+};
 
 
 /***********************************************************
@@ -156,7 +184,7 @@ function renderDDx() {
  ***********************************************************/
 function getDDxGroupClass(group) {
     switch(group) {
-        case "platelet_vwf": return "card-pulmonary";   // تغيرها لاحقاً من CSS
+        case "platelet_vwf": return "card-pulmonary";
         case "coagulation": return "card-cardiac";
         case "local": return "card-gi";
         case "systemic": return "card-other";
@@ -166,7 +194,7 @@ function getDDxGroupClass(group) {
 
 
 /***********************************************************
- * FINAL CASE SUMMARY (أظهره عند انتهاء جميع الأسئلة)
+ * FINAL CASE SUMMARY
  ***********************************************************/
 function renderFinalCase() {
     qPanel.innerHTML = `
@@ -177,8 +205,7 @@ function renderFinalCase() {
                 <strong>Name:</strong> ${EngineState.answers.name || "Unknown"}<br>
                 <strong>Age:</strong> ${EngineState.answers.age || "Unknown"}<br>
                 <strong>Sex:</strong> ${EngineState.answers.sex || "Unknown"}<br>
-                <strong>Occupation:</strong> ${EngineState.answers.occupation || "Unknown"}<br>
-                <br>
+                <strong>Occupation:</strong> ${EngineState.answers.occupation || "Unknown"}<br><br>
 
                 <strong>Chief Complaint:</strong> ${EngineState.answers.chiefComplaint}<br>
                 <strong>Duration:</strong> ${EngineState.answers.duration}<br>
@@ -197,6 +224,7 @@ function renderFinalCase() {
     `;
 
     nextBtn.style.display = "none";
+    updateProgressBar();
 }
 
 
@@ -214,8 +242,9 @@ function getTopDDx() {
 
 
 /***********************************************************
- * START RENDERING
+ * INITIAL RENDER
  ***********************************************************/
 renderCurrentQuestion();
 renderDDx();
 renderReasoning();
+updateProgressBar();

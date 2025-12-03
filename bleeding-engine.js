@@ -1,10 +1,11 @@
 /***********************************************************
- * BLEEDING TENDENCY — ENGINE (FULL UNIFIED VERSION)
+ * BLEEDING TENDENCY — ENGINE (FINAL VERSION WITH UNDO SUPPORT)
  ***********************************************************/
 
-/* =========================================================
-   ENGINE STATE — holds all progress and scores
-   ========================================================= */
+
+/***********************************************************
+ * ENGINE STATE — holds all progress and scores
+ ***********************************************************/
 const EngineState = {
     currentIndex: 0,       // which question we are on
     answers: {},           // user answers
@@ -14,42 +15,38 @@ const EngineState = {
 };
 
 
-/* =========================================================
-   INITIALIZE DDx SCORES FROM DDX_Data
-   ========================================================= */
+/***********************************************************
+ * INITIALIZE DDx SCORES FROM DDX_Data
+ ***********************************************************/
 function initDDxScores() {
     DDX_Data.forEach(d => {
         EngineState.ddxScores[d.id] = d.baselineScore || 0;
     });
 }
-
 initDDxScores();
 
 
 /***********************************************************
- * PROCESS ANSWER
- * This function:
- *  - Saves the answer
- *  - Parses it (if question has parser)
- *  - Generates reasoning
- *  - Updates DDx scores
- *  - Moves to next question
+ * PROCESS ANSWER (WITH UNDO / SNAPSHOT SUPPORT)
  ***********************************************************/
 function handleAnswer(questionId, value) {
 
     const question = Questions.find(q => q.id === questionId);
     if (!question) return;
 
-    // Parse if needed
+    // ⭐ IMPORTANT — record state BEFORE modifying anything
+    recordStateBeforeAnswer(questionId, value);
+
+    // Parse the value if needed
     let parsedValue = value;
     if (question.parse) {
         parsedValue = question.parse(value);
     }
 
-    // Save answer
+    // Save the answer
     EngineState.answers[questionId] = parsedValue;
 
-    // Generate reasoning
+    // Generate reasoning text
     if (question.reasoning) {
         const r = question.reasoning(parsedValue);
         if (r) {
@@ -60,10 +57,10 @@ function handleAnswer(questionId, value) {
         }
     }
 
-    // Update DDx based on this question
+    // Apply DDx scoring logic
     updateDDxFromQuestion(questionId, parsedValue);
 
-    // Go to next question
+    // Move to next question
     EngineState.currentIndex++;
 }
 
@@ -114,7 +111,7 @@ function updateDDxFromQuestion(qid, value) {
         }
     }
 
-    /* OCCUPATION EFFECTS ------------------------------------ */
+    /* OCCUPATION ----------------------------------------- */
     if (qid === "occupation") {
         switch(value) {
             case "retired":
@@ -127,7 +124,7 @@ function updateDDxFromQuestion(qid, value) {
         }
     }
 
-    /* CHIEF COMPLAINT EFFECTS ------------------------------- */
+    /* CHIEF COMPLAINT ------------------------------------ */
     if (qid === "chiefComplaint") {
         switch(value) {
             case "bruising":
@@ -165,7 +162,7 @@ function updateDDxFromQuestion(qid, value) {
         }
     }
 
-    /* DURATION EFFECT --------------------------------------- */
+    /* DURATION -------------------------------------------- */
     if (qid === "duration") {
         switch(value) {
             case "sinceChildhood":
@@ -187,7 +184,7 @@ function updateDDxFromQuestion(qid, value) {
         }
     }
 
-    /* BLEEDING SITE EFFECT (Entry Question A+) --------------- */
+    /* BLEEDING SITE --------------------------------------- */
     if (qid === "bleedingSite") {
         switch(value) {
             case "mucosal":
@@ -239,7 +236,7 @@ function updateDDxFromQuestion(qid, value) {
 
 
 /***********************************************************
- * UTILITY: ADJUST DDx SCORE
+ * ADJUST DDx SCORE
  ***********************************************************/
 function adjust(id, amount) {
     EngineState.ddxScores[id] += amount;
