@@ -1,220 +1,320 @@
-/******************************************************
- * BLEEDING TENDENCY — DATA SECTION
- * This file contains:
- * 1) Personal Information Questions
- * 2) Chief Complaint
- * 3) Duration of Complaint
- * 4) Entry Question A+
- * 5) Dynamic Pathway Questions
- ******************************************************/
+/* ============================================================
+   BLEEDING TENDENCY – DYNAMIC QUESTION SYSTEM (PATHWAY VERSION)
+   ------------------------------------------------------------
+   Pathways:
+   - Platelet / vWF (mucosal bleeding, bruising, heavy menses)
+   - Coagulation (joint bleeding, hemarthrosis, post-surgical bleed)
+   - Drug-Induced (aspirin, NSAIDs, anticoagulants)
+   - Local Bleeding (single-site recurrent bleeding)
+   ============================================================ */
 
-const Questions = [
+const bleedingQuestions = [
 
-/* =====================================================
-   1) PERSONAL INFORMATION — ONE QUESTION AT A TIME
-   ===================================================== */
+/* ============================================================
+   1) UNIVERSAL QUESTIONS (ALWAYS ASKED FIRST)
+   ============================================================ */
 
 {
-    id: "name",
-    section: "Personal Information",
-    text: "What is the patient's name?",
+    id: "patient_name",
+    text: "What is the patient’s name?",
     type: "text",
-    affectsDDx: false,   // لا يؤثر على التشخيص
-    reasoning: (v) => `Patient is identified as ${v}.`
+    validate: v => v.trim().length > 0 || "Name is required.",
+    reasoning: v => `Patient identified: ${v}.`
 },
 
 {
     id: "age",
-    section: "Personal Information",
     text: "How old is the patient?",
-    type: "text",    // المريض يكتب رقم لكن الحقل text
-    parse: (v) => {
-        let age = parseInt(v);
-        return isNaN(age) ? null : age;
+    type: "text",
+    validate: (v) => {
+        if (!v.trim()) return "Age is required.";
+        const n = parseInt(v);
+        if (isNaN(n) || n < 0 || n > 120) return "Enter a valid age.";
+        return true;
     },
-    affectsDDx: true,
-    reasoning: (age) => {
-        if (!age) return "Age unclear.";
-
-        if (age <= 14)
-            return "Pediatric age → consider hemophilia, ITP, congenital disorders.";
-        if (age <= 40)
-            return "Young adult → vWF disease, ITP, menstrual bleeding possible.";
-        if (age <= 65)
-            return "Middle-aged → consider liver disease and drug-related bleeding.";
-        return "Elderly → bleeding often due to anticoagulants, liver disease, or malignancy.";
+    reasoning: (v) => {
+        const age = parseInt(v);
+        if (age <= 14) return "Young age increases likelihood of congenital bleeding disorders.";
+        if (age >= 65) return "Older age increases risks of liver disease or anticoagulant-related bleeding.";
+        return "Age documented.";
     }
 },
 
 {
     id: "sex",
-    section: "Personal Information",
-    text: "What is the patient's sex?",
+    text: "What is the patient’s sex?",
     type: "single",
-    options: [
-        { value: "male", label: "Male" },
-        { value: "female", label: "Female" }
-    ],
-    affectsDDx: true,
-    reasoning: (sex) => {
-        if (sex === "male") return "Male → hemophilia significantly more likely.";
-        if (sex === "female") return "Female → consider menorrhagia and vWF disease.";
-        return "";
-    }
+    options: ["male", "female"],
+    validate: v => !!v || "Please select one.",
+    reasoning: (v) =>
+        v === "male"
+        ? "Male sex raises suspicion for hemophilia (X-linked disorders)."
+        : "Female sex increases likelihood of von Willebrand disease."
 },
 
 {
-    id: "occupation",
-    section: "Personal Information",
-    text: "What is the patient's occupation?",
+    id: "chief_complaint",
+    text: "What is the main bleeding complaint?",
     type: "single",
     options: [
-        { value: "office", label: "Office worker" },
-        { value: "manual", label: "Manual labor worker" },
-        { value: "healthcare", label: "Healthcare worker" },
-        { value: "student", label: "Student" },
-        { value: "retired", label: "Retired / elderly" },
-        { value: "housewife", label: "Housewife" },
-        { value: "athlete", label: "Athlete" }
+        "bruising",
+        "nose/gum bleeding",
+        "joint bleeding",
+        "heavy menses",
+        "post-surgical bleeding",
+        "recurrent bleeding from one spot"
     ],
-    affectsDDx: true,
-    reasoning: (job) => {
-        switch(job) {
-            case "manual": 
-                return "Manual labor → bruising may be trauma-related OR excessive bleeding.";
-            case "retired":
-                return "Retired → higher chance of anticoagulant use or liver disease.";
-            case "healthcare":
-                return "Healthcare worker → increased medication exposure.";
-            case "housewife":
-                return "Housewife → menorrhagia relevance in bleeding history.";
-            default:
-                return "Occupation does not strongly modify bleeding etiology.";
+    validate: v => !!v || "Please select a complaint.",
+    reasoning: (v) => {
+        switch(v){
+            case "bruising": return "Bruising suggests platelet or vWF dysfunction.";
+            case "nose/gum bleeding": return "Mucosal bleeding strongly indicates platelet/vWF issues.";
+            case "joint bleeding": return "Joint bleeding strongly indicates coagulation factor deficiency (hemophilia).";
+            case "heavy menses": return "Heavy menses is classic for von Willebrand disease.";
+            case "post-surgical bleeding": return "Post-procedure bleeding suggests coagulation factor deficiency.";
+            case "recurrent bleeding from one spot": return "Single-site repeated bleeding suggests a local structural cause.";
         }
     }
 },
 
-/* =====================================================
-   2) CHIEF COMPLAINT
-   ===================================================== */
-
 {
-    id: "chiefComplaint",
-    section: "Chief Complaint",
-    text: "Why is the patient seeking medical attention today?",
+    id: "onset",
+    text: "When did the bleeding problem start?",
     type: "single",
-    options: [
-        { value: "bruising", label: "I bruise easily" },
-        { value: "noseGumBleeding", label: "Bleeding from nose or gums" },
-        { value: "smallCuts", label: "Prolonged bleeding after small cuts" },
-        { value: "heavyMenses", label: "Heavy menstrual bleeding" },
-        { value: "jointBleeding", label: "Joint swelling with blood" },
-        { value: "postSurgery", label: "Bleeding too much after surgery/dental work" },
-        { value: "recurrentSpot", label: "Bleeding repeatedly from the same spot" },
-        { value: "giBleeding", label: "Blood in stool or vomit" }
-    ],
-    affectsDDx: true,
-    reasoning: (complaint) => {
-        switch(complaint) {
-            case "bruising":
-                return "Bruising easily → platelet dysfunction vs vWF disease.";
-            case "noseGumBleeding":
-                return "Mucosal bleeding → primary hemostasis problem.";
-            case "smallCuts":
-                return "Bleeding after small cuts → platelet/vWF defect.";
-            case "heavyMenses":
-                return "Menorrhagia → vWF deficiency commonly suspected in females.";
-            case "jointBleeding":
-                return "Joint bleeding (hemarthrosis) → coagulation factor deficiency (hemophilia).";
-            case "postSurgery":
-                return "Post-surgical bleeding → immediate = platelet / delayed = coagulation.";
-            case "recurrentSpot":
-                return "Recurrent bleeding from one site → local lesion.";
-            case "giBleeding":
-                return "GI bleeding → systemic, local GI lesion, or anticoagulant effect.";
-        }
+    options: ["since childhood", "months", "weeks", "days"],
+    validate: (v, ans) => {
+        if (!v) return "Select an onset.";
+        if (v === "since childhood" && ans.age && parseInt(ans.age) < 2)
+            return "Childhood onset is not compatible with age < 2.";
+        return true;
+    },
+    reasoning: (v) => {
+        if (v === "since childhood") return "Chronic childhood onset suggests congenital disorders.";
+        if (v === "days") return "Acute onset indicates acquired causes.";
+        return "Onset documented.";
     }
 },
 
-/* =====================================================
-   3) DURATION OF COMPLAINT (NEW REQUEST)
-   ===================================================== */
+{
+    id: "severity",
+    text: "How severe is the bleeding?",
+    type: "single",
+    options: ["mild","moderate","severe"],
+    validate: v => !!v || "Choose a severity.",
+    reasoning: v => 
+        v === "severe"
+        ? "Severe bleeding strongly suggests coagulation factor deficiency or major platelet dysfunction."
+        : "Severity recorded."
+},
+
+/* ============================================================
+   2) PATHWAY TRIGGER – Decides which pathway to enter
+   ============================================================ */
 
 {
-    id: "duration",
-    section: "Chief Complaint",
-    text: "How long has the bleeding problem been occurring?",
-    type: "single",
-    options: [
-        { value: "sinceChildhood", label: "Since childhood" },
-        { value: "years", label: "For many years" },
-        { value: "months", label: "For several months" },
-        { value: "weeks", label: "For several weeks" },
-        { value: "days", label: "For a few days" },
-        { value: "sudden", label: "Sudden onset" }
-    ],
-    affectsDDx: true,
-    reasoning: (d) => {
-        switch(d) {
-            case "sinceChildhood":
-                return "Since childhood → suggests congenital disorder such as hemophilia or vWF.";
-            case "years":
-                return "Chronic bleeding → suggests inherited disorder or chronic liver disease.";
-            case "months":
-                return "Several months → consider ITP, malignancy, liver disease.";
-            case "weeks":
-                return "Weeks → acquired causes likely.";
-            case "days":
-                return "Acute onset → drugs, infection, DIC possible.";
-            case "sudden":
-                return "Sudden severe bleeding → DIC, trauma, anticoagulant toxicity.";
-        }
+    id: "pathway_selector",
+    type: "pathway",
+    computePathway: (answers) => {
+        const cc = answers.chief_complaint;
+
+        if (cc === "bruising") return "platelet";
+        if (cc === "nose/gum bleeding") return "vWF";
+        if (cc === "heavy menses") return "vWF";
+        if (cc === "joint bleeding") return "coagulation";
+        if (cc === "post-surgical bleeding") return "coagulation";
+        if (cc === "recurrent bleeding from one spot") return "local";
+
+        return "general";
     }
 },
 
-/* =====================================================
-   4) ENTRY QUESTION A+ (THE MASTER PATHWAY SELECTOR)
-   ===================================================== */
+/* ============================================================
+   3) PLATELET PATHWAY QUESTIONS
+   ============================================================ */
 
 {
-    id: "bleedingSite",
-    section: "Bleeding Characteristics",
-    text: "Where do you notice the bleeding?",
+    id: "platelet_1",
+    pathway: "platelet",
+    text: "Does the patient have petechiae (tiny pinpoint bleeding spots)?",
     type: "single",
-    options: [
-        { value: "mucosal", label: "Nose / gums / mouth" },
-        { value: "skinBruising", label: "Bruising or petechiae" },
-        { value: "smallCuts", label: "Prolonged bleeding after small cuts" },
-        { value: "joint", label: "Bleeding inside joints" },
-        { value: "muscle", label: "Deep muscle bleeding / hematomas" },
-        { value: "singleSpot", label: "Bleeding always from one place" },
-        { value: "postProcedure", label: "Bleeding after procedures" },
-        { value: "gi", label: "Blood in stool or vomit" },
-        { value: "urine", label: "Blood in urine" },
-        { value: "resp", label: "Coughing or vomiting blood" }
-    ],
-    affectsDDx: true,
-    reasoning: (b) => {
-        switch(b) {
-            case "mucosal":
-            case "skinBruising":
-            case "smallCuts":
-                return "Primary hemostasis defect → platelet or vWF disease.";
-            case "joint":
-            case "muscle":
-                return "Deep bleeding → coagulation factor deficiency (hemophilia).";
-            case "singleSpot":
-                return "Localized bleeding → local lesion.";
-            case "postProcedure":
-                return "Procedure bleeding → immediate = platelet/vWF, delayed = coagulation.";
-            case "gi":
-                return "GI bleeding → local GI lesion or systemic coagulopathy.";
-            case "urine":
-                return "Hematuria → possible renal lesion or systemic bleeding.";
-            case "resp":
-                return "Hemoptysis → pulmonary pathology or systemic bleeding.";
-        }
-    }
-}
+    options: ["yes","no"],
+    validate: v => !!v || "Please choose an answer.",
+    reasoning: v =>
+        v === "yes"
+        ? "Petechiae strongly indicate platelet dysfunction (ITP, drug-induced, vWF)."
+        : "Absence of petechiae lowers likelihood of severe platelet dysfunction."
+},
 
-]; // END OF QUESTIONS
+{
+    id: "platelet_2",
+    pathway: "platelet",
+    text: "Does bleeding occur after minor trauma?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v => 
+        v === "yes"
+        ? "Bleeding after minimal trauma suggests platelet/vWF dysfunction."
+        : "Normal trauma response reduces platelet disorder suspicion."
+},
+
+{
+    id: "platelet_3",
+    pathway: "platelet",
+    text: "Does the patient bruise easily and frequently?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Frequent bruising is consistent with platelet or vWF disorders."
+        : "Absence of easy bruising lowers suspicion."
+},
+
+/* ============================================================
+   4) vWF PATHWAY QUESTIONS
+   ============================================================ */
+
+{
+    id: "vwf_1",
+    pathway: "vWF",
+    text: "Is there mucosal bleeding (nose, gums, menstrual, GI)?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Mucosal bleeding is classic for von Willebrand disease."
+        : "Absence of mucosal bleeding slightly reduces vWF probability."
+},
+
+{
+    id: "vwf_2",
+    pathway: "vWF",
+    text: "Is bleeding prolonged after minor procedures (dental extraction, injections)?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Prolonged mucosal or procedural bleeding strongly supports vWF deficiency."
+        : "Normal procedural bleeding reduces vWF suspicion."
+},
+
+{
+    id: "vwf_3",
+    pathway: "vWF",
+    text: "Is there a family history of mucosal bleeding or vWF disorder?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Family history supports inherited vWF deficiency."
+        : "No family history lowers inherited vWF likelihood."
+},
+
+/* ============================================================
+   5) COAGULATION PATHWAY (Hemophilia / Factor Deficiency)
+   ============================================================ */
+
+{
+    id: "coag_1",
+    pathway: "coagulation",
+    text: "Has the patient experienced joint swelling or hemarthrosis?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Hemarthrosis is a hallmark of hemophilia (factor VIII/IX deficiency)."
+        : "Absence of hemarthrosis reduces hemophilia likelihood."
+},
+
+{
+    id: "coag_2",
+    pathway: "coagulation",
+    text: "Is bleeding prolonged after injury or surgery?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Prolonged bleeding after injury indicates coagulation factor deficiency."
+        : "Normal clotting after trauma reduces coagulation disorder suspicion."
+},
+
+{
+    id: "coag_3",
+    pathway: "coagulation",
+    text: "Are male relatives affected by similar bleeding episodes?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Male relatives affected suggests X-linked hemophilia."
+        : "Absence of male-pattern family history lowers hemophilia likelihood."
+},
+
+/* ============================================================
+   6) LOCAL BLEEDING PATHWAY (Structural lesion)
+   ============================================================ */
+
+{
+    id: "local_1",
+    pathway: "local",
+    text: "Is the bleeding always from the same exact spot?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Recurrent bleeding from one site suggests a local structural problem."
+        : "If bleeding varies, systemic causes are more likely."
+},
+
+{
+    id: "local_2",
+    pathway: "local",
+    text: "Any trauma or injury to that area?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Local trauma can explain recurrent site-specific bleeding."
+        : "No trauma → suspect vascular abnormalities."
+},
+
+/* ============================================================
+   7) DRUG-INDUCED BLEEDING PATHWAY
+   ============================================================ */
+
+{
+    id: "drug_1",
+    pathway: "drug",
+    text: "Is the patient using aspirin regularly?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Aspirin irreversibly inhibits platelets, increasing bleeding tendency."
+        : "No aspirin use documented."
+},
+
+{
+    id: "drug_2",
+    pathway: "drug",
+    text: "Is the patient taking NSAIDs?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "NSAIDs impair platelet aggregation and can worsen mucosal bleeding."
+        : "No NSAID-related risk."
+},
+
+{
+    id: "drug_3",
+    pathway: "drug",
+    text: "Is the patient on anticoagulants (warfarin, DOACs, heparin)?",
+    type: "single",
+    options: ["yes","no"],
+    reasoning: v =>
+        v === "yes"
+        ? "Anticoagulants directly increase bleeding risk."
+        : "No anticoagulant exposure."
+},
+
+];

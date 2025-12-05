@@ -1,95 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <title>Bleeding Tendency Clinical Simulator</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <title>Bleeding History & Reasoning Simulator</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Font (Optional) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-    <!-- =======================================================
-         HEADER
-    ======================================================== -->
-    <header class="app-header">
-        <h1>Bleeding Tendency Simulator</h1>
-        <div class="app-subtitle">Interactive Clinical History & Reasoning System</div>
-    </header>
+    <!-- ============================
+         MAIN LAYOUT — 3 PANELS
+    ================================ -->
+    <div class="container">
 
-    <!-- =======================================================
-         PROGRESS BAR
-    ======================================================== -->
-    <div id="progressBar">
-        <div id="progressFill"></div>
+        <!-- =============================
+             PANEL 1 — QUESTIONS
+        ================================= -->
+        <div class="panel" id="question-panel">
+            <div class="panel-title">Patient Interview</div>
+
+            <!-- Question text + options injected here -->
+        </div>
+
+
+        <!-- =============================
+             PANEL 2 — CLINICAL REASONING
+        ================================= -->
+        <div class="panel" id="reasoning-panel">
+            <div class="panel-title">Clinical Reasoning</div>
+
+            <!-- Reasoning blocks injected here -->
+        </div>
+
+
+        <!-- =============================
+             PANEL 3 — DIFFERENTIAL DIAGNOSIS
+        ================================= -->
+        <div class="panel" id="ddx-panel">
+            <div class="panel-title">Differential Diagnosis</div>
+
+            <div class="ddx-placeholder">
+                DDx will appear once you answer the first question.
+            </div>
+        </div>
+
     </div>
 
 
-    <!-- =======================================================
-         MAIN 3-CARD LAYOUT
-    ======================================================== -->
-    <div class="app-layout">
+    <!-- =============================
+         CONTROL BUTTONS (GLOBAL)
+    =============================== -->
+    <div class="control-buttons" style="padding: 20px;">
 
-        <!-- ============= 1) DIFFERENTIAL DIAGNOSIS PANEL ============= -->
-        <div class="card card-ddx" id="ddxCard">
-            <div class="card-header">
-                <div class="card-title">Differential Diagnosis</div>
-            </div>
+        <button id="back-btn">Back</button>
+        <button id="next-btn">Next</button>
 
-            <div class="card-body" id="ddxContainer">
-                <!-- JS will render DDx here -->
-            </div>
-        </div>
+        <div id="error-box"></div>
+    </div>
 
 
-        <!-- ============= 2) CLINICAL REASONING PANEL ============= -->
-        <div class="card card-reason">
-            <div class="card-header">
-                <div class="card-title">Clinical Reasoning</div>
-            </div>
-
-            <div class="card-body" id="reasoningCardBody">
-                <!-- JS will render reasoning here -->
-            </div>
-        </div>
-
-
-        <!-- ============= 3) QUESTIONS PANEL ============= -->
-        <div class="card card-history">
-            <div class="card-header">
-                <div class="card-title">Questions</div>
-            </div>
-
-            <div class="card-body" id="questionsCard">
-                <!-- JS renders the questions here -->
-            </div>
-
-            <div class="controls-row">
-                <button id="btnBack" class="btn btn-secondary">Back</button>
-                <button id="btnRestart" class="btn btn-secondary">Restart</button>
-                <button id="btnNext" class="btn btn-primary">Next</button>
-            </div>
-        </div>
-
-    </div> <!-- END app-layout -->
-
-
-    <!-- =======================================================
-         SCRIPT IMPORTS (VERY IMPORTANT ORDER)
-    ======================================================== -->
-
-    <!-- 1) DATA (Questions) -->
-    <script src="bleeding-data.js"></script>
-
-    <!-- 2) DDX DATA -->
-    <script src="bleeding-ddx.js"></script>
-
-    <!-- 3) ENGINE (Logic) -->
-    <script src="bleeding-engine.js"></script>
-
-    <!-- 4) UI UTILITIES -->
+    <!-- =============================
+         JAVASCRIPT FILES — ORDER IMPORTANT
+    =============================== -->
+    
+    <!-- Utils (collapse, scroll, DOM helpers) -->
     <script src="ui-utils.js"></script>
 
-    <!-- 5) MAIN UI RENDERING -->
+    <!-- Core Data (questions + ddx definitions) -->
+    <script src="bleeding-data.js"></script>
+    <script src="bleeding-ddx.js"></script>
+
+    <!-- Engine (logic + scoring) -->
+    <script src="bleeding-engine.js"></script>
+
+    <!-- UI Controller -->
     <script src="bleeding-ui.js"></script>
 
 </body>

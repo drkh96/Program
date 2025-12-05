@@ -1,243 +1,156 @@
-/***********************************************************
- * BLEEDING TENDENCY — ENGINE (FINAL VERSION WITH UNDO SUPPORT)
- ***********************************************************/
+/* ============================================================
+   BLEEDING SIMULATOR ENGINE — V2
+   This engine handles:
+   - State management
+   - Validation
+   - Pathway selection
+   - Dynamic question progression
+   - DDx scoring
+   - Reasoning collection
+   - Back system
+   ============================================================ */
 
-
-/***********************************************************
- * ENGINE STATE — holds all progress and scores
- ***********************************************************/
-const EngineState = {
-    currentIndex: 0,       // which question we are on
-    answers: {},           // user answers
-    reasoning: [],         // accumulated reasoning
-    ddxScores: {},         // disease scores
-    completed: false
+// =====================
+// GLOBAL STATE
+// =====================
+const BleedingState = {
+    index: 0,                             // current question index
+    answers: {},                          // saved answers
+    reasoning: [],                        // reasoning list
+    pathway: null,                        // current active pathway
+    history: [],                          // for Back
+    ddxScores: {},                        // DDx scoring map
+    initialized: false                    // indicates first answer
 };
 
-
-/***********************************************************
- * INITIALIZE DDx SCORES FROM DDX_Data
- ***********************************************************/
-function initDDxScores() {
-    DDX_Data.forEach(d => {
-        EngineState.ddxScores[d.id] = d.baselineScore || 0;
+// =====================
+// INITIALIZE DDx SCORES
+// =====================
+function initDDXScores() {
+    BleedingState.ddxScores = {};
+    bleedingDDX.forEach(d => {
+        BleedingState.ddxScores[d.id] = d.baseline || 0;
     });
 }
-initDDxScores();
 
+// =====================
+// SAVE SNAPSHOT BEFORE CHANGE
+// =====================
+function pushHistory() {
+    BleedingState.history.push(JSON.parse(JSON.stringify(BleedingState)));
+}
 
-/***********************************************************
- * PROCESS ANSWER (WITH UNDO / SNAPSHOT SUPPORT)
- ***********************************************************/
-function handleAnswer(questionId, value) {
+// =====================
+// UNDO (BACK button)
+// =====================
+function bleedUndo() {
+    if (BleedingState.history.length === 0) return false;
+    const last = BleedingState.history.pop();
+    Object.assign(BleedingState, last);
+    return true;
+}
 
-    const question = Questions.find(q => q.id === questionId);
-    if (!question) return;
+// =====================
+// CHECK VALIDATION
+// =====================
+function validateAnswer(question, value) {
+    if (!question.validate) return true;
+    const res = question.validate(value, BleedingState.answers);
+    return res === true ? true : res;   // return error message or true
+}
 
-    // ⭐ IMPORTANT — record state BEFORE modifying anything
-    recordStateBeforeAnswer(questionId, value);
+// =====================
+// GET NEXT QUESTION
+// =====================
+function getNextQuestion() {
 
-    // Parse the value if needed
-    let parsedValue = value;
-    if (question.parse) {
-        parsedValue = question.parse(value);
+    // If index beyond universal questions → start pathway
+    if (BleedingState.index >= bleedingQuestions.length) return null;
+
+    const q = bleedingQuestions[BleedingState.index];
+
+    // Pathway organizer
+    if (q.type === "pathway") {
+        BleedingState.pathway = q.computePathway(BleedingState.answers);
+        BleedingState.index++;
+        return getNextQuestion();
     }
 
-    // Save the answer
-    EngineState.answers[questionId] = parsedValue;
+    // Skip questions that do not belong to current pathway
+    if (q.pathway && q.pathway !== BleedingState.pathway) {
+        BleedingState.index++;
+        return getNextQuestion();
+    }
 
-    // Generate reasoning text
+    return q;
+}
+
+// =====================
+// APPLY ANSWER
+// =====================
+function applyBleedingAnswer(question, value) {
+
+    // 1) Validate
+    const valid = validateAnswer(question, value);
+    if (valid !== true) return { ok: false, error: valid };
+
+    // 2) Save state before changes
+    pushHistory();
+
+    // 3) Register answer
+    BleedingState.answers[question.id] = value;
+
+    // 4) Reasoning
     if (question.reasoning) {
-        const r = question.reasoning(parsedValue);
-        if (r) {
-            EngineState.reasoning.push({
-                from: questionId,
-                text: r
-            });
-        }
+        const r = question.reasoning(value, BleedingState.answers);
+        if (r) BleedingState.reasoning.push(r);
     }
 
-    // Apply DDx scoring logic
-    updateDDxFromQuestion(questionId, parsedValue);
+    // 5) Update DDx Scores
+    updateDDX(question.id, value);
 
-    // Move to next question
-    EngineState.currentIndex++;
+    // 6) Move to next
+    BleedingState.index++;
+    BleedingState.initialized = true;
+
+    return { ok: true };
 }
 
+// =====================
+// UPDATE DDx SCORING
+// =====================
+function updateDDX(questionId, value) {
 
-/***********************************************************
- * UPDATE DDx SCORES BASED ON EACH ANSWER
- ***********************************************************/
-function updateDDxFromQuestion(qid, value) {
+    bleedingDDX.forEach(disease => {
 
-    /* AGE EFFECTS ---------------------------------------- */
-    if (qid === "age") {
-        let age = value;
-        if (!age) return;
+        const triggers = disease.triggers || {};
+        const trigger = triggers[questionId];
 
-        if (age <= 14) {
-            adjust("hemA", +3);
-            adjust("hemB", +3);
-            adjust("itp", +2);
-            adjust("vwf", +2);
-            adjust("drugPlatelet", -2);
-            adjust("liverFailure", -2);
+        // CASE 1 — trigger is direct object mapping {yes: +3, no: -1}
+        if (trigger && typeof trigger === "object") {
+            if (value in trigger) BleedingState.ddxScores[disease.id] += trigger[value];
         }
-        else if (age <= 40) {
-            adjust("vwf", +2);
-            adjust("itp", +1);
+
+        // CASE 2 — trigger is age / custom function
+        if (typeof triggers.age === "function" && questionId === "age") {
+            const age = parseInt(value);
+            BleedingState.ddxScores[disease.id] += triggers.age(age);
         }
-        else if (age <= 65) {
-            adjust("liverFailure", +2);
-            adjust("warfarin", +2);
+
+        // CASE 3 — triggers on chief complaint
+        if (trigger && questionId === "chief_complaint") {
+            if (value in trigger) BleedingState.ddxScores[disease.id] += trigger[value];
         }
-        else {
-            adjust("warfarin", +3);
-            adjust("liverFailure", +2);
-            adjust("leukemia", +2);
-            adjust("hemA", -3);
-            adjust("hemB", -3);
-        }
-    }
-
-    /* SEX EFFECTS ---------------------------------------- */
-    if (qid === "sex") {
-        if (value === "male") {
-            adjust("hemA", +2);
-            adjust("hemB", +2);
-        }
-        if (value === "female") {
-            adjust("vwf", +2);
-        }
-    }
-
-    /* OCCUPATION ----------------------------------------- */
-    if (qid === "occupation") {
-        switch(value) {
-            case "retired":
-                adjust("warfarin", +2);
-                adjust("liverFailure", +1);
-                break;
-            case "manual":
-                adjust("epistaxisLocal", +1);
-                break;
-        }
-    }
-
-    /* CHIEF COMPLAINT ------------------------------------ */
-    if (qid === "chiefComplaint") {
-        switch(value) {
-            case "bruising":
-            case "noseGumBleeding":
-            case "smallCuts":
-                adjust("vwf", +2);
-                adjust("itp", +2);
-                adjust("drugPlatelet", +1);
-                adjust("hemA", -2);
-                adjust("hemB", -2);
-                break;
-
-            case "jointBleeding":
-                adjust("hemA", +3);
-                adjust("hemB", +3);
-                adjust("itp", -3);
-                adjust("vwf", -2);
-                break;
-
-            case "postSurgery":
-                adjust("vwf", +1);
-                adjust("hemA", +1);
-                adjust("hemB", +1);
-                break;
-
-            case "recurrentSpot":
-                adjust("epistaxisLocal", +3);
-                break;
-
-            case "giBleeding":
-                adjust("pepticUlcer", +2);
-                adjust("liverFailure", +1);
-                adjust("warfarin", +1);
-                break;
-        }
-    }
-
-    /* DURATION -------------------------------------------- */
-    if (qid === "duration") {
-        switch(value) {
-            case "sinceChildhood":
-                adjust("hemA", +3);
-                adjust("hemB", +3);
-                adjust("vwf", +2);
-                break;
-
-            case "months":
-                adjust("itp", +1);
-                adjust("leukemia", +1);
-                break;
-
-            case "days":
-            case "sudden":
-                adjust("dic", +3);
-                adjust("warfarin", +1);
-                break;
-        }
-    }
-
-    /* BLEEDING SITE --------------------------------------- */
-    if (qid === "bleedingSite") {
-        switch(value) {
-            case "mucosal":
-            case "skinBruising":
-            case "smallCuts":
-                adjust("vwf", +2);
-                adjust("itp", +2);
-                adjust("drugPlatelet", +1);
-                adjust("hemA", -2);
-                break;
-
-            case "joint":
-                adjust("hemA", +3);
-                adjust("hemB", +3);
-                adjust("factor13", +1);
-                break;
-
-            case "muscle":
-                adjust("hemA", +2);
-                adjust("hemB", +2);
-                adjust("factor13", +1);
-                break;
-
-            case "singleSpot":
-                adjust("epistaxisLocal", +3);
-                break;
-
-            case "postProcedure":
-                adjust("vwf", +1);
-                adjust("hemA", +1);
-                adjust("hemB", +1);
-                break;
-
-            case "gi":
-                adjust("pepticUlcer", +2);
-                adjust("liverFailure", +1);
-                break;
-
-            case "urine":
-                adjust("kidneyFail", +2);
-                break;
-
-            case "resp":
-                adjust("dic", +1);
-                break;
-        }
-    }
+    });
 }
 
-
-/***********************************************************
- * ADJUST DDx SCORE
- ***********************************************************/
-function adjust(id, amount) {
-    EngineState.ddxScores[id] += amount;
-}
+// =====================
+// EXPORT FUNCTIONS
+// =====================
+const BleedingEngine = {
+    getNextQuestion,
+    applyAnswer: applyBleedingAnswer,
+    undo: bleedUndo,
+    initDDX: initDDXScores,
+    state: BleedingState
+};

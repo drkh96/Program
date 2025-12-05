@@ -1,338 +1,221 @@
-/***********************************************************
- * BLEEDING TENDENCY — DIFFERENTIAL DIAGNOSIS DATA SECTION
- * Each disease has:
- *  - id
- *  - group
- *  - name
- *  - baselineScore
- *  - features: []         // expandable dropdown
- *  - investigations: []   // expandable dropdown
- ***********************************************************/
+/* ============================================================
+   BLEEDING TENDENCY — DIFFERENTIAL DIAGNOSIS SYSTEM
+   ------------------------------------------------------------
+   Compatible with dynamic pathways from bleeding-data.js
+   Groups:
+   - Platelet disorders
+   - von Willebrand disease
+   - Coagulation factor deficiency (Hemophilia A/B)
+   - Systemic / Liver disease
+   - Drug-induced bleeding
+   - Local structural bleeding
+   ============================================================ */
 
-const DDX_Data = [
+const bleedingDDX = [
 
-/* =========================================================
-   1) PRIMARY HEMOSTASIS — PLATELETS / VON WILLEBRAND
-   ========================================================= */
-
-{
-    id: "vwf",
-    group: "platelet_vwf",
-    name: "Von Willebrand Disease",
-    baselineScore: 2,
-    features: [
-        "Mucosal bleeding (nose, gums)",
-        "Easy bruising",
-        "Heavy menstrual bleeding",
-        "Bleeding after dental procedures",
-        "Family history in both males and females"
-    ],
-    investigations: [
-        "Prolonged bleeding time",
-        "Normal or mildly prolonged APTT",
-        "Normal PT",
-        "Low VWF antigen or activity"
-    ]
-},
+/* ============================================================
+   PLATELET DISORDERS
+   ============================================================ */
 
 {
     id: "itp",
-    group: "platelet_vwf",
     name: "Immune Thrombocytopenia (ITP)",
-    baselineScore: 1,
+    group: "platelet",
+    baseline: 1,
+    triggers: {
+        platelet_1: { yes: +3 },        // petechiae
+        platelet_2: { yes: +2 },        // bleeding after minor trauma
+        platelet_3: { yes: +2 },        // easy bruising
+        drug_2:     { yes: +1 }         // NSAIDs worsen platelet dysfunction
+    },
     features: [
-        "Petechiae and purpura",
+        "Petechiae",
         "Easy bruising",
         "Mucosal bleeding",
-        "No joint bleeding",
-        "Often follows infection (children)"
+        "Normal PT/PTT, low platelets"
     ],
     investigations: [
-        "Low platelet count",
-        "Normal PT and APTT",
-        "Peripheral smear: few platelets",
-        "Bone marrow hypertrophy (if chronic)"
+        "CBC (low platelets)",
+        "Peripheral smear",
+        "Exclude infections & medications"
     ]
 },
 
 {
-    id: "drugPlatelet",
-    group: "platelet_vwf",
-    name: "Drug-Induced Platelet Dysfunction",
-    baselineScore: 1,
-    features: [
-        "Bleeding after minor cuts",
-        "Nose/gum bleeding",
-        "History of aspirin, clopidogrel, NSAIDs, SSRIs",
-        "Normal platelet count but abnormal function"
-    ],
-    investigations: [
-        "Platelet function tests abnormal",
-        "Normal PT and APTT",
-        "Medication history"
-    ]
-},
-
-{
-    id: "uremic",
-    group: "platelet_vwf",
-    name: "Uremic Platelet Dysfunction",
-    baselineScore: 1,
+    id: "aspirin_effect",
+    name: "Aspirin-Induced Platelet Dysfunction",
+    group: "platelet",
+    baseline: 0,
+    triggers: {
+        drug_1: { yes: +3 },           // aspirin use
+        platelet_3: { yes: +1 }
+    },
     features: [
         "Mucosal bleeding",
-        "Easy bruising",
-        "History of kidney failure",
-        "Prolonged bleeding after procedures"
+        "Bruising",
+        "Normal platelet count with dysfunction"
     ],
     investigations: [
-        "High creatinine / urea",
-        "Normal PT and APTT",
-        "Bleeding time prolonged"
+        "Bleeding time prolonged",
+        "Platelet function assay"
     ]
 },
 
-/* =========================================================
-   2) COAGULATION FACTORS — SECONDARY HEMOSTASIS
-   ========================================================= */
+/* ============================================================
+   von WILLEBRAND DISEASE
+   ============================================================ */
+
+{
+    id: "vwf",
+    name: "Von Willebrand Disease",
+    group: "vWF",
+    baseline: 2,
+    triggers: {
+        chief_complaint: {
+            "nose/gum bleeding": +2,
+            "heavy menses": +3
+        },
+        vwf_1: { yes: +3 },    // mucosal bleeding
+        vwf_2: { yes: +2 },    // prolonged bleeding after procedures
+        vwf_3: { yes: +2 },    // family history
+        platelet_3: { yes: +1 }
+    },
+    features: [
+        "Mucosal bleeding",
+        "Heavy menses",
+        "Epistaxis",
+        "Prolonged bleeding after dental extraction"
+    ],
+    investigations: [
+        "VWF antigen",
+        "VWF activity (ristocetin)",
+        "Factor VIII activity"
+    ]
+},
+
+/* ============================================================
+   COAGULATION DISORDERS — HEMOPHILIA A/B
+   ============================================================ */
 
 {
     id: "hemA",
+    name: "Hemophilia A (Factor VIII deficiency)",
     group: "coagulation",
-    name: "Hemophilia A (Factor VIII Deficiency)",
-    baselineScore: 2,
+    baseline: 1,
+    triggers: {
+        coag_1: { yes: +3 },  // hemarthrosis
+        coag_2: { yes: +2 },  // prolonged bleeding after injury
+        coag_3: { yes: +3 },  // male relatives affected
+        sex:    { male: +1 },
+        onset:  { "since childhood": +2 }
+    },
     features: [
-        "Joint bleeding (hemarthrosis)",
-        "Deep muscle hematoma",
-        "Delayed post-surgical bleeding",
-        "Male predominance (X-linked)",
-        "Bleeding since childhood"
+        "Joint bleeding",
+        "Deep tissue bleeding",
+        "Prolonged postoperative bleeding",
+        "Elevated aPTT"
     ],
     investigations: [
-        "Prolonged APTT",
-        "Normal PT",
-        "Low Factor VIII level"
+        "Factor VIII level",
+        "PT normal, aPTT prolonged"
     ]
 },
 
 {
     id: "hemB",
+    name: "Hemophilia B (Factor IX deficiency)",
     group: "coagulation",
-    name: "Hemophilia B (Factor IX Deficiency)",
-    baselineScore: 2,
+    baseline: 1,
+    triggers: {
+        coag_1: { yes: +3 },
+        coag_2: { yes: +2 },
+        coag_3: { yes: +3 },
+        sex:    { male: +1 },
+        onset:  { "since childhood": +2 }
+    },
     features: [
         "Joint bleeding",
-        "Muscle hematomas",
-        "Delayed post-trauma bleeding",
-        "Males affected",
-        "Bleeding from childhood"
+        "Deep muscle bleeding",
+        "Prolonged aPTT"
     ],
     investigations: [
-        "Prolonged APTT",
-        "Normal PT",
-        "Low Factor IX"
+        "Factor IX level",
+        "PT normal, aPTT prolonged"
     ]
 },
 
-{
-    id: "factor13",
-    group: "coagulation",
-    name: "Factor XIII Deficiency",
-    baselineScore: 1,
-    features: [
-        "Bleeding with normal PT/APTT",
-        "Delayed bleeding hours after trauma",
-        "Umbilical stump bleeding in infants",
-        "Intracranial bleeding without trauma"
-    ],
-    investigations: [
-        "Normal PT / APTT",
-        "Low Factor XIII level",
-        "Clot solubility test abnormal"
-    ]
-},
+/* ============================================================
+   LIVER DISEASE / SYSTEMIC DISORDERS
+   ============================================================ */
 
 {
-    id: "vitK",
-    group: "coagulation",
-    name: "Vitamin K Deficiency",
-    baselineScore: 1,
+    id: "liver_disease",
+    name: "Liver Disease (Coagulation Factor Synthesis Failure)",
+    group: "systemic",
+    baseline: 0,
+    triggers: {
+        severity: { severe: +1 },
+        age:      (age) => age >= 50 ? +1 : 0
+    },
     features: [
-        "Bleeding after surgery",
-        "GI bleeding",
-        "History of malabsorption or antibiotics",
-        "Liver disease risk factors"
-    ],
-    investigations: [
-        "Prolonged PT (first)",
-        "Prolonged APTT (later)",
-        "Low Vitamin K dependent factors"
-    ]
-},
-
-{
-    id: "warfarin",
-    group: "coagulation",
-    name: "Warfarin Toxicity",
-    baselineScore: 2,
-    features: [
+        "Epistaxis",
         "Bruising",
-        "GI bleeding",
-        "Hematuria",
-        "Recent change in dose or diet",
-        "INR > 3"
-    ],
-    investigations: [
         "Prolonged PT/INR",
-        "Prolonged APTT",
-        "Warfarin use history"
-    ]
-},
-
-{
-    id: "liverFailure",
-    group: "coagulation",
-    name: "Liver Disease Coagulopathy",
-    baselineScore: 1,
-    features: [
-        "Mucosal and deep bleeding",
-        "Spider nevi or jaundice",
-        "Chronic alcohol use",
-        "Easy bruising"
+        "Low synthesis of clotting factors"
     ],
     investigations: [
-        "Prolonged PT and APTT",
-        "Low platelets",
-        "Abnormal LFTs"
+        "Liver function tests",
+        "INR/PT",
+        "Ultrasound liver"
     ]
 },
 
-/* =========================================================
-   3) LOCAL BLEEDING LESIONS
-   ========================================================= */
+/* ============================================================
+   DRUG-INDUCED BLEEDING
+   ============================================================ */
 
 {
-    id: "epistaxisLocal",
+    id: "warfarin_effect",
+    name: "Warfarin or Anticoagulant Effect",
+    group: "drug",
+    baseline: 1,
+    triggers: {
+        drug_3: { yes: +4 },   // anticoagulants
+        severity: { severe: +1 }
+    },
+    features: [
+        "Severe bleeding",
+        "Prolonged PT/INR",
+        "History of anticoagulant use"
+    ],
+    investigations: [
+        "INR/PT",
+        "Medication review"
+    ]
+},
+
+/* ============================================================
+   LOCAL BLEEDING
+   ============================================================ */
+
+{
+    id: "local_lesion",
+    name: "Local Structural Lesion",
     group: "local",
-    name: "Local Epistaxis (Nasal Lesion)",
-    baselineScore: 0,
+    baseline: 0,
+    triggers: {
+        local_1: { yes: +3 },    // same spot bleeding
+        local_2: { yes: +2 }     // trauma
+    },
     features: [
-        "Bleeding from one nostril",
-        "Triggered by nose picking or dryness",
-        "Recurrent bleeding in same spot",
-        "No bruising elsewhere"
+        "Repeated bleeding at one anatomical site",
+        "Possible vascular malformation",
+        "Bleeding not correlated with systemic disorders"
     ],
     investigations: [
-        "Local nasal exam",
-        "No systemic abnormalities"
-    ]
-},
-
-{
-    id: "pepticUlcer",
-    group: "local",
-    name: "Peptic Ulcer Bleeding",
-    baselineScore: 0,
-    features: [
-        "Melena or hematemesis",
-        "Epigastric pain",
-        "NSAID use",
-        "No bruising"
-    ],
-    investigations: [
-        "Endoscopy",
-        "CBC for anemia",
-        "Stool occult blood"
-    ]
-},
-
-{
-    id: "hemorrhoids",
-    group: "local",
-    name: "Hemorrhoids",
-    baselineScore: 0,
-    features: [
-        "Bright red rectal bleeding",
-        "Pain or itching",
-        "Constipation"
-    ],
-    investigations: [
-        "Rectal exam",
-        "Anoscopy"
-    ]
-},
-
-/* =========================================================
-   4) SYSTEMIC BLEEDING CONDITIONS
-   ========================================================= */
-
-{
-    id: "dic",
-    group: "systemic",
-    name: "Disseminated Intravascular Coagulation (DIC)",
-    baselineScore: 1,
-    features: [
-        "Acute severe bleeding",
-        "Bleeding from multiple sites",
-        "Fever or sepsis history",
-        "Organ failure signs"
-    ],
-    investigations: [
-        "Prolonged PT and APTT",
-        "Low fibrinogen",
-        "High D-dimer",
-        "Low platelets"
-    ]
-},
-
-{
-    id: "leukemia",
-    group: "systemic",
-    name: "Leukemia",
-    baselineScore: 1,
-    features: [
-        "Bruising",
-        "Recurrent infections",
-        "Fatigue, weight loss",
-        "Pallor"
-    ],
-    investigations: [
-        "CBC (blasts)",
-        "Bone marrow biopsy",
-        "Low platelets"
-    ]
-},
-
-{
-    id: "aplastic",
-    group: "systemic",
-    name: "Aplastic Anemia",
-    baselineScore: 0,
-    features: [
-        "Bleeding + infections + anemia",
-        "Pancytopenia",
-        "Fatigue"
-    ],
-    investigations: [
-        "CBC: pancytopenia",
-        "Bone marrow: hypocellular"
-    ]
-},
-
-{
-    id: "kidneyFail",
-    group: "systemic",
-    name: "Chronic Kidney Failure",
-    baselineScore: 0,
-    features: [
-        "Easy bruising",
-        "Mucosal bleeding",
-        "Uremic symptoms",
-        "Fatigue"
-    ],
-    investigations: [
-        "High urea/creatinine",
-        "Normal PT/APTT",
-        "Prolonged bleeding time"
+        "ENT exam / local inspection",
+        "Endoscopy (if GI)",
+        "Imaging if structural lesion suspected"
     ]
 }
 

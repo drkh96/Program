@@ -1,270 +1,231 @@
-/***********************************************************
- * BLEEDING TENDENCY — FULL UI RENDERING SYSTEM (UPDATED)
- ***********************************************************/
+/* ============================================================
+   BLEEDING SIMULATOR — UI HANDLER (Front-End Controller)
+   ------------------------------------------------------------
+   Responsible for:
+   - Rendering questions
+   - Showing reasoning
+   - Updating DDx panel
+   - Handling buttons (Next, Back)
+   - Coordinating with BleedingEngine
+   ============================================================ */
 
 
-/* ROOT DOM ELEMENTS */
-const qPanel = document.getElementById("questionsCard");
-const reasoningPanel = document.getElementById("reasoningCardBody");
-const ddxPanel = document.getElementById("ddxContainer");
-const nextBtn = document.getElementById("btnNext");
-const backBtn = document.getElementById("btnBack");
-const restartBtn = document.getElementById("btnRestart");
+/* --------------------------
+   DOM ELEMENTS
+--------------------------- */
+const qPanel = document.getElementById("question-panel");
+const rPanel = document.getElementById("reasoning-panel");
+const dPanel = document.getElementById("ddx-panel");
+
+const nextBtn = document.getElementById("next-btn");
+const backBtn = document.getElementById("back-btn");
+const errorBox = document.getElementById("error-box");
 
 
-/***********************************************************
- * INITIAL STATE — Hide DDx until first answer
- ***********************************************************/
-ddxPanel.innerHTML = `
-    <div class="dd-empty" style="text-align:center; opacity:0.6; margin-top:20px;">
-        Answer questions to generate differential diagnosis…
-    </div>
-`;
+/* ============================================================
+   START THE ENGINE
+============================================================ */
+BleedingEngine.initDDX();
 
 
-/***********************************************************
- * MAIN RENDER FUNCTION — Displays current question
- ***********************************************************/
-function renderCurrentQuestion() {
-    let index = EngineState.currentIndex;
+/* ============================================================
+   RENDER NEXT QUESTION
+============================================================ */
+function renderQuestion() {
 
-    // Finished all questions
-    if (index >= Questions.length) {
-        renderFinalCase();
-        updateProgressBar();
+    const question = BleedingEngine.getNextQuestion();
+
+    // No more questions → show summary later (optional)
+    if (!question) {
+        qPanel.innerHTML = `<div class="finished-text">All questions completed.</div>`;
+        nextBtn.style.display = "none";
         return;
     }
 
-    let q = Questions[index];
+    // Reset UI
+    errorBox.innerHTML = "";
+    qPanel.innerHTML = "";
 
-    qPanel.innerHTML = `
-        <div class="section-label">${q.section}</div>
-        <div class="step-counter">Step ${index + 1} of ${Questions.length}</div>
+    // Render question text
+    const qText = document.createElement("div");
+    qText.className = "question-text";
+    qText.innerText = question.text;
+    qPanel.appendChild(qText);
 
-        <div class="question-text fade-in">${q.text}</div>
 
-        <div class="options-container" id="optionsBox"></div>
-    `;
+    /* ================================
+       TYPE: TEXT
+    ================================= */
+    if (question.type === "text") {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.id = "q-input";
+        input.className = "text-input";
+        qPanel.appendChild(input);
+    }
 
-    const optionsBox = document.getElementById("optionsBox");
 
-    if (q.type === "single") {
-        nextBtn.style.display = "none";
+    /* ================================
+       TYPE: SINGLE OPTION
+    ================================= */
+    if (question.type === "single") {
+        question.options.forEach(opt => {
+            const btn = document.createElement("div");
+            btn.className = "option-btn";
+            btn.innerText = opt;
 
-        q.options.forEach(opt => {
-            let row = document.createElement("div");
-            row.className = "option-row radio-option";
-            row.innerHTML = `
-                <label class="option-label">
-                    <input type="radio" name="${q.id}" value="${opt.value}">
-                    ${opt.label}
-                </label>
-            `;
-            row.onclick = () => {
-                row.querySelector("input").checked = true;
-
-                recordStateBeforeAnswer(q.id, opt.value);
-                handleAnswer(q.id, opt.value);
-
-                updatePanels();
-                renderCurrentQuestion();
+            btn.onclick = () => {
+                handleAnswer(question, opt);
             };
-            optionsBox.appendChild(row);
+
+            qPanel.appendChild(btn);
         });
     }
 
-    else if (q.type === "text") {
-        optionsBox.innerHTML = `
-            <input type="text" id="input_${q.id}" placeholder="Enter here..." class="option-row">
-        `;
 
-        nextBtn.style.display = "block";
-        nextBtn.onclick = () => {
-            const v = document.getElementById(`input_${q.id}`).value.trim();
-            if (!v) return;
-
-            recordStateBeforeAnswer(q.id, v);
-            handleAnswer(q.id, v);
-
-            updatePanels();
-            renderCurrentQuestion();
-        };
+    /* ================================
+       TYPE: PATHWAY (auto skip)
+    ================================= */
+    if (question.type === "pathway") {
+        const result = BleedingEngine.applyAnswer(question, null);
+        if (!result.ok) return; 
+        renderQuestion();
+        return;
     }
-
-    updateProgressBar();
 }
 
 
-/***********************************************************
- * UPDATE PANELS (Reasoning + DDx after answers)
- ***********************************************************/
-function updatePanels() {
+/* ============================================================
+   HANDLE ANSWER CLICK
+============================================================ */
+function handleAnswer(question, value) {
 
-    // Only show DDx after answering at least ONE question
-    if (EngineState.currentIndex > 0) {
-        renderDDx();
+    const result = BleedingEngine.applyAnswer(question, value);
+
+    if (!result.ok) {
+        errorBox.innerText = result.error;
+        return;
     }
 
     renderReasoning();
+    renderDDX();
+    renderQuestion();
 }
 
 
-/***********************************************************
- * REASONING PANEL
- ***********************************************************/
-function renderReasoning() {
-    reasoningPanel.innerHTML = "";
+/* ============================================================
+   HANDLE NEXT BUTTON (for text questions)
+============================================================ */
+nextBtn.onclick = () => {
+    const question = BleedingEngine.getNextQuestion();
+    if (!question) return;
 
-    EngineState.reasoning.forEach(r => {
-        let block = document.createElement("div");
-        block.className = "reason-item-royal";
-
-        block.innerHTML = `
-            <div class="reason-text">${r.text}</div>
-        `;
-
-        reasoningPanel.appendChild(block);
-    });
-}
+    if (question.type === "text") {
+        const val = document.getElementById("q-input").value.trim();
+        handleAnswer(question, val);
+    }
+};
 
 
-/***********************************************************
- * DDX PANEL — Diseases sorted dynamically after answering
- ***********************************************************/
-function renderDDx() {
-    ddxPanel.innerHTML = "";
-
-    let sorted = DDX_Data
-        .map(d => ({ ...d, score: EngineState.ddxScores[d.id] }))
-        .sort((a, b) => b.score - a.score);
-
-    sorted.forEach(d => {
-        let card = document.createElement("div");
-        card.className = `device-card fade-royal ${getDDxGroupClass(d.group)}`;
-
-        card.innerHTML = `
-            <div class="device-card-header">${d.name}</div>
-
-            <div class="dd-disease-box">
-
-                <div class="dd-section">
-                    <button class="ddx-toggle" onclick="toggleDropdown('${d.id}_feat')">▶ Features</button>
-                    <div class="ddx-dropdown hidden" id="${d.id}_feat">
-                        ${d.features.map(f => `<div class="dd-line">• ${f}</div>`).join("")}
-                    </div>
-                </div>
-
-                <div class="dd-section">
-                    <button class="ddx-toggle" onclick="toggleDropdown('${d.id}_inv')">▶ Investigations</button>
-                    <div class="ddx-dropdown hidden inv" id="${d.id}_inv">
-                        ${d.investigations.map(i => `<div class="dd-line">• ${i}</div>`).join("")}
-                    </div>
-                </div>
-
-            </div>
-        `;
-
-        ddxPanel.appendChild(card);
-    });
-
-    afterDDXRender();
-}
-
-
-/***********************************************************
- * BACK BUTTON
- ***********************************************************/
+/* ============================================================
+   HANDLE BACK BUTTON
+============================================================ */
 backBtn.onclick = () => {
-    const ok = undoLastAnswer();
+    const ok = BleedingEngine.undo();
     if (!ok) return;
 
-    renderCurrentQuestion();
-    updatePanels();
-    updateProgressBar();
+    renderReasoning();
+    renderDDX();
+    renderQuestion();
 };
 
 
-/***********************************************************
- * RESTART BUTTON
- ***********************************************************/
-restartBtn.onclick = () => {
-    restartSimulation();
+/* ============================================================
+   RENDER REASONING PANEL
+============================================================ */
+function renderReasoning() {
 
-    ddxPanel.innerHTML = `
-        <div class="dd-empty" style="text-align:center; opacity:0.6; margin-top:20px;">
-            Answer questions to generate differential diagnosis…
-        </div>
-    `;
+    const list = BleedingEngine.state.reasoning;
+    rPanel.innerHTML = ""; 
 
-    renderCurrentQuestion();
-    updateProgressBar();
-};
+    list.forEach((text, i) => {
+
+        const block = document.createElement("div");
+        block.className = "reason-block";
+
+        const header = document.createElement("div");
+        header.className = "reason-header";
+        header.innerHTML = `Reasoning #${i+1}`;
+
+        const body = document.createElement("div");
+        body.className = "reason-body";
+        body.innerText = text;
+
+        header.onclick = () => {
+            body.classList.toggle("open");
+        };
+
+        block.appendChild(header);
+        block.appendChild(body);
+        rPanel.appendChild(block);
+    });
+}
 
 
-/***********************************************************
- * GROUP → CSS Class
- ***********************************************************/
-function getDDxGroupClass(group) {
-    switch(group) {
-        case "platelet_vwf": return "card-pulmonary";
-        case "coagulation": return "card-cardiac";
-        case "local": return "card-gi";
-        case "systemic": return "card-other";
-        default: return "card-other";
+/* ============================================================
+   RENDER DDx PANEL (Dynamic, Sorted)
+============================================================ */
+function renderDDX() {
+
+    // Hide DDx until first answer
+    if (!BleedingEngine.state.initialized) {
+        dPanel.innerHTML = `<div class="ddx-placeholder">DDx will appear after first answer.</div>`;
+        return;
     }
+
+    const scores = BleedingEngine.state.ddxScores;
+
+    // Convert to array and sort
+    const list = Object.keys(scores)
+        .map(id => ({
+            id: id,
+            score: scores[id],
+            data: bleedingDDX.find(d => d.id === id)
+        }))
+        .sort((a, b) => b.score - a.score);
+
+    dPanel.innerHTML = "";
+
+    list.forEach(item => {
+
+        const card = document.createElement("div");
+        card.className = "ddx-card";
+
+        const title = document.createElement("div");
+        title.className = "ddx-name";
+        title.innerText = `${item.data.name} (${item.score})`;
+
+        // Collapsible features
+        const feat = document.createElement("div");
+        feat.className = "ddx-section";
+        feat.innerHTML = "<b>Features:</b><br>" + item.data.features.join("<br>");
+
+        const inv = document.createElement("div");
+        inv.className = "ddx-section";
+        inv.innerHTML = "<b>Investigations:</b><br>" + item.data.investigations.join("<br>");
+
+        card.appendChild(title);
+        card.appendChild(feat);
+        card.appendChild(inv);
+
+        dPanel.appendChild(card);
+    });
 }
 
 
-/***********************************************************
- * FINAL CASE SUMMARY
- ***********************************************************/
-function renderFinalCase() {
-    qPanel.innerHTML = `
-        <div class="scenario-block fade-in">
-            <div class="scenario-title">Final Case Summary</div>
-
-            <div class="scenario-text">
-                <strong>Name:</strong> ${EngineState.answers.name || "Unknown"}<br>
-                <strong>Age:</strong> ${EngineState.answers.age || "Unknown"}<br>
-                <strong>Sex:</strong> ${EngineState.answers.sex || "Unknown"}<br>
-                <strong>Occupation:</strong> ${EngineState.answers.occupation || "Unknown"}<br><br>
-
-                <strong>Chief Complaint:</strong> ${EngineState.answers.chiefComplaint}<br>
-                <strong>Duration:</strong> ${EngineState.answers.duration}<br>
-            </div>
-
-            <div class="scenario-text">
-                <strong>Clinical Reasoning Summary:</strong><br>
-                ${EngineState.reasoning.map(r => `• ${r.text}`).join("<br>")}
-            </div>
-
-            <div class="scenario-text">
-                <strong>Most Likely Diagnosis:</strong><br>
-                ${getTopDDx()}
-            </div>
-        </div>
-    `;
-
-    nextBtn.style.display = "none";
-    updateProgressBar();
-}
-
-
-/***********************************************************
- * HELPER — TOP SCORING DIAGNOSIS
- ***********************************************************/
-function getTopDDx() {
-    let sorted = Object.entries(EngineState.ddxScores)
-        .sort((a, b) => b[1] - a[1]);
-
-    let topId = sorted[0][0];
-    let disease = DDX_Data.find(d => d.id === topId);
-    return disease ? disease.name : "No clear diagnosis";
-}
-
-
-/***********************************************************
- * INITIAL RENDER — NO DDx AT START
- ***********************************************************/
-renderCurrentQuestion();
-updateProgressBar();
+/* ============================================================
+   START UI
+============================================================ */
+renderQuestion();
+renderDDX();
+renderReasoning();
