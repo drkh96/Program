@@ -1,5 +1,5 @@
 /***********************************************************
- * BLEEDING TENDENCY — FULL UI RENDERING SYSTEM
+ * BLEEDING TENDENCY — FULL UI RENDERING SYSTEM (UPDATED)
  ***********************************************************/
 
 
@@ -13,7 +13,17 @@ const restartBtn = document.getElementById("btnRestart");
 
 
 /***********************************************************
- * MAIN RENDER FUNCTION — Displays the current question
+ * INITIAL STATE — Hide DDx until first answer
+ ***********************************************************/
+ddxPanel.innerHTML = `
+    <div class="dd-empty" style="text-align:center; opacity:0.6; margin-top:20px;">
+        Answer questions to generate differential diagnosis…
+    </div>
+`;
+
+
+/***********************************************************
+ * MAIN RENDER FUNCTION — Displays current question
  ***********************************************************/
 function renderCurrentQuestion() {
     let index = EngineState.currentIndex;
@@ -53,7 +63,7 @@ function renderCurrentQuestion() {
             row.onclick = () => {
                 row.querySelector("input").checked = true;
 
-                recordStateBeforeAnswer(q.id, opt.value); // ← BACK SUPPORT
+                recordStateBeforeAnswer(q.id, opt.value);
                 handleAnswer(q.id, opt.value);
 
                 updatePanels();
@@ -73,7 +83,7 @@ function renderCurrentQuestion() {
             const v = document.getElementById(`input_${q.id}`).value.trim();
             if (!v) return;
 
-            recordStateBeforeAnswer(q.id, v); // ← BACK SUPPORT
+            recordStateBeforeAnswer(q.id, v);
             handleAnswer(q.id, v);
 
             updatePanels();
@@ -81,16 +91,21 @@ function renderCurrentQuestion() {
         };
     }
 
-    updateProgressBar(); // ← Progress bar update
+    updateProgressBar();
 }
 
 
 /***********************************************************
- * UPDATE REASONING + DDX PANELS AFTER EACH ANSWER
+ * UPDATE PANELS (Reasoning + DDx after answers)
  ***********************************************************/
 function updatePanels() {
+
+    // Only show DDx after answering at least ONE question
+    if (EngineState.currentIndex > 0) {
+        renderDDx();
+    }
+
     renderReasoning();
-    renderDDx();
 }
 
 
@@ -114,12 +129,11 @@ function renderReasoning() {
 
 
 /***********************************************************
- * DDX PANEL — Diseases sorted by highest scores
+ * DDX PANEL — Diseases sorted dynamically after answering
  ***********************************************************/
 function renderDDx() {
     ddxPanel.innerHTML = "";
 
-    // Sort diseases by score
     let sorted = DDX_Data
         .map(d => ({ ...d, score: EngineState.ddxScores[d.id] }))
         .sort((a, b) => b.score - a.score);
@@ -142,7 +156,7 @@ function renderDDx() {
 
                 <div class="dd-section">
                     <button class="ddx-toggle" onclick="toggleDropdown('${d.id}_inv')">▶ Investigations</button>
-                   <div class="ddx-dropdown hidden inv" id="${d.id}_inv">
+                    <div class="ddx-dropdown hidden inv" id="${d.id}_inv">
                         ${d.investigations.map(i => `<div class="dd-line">• ${i}</div>`).join("")}
                     </div>
                 </div>
@@ -158,29 +172,37 @@ function renderDDx() {
 
 
 /***********************************************************
- * BACK BUTTON LOGIC
+ * BACK BUTTON
  ***********************************************************/
 backBtn.onclick = () => {
     const ok = undoLastAnswer();
     if (!ok) return;
 
     renderCurrentQuestion();
-    renderReasoning();
-    renderDDx();
+    updatePanels();
     updateProgressBar();
 };
 
 
 /***********************************************************
- * RESTART BUTTON LOGIC
+ * RESTART BUTTON
  ***********************************************************/
 restartBtn.onclick = () => {
     restartSimulation();
+
+    ddxPanel.innerHTML = `
+        <div class="dd-empty" style="text-align:center; opacity:0.6; margin-top:20px;">
+            Answer questions to generate differential diagnosis…
+        </div>
+    `;
+
+    renderCurrentQuestion();
+    updateProgressBar();
 };
 
 
 /***********************************************************
- * MAP GROUP TO CSS COLOR CLASS
+ * GROUP → CSS Class
  ***********************************************************/
 function getDDxGroupClass(group) {
     switch(group) {
@@ -229,7 +251,7 @@ function renderFinalCase() {
 
 
 /***********************************************************
- * HELPER — GET HIGHEST SCORE DIAGNOSIS
+ * HELPER — TOP SCORING DIAGNOSIS
  ***********************************************************/
 function getTopDDx() {
     let sorted = Object.entries(EngineState.ddxScores)
@@ -242,9 +264,7 @@ function getTopDDx() {
 
 
 /***********************************************************
- * INITIAL RENDER
+ * INITIAL RENDER — NO DDx AT START
  ***********************************************************/
 renderCurrentQuestion();
-renderDDx();
-renderReasoning();
 updateProgressBar();
